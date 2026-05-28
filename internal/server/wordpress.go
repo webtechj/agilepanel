@@ -68,24 +68,9 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 		"--dbuser="+dbUser,
 		"--dbpass="+dbPassword,
 		"--dbhost=127.0.0.1",
-		"--prefix="+prefixArg,
+		"--dbprefix="+prefixArg,
 	); err != nil {
 		return "", fmt.Errorf("wp config create failed: %w", err)
-	}
-
-	// Secure wp-config.php by moving it to the parent directory (outside of public htdocs webroot)
-	if runtime.GOOS == "linux" {
-		parentDir := filepath.Dir(publicDir)
-		configPath := filepath.Join(publicDir, "wp-config.php")
-		targetConfigPath := filepath.Join(parentDir, "wp-config.php")
-
-		if _, err := os.Stat(configPath); err == nil {
-			if err := os.Rename(configPath, targetConfigPath); err != nil {
-				return "", fmt.Errorf("failed to move wp-config.php to parent directory: %w", err)
-			}
-			_ = os.Chmod(targetConfigPath, 0600)
-			fmt.Println("WP-CLI: Secured wp-config.php in parent directory.")
-		}
 	}
 
 	// 3. Install WordPress
@@ -121,6 +106,21 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 	fmt.Println("WP-CLI: Enabling Redis Object Cache drop-in...")
 	if err := RunAsUser(username, homeDir, "wp", "redis", "enable", "--path="+publicDir); err != nil {
 		return "", fmt.Errorf("wp redis enable failed: %w", err)
+	}
+
+	// 7. Secure wp-config.php by moving it to the parent directory (outside of public htdocs webroot)
+	if runtime.GOOS == "linux" {
+		parentDir := filepath.Dir(publicDir)
+		configPath := filepath.Join(publicDir, "wp-config.php")
+		targetConfigPath := filepath.Join(parentDir, "wp-config.php")
+
+		if _, err := os.Stat(configPath); err == nil {
+			if err := os.Rename(configPath, targetConfigPath); err != nil {
+				return "", fmt.Errorf("failed to move wp-config.php to parent directory: %w", err)
+			}
+			_ = os.Chmod(targetConfigPath, 0600)
+			fmt.Println("WP-CLI: Secured wp-config.php in parent directory.")
+		}
 	}
 
 	return adminPassword, nil
