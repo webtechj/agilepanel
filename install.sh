@@ -79,6 +79,32 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
 fi
 apt-get update
 
+# 3.5. Stop conflicting web servers and configure firewall
+echo "Checking for conflicting web servers (apache2/nginx)..."
+if systemctl list-unit-files | grep -q apache2; then
+    echo "Stopping and disabling apache2..."
+    systemctl stop apache2 || true
+    systemctl disable apache2 || true
+fi
+if systemctl list-unit-files | grep -q nginx; then
+    echo "Stopping and disabling nginx..."
+    systemctl stop nginx || true
+    systemctl disable nginx || true
+fi
+
+echo "Configuring firewall rules for HTTP/HTTPS..."
+if command -v ufw &> /dev/null; then
+    echo "UFW detected. Allowing port 80 and 443..."
+    ufw allow 22/tcp || true
+    ufw allow 80/tcp || true
+    ufw allow 443/tcp || true
+elif command -v firewall-cmd &> /dev/null; then
+    echo "Firewalld detected. Allowing HTTP and HTTPS..."
+    firewall-cmd --permanent --add-service=http || true
+    firewall-cmd --permanent --add-service=https || true
+    firewall-cmd --reload || true
+fi
+
 # 4. Install Core Server Dependencies
 apt-get install -y caddy mariadb-server redis-server php8.3-fpm php8.3-mysql php8.3-redis php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-bcmath php8.3-opcache
 
