@@ -47,9 +47,6 @@ func TestGenerateCaddyfile(t *testing.T) {
 	if !strings.Contains(content, "protocols h1 h2 h3") {
 		t.Error("expected Caddyfile to include HTTP/3 activation protocols h1 h2 h3")
 	}
-	if !strings.Contains(content, "souin") {
-		t.Error("expected Caddyfile to include Souin caching directives")
-	}
 	if !strings.Contains(content, ":80 {") {
 		t.Error("expected Caddyfile to include default :80 catch-all block")
 	}

@@ -17,12 +17,6 @@ const caddyfileTemplateStr = `# Global Options Block
     servers {
         protocols h1 h2 h3
     }
-    # Global Souin cache configuration
-    cache {
-        api {
-            souin
-        }
-    }
 }
 
 # Default Welcome Page catch-all
@@ -75,18 +69,6 @@ const caddyfileTemplateStr = `# Global Options Block
         path /xmlrpc.php /wp-admin/install.php
     }
     respond @blocked-php "Access Denied" 403
-
-    # Souin Caching for WordPress (bypasses cache for admin/login sessions & dynamic requests)
-    @authorized-cache {
-        not header_regexp Cookie "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_logged_in"
-        not path_regexp "(/wp-admin/|/xmlrpc.php|/wp-(app|cron|login|register|mail).php|wp-.*.php|/feed/|index.php|wp-comments-popup.php|wp-links-opml.php|wp-locations.php|sitemap(index)?.xml|[a-z0-9-]+-sitemap([0-9]+)?.xml)"
-        not method POST
-        not expression {query} != ''
-    }
-
-    cache @authorized-cache {
-        ttl 300s
-    }
 
     {{if and $.Global.AdminUser $.Global.AdminPasswordHash}}
     # WordOps HTTP Basic Authentication security for phpMyAdmin and tools
