@@ -3,8 +3,10 @@ package site
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -116,6 +118,7 @@ func Create(domain string, phpVersion string, installWP bool) error {
 			PublicDir:    publicDir,
 			DatabaseName: dbName,
 			DatabaseUser: dbUser,
+			DatabasePass: dbPassword,
 			SystemUser:   systemUser,
 			IsLocked:     false,
 		}
@@ -579,5 +582,148 @@ func BackupDB(domain string) error {
 	}
 
 	fmt.Printf("Success: Database backed up successfully at %s.\n", backupPath)
+	return nil
+}
+
+// List displays all sites currently registered in the panel state.
+func List() error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	if len(state.Sites) == 0 {
+		fmt.Println("No websites have been created yet on this server.")
+		return nil
+	}
+
+	fmt.Println("=========================================================================")
+	fmt.Printf("%-24s %-12s %-12s %-12s %-8s\n", "DOMAIN", "SYSTEM USER", "PHP VERSION", "DB NAME", "STATUS")
+	fmt.Println("=========================================================================")
+	for _, site := range state.Sites {
+		statusStr := "active 🟢"
+		if site.IsLocked {
+			statusStr = "locked 🔒"
+		}
+		fmt.Printf("%-24s %-12s %-12s %-12s %-8s\n", site.Domain, site.SystemUser, site.PHPVersion, site.DatabaseName, statusStr)
+	}
+	fmt.Println("=========================================================================")
+	return nil
+}
+
+// Info shows comprehensive configuration details for a specific website.
+func Info(domain string) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	var targetSite config.SiteConfig
+	found := false
+	for _, s := range state.Sites {
+		if strings.EqualFold(s.Domain, domain) {
+			targetSite = s
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("site %s not found in state", domain)
+	}
+
+	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
+	configDir := filepath.Join(parentDir, "conf")
+	backupDir := filepath.Join(parentDir, "backup")
+
+	dbPassword := targetSite.DatabasePass
+	if dbPassword == "" {
+		dbPassword = "[not stored in state]"
+	}
+
+	statusStr := "Active 🟢"
+	if targetSite.IsLocked {
+		statusStr = "Locked (Read-Only) 🔒"
+	}
+
+	fmt.Println("=========================================================================")
+	fmt.Printf("                   SITE CONFIGURATION: %s\n", strings.ToUpper(targetSite.Domain))
+	fmt.Println("=========================================================================")
+	fmt.Printf("Domain Name:         %s\n", targetSite.Domain)
+	fmt.Printf("System User/Group:   %s\n", targetSite.SystemUser)
+	fmt.Printf("PHP version:         %s\n", targetSite.PHPVersion)
+	fmt.Printf("Site Status:         %s\n", statusStr)
+	fmt.Println("-------------------------------------------------------------------------")
+	fmt.Printf("Webroot Directory:   %s\n", targetSite.PublicDir)
+	fmt.Printf("Config Directory:    %s\n", configDir)
+	fmt.Printf("Backup Directory:    %s\n", backupDir)
+	fmt.Println("-------------------------------------------------------------------------")
+	fmt.Printf("Database Name:       %s\n", targetSite.DatabaseName)
+	fmt.Printf("Database User:       %s\n", targetSite.DatabaseUser)
+	fmt.Printf("Database Password:   %s\n", dbPassword)
+	fmt.Println("=========================================================================")
+	return nil
+}
+
+// Edit opens the PHP-FPM pool configuration in the system's text editor and reloads the service.
+func Edit(domain string) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	var targetSite config.SiteConfig
+	found := false
+	for _, s := range state.Sites {
+		if strings.EqualFold(s.Domain, domain) {
+			targetSite = s
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("site %s not found in state", domain)
+	}
+
+	poolPath := server.GetPHPPoolPath(targetSite.PHPVersion, targetSite.Domain)
+
+	// Determine editor to use
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		if runtime.GOOS == "windows" {
+			editor = "notepad.exe"
+		} else {
+			// Try nano first, fallback to vi
+			if _, err := exec.LookPath("nano"); err == nil {
+				editor = "nano"
+			} else {
+				editor = "vi"
+			}
+		}
+	}
+
+	fmt.Printf("Opening PHP FPM pool configuration for %s in %s...\n", domain, editor)
+	
+	if os.Getenv("AGILEPANEL_TEST_MODE") != "true" {
+		cmd := exec.Command(editor, poolPath)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to run editor %s: %w", editor, err)
+		}
+	} else {
+		fmt.Printf("Test Mode: Skipping launching editor %s for file %s\n", editor, poolPath)
+	}
+
+	fmt.Println("Reloading PHP FPM service to apply changes...")
+	if err := server.ReloadPHP(targetSite.PHPVersion); err != nil {
+		return fmt.Errorf("failed to reload PHP FPM: %w", err)
+	}
+
+	fmt.Println("Success: Web server settings updated successfully.")
 	return nil
 }

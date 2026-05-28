@@ -162,6 +162,22 @@ func TestSiteOrchestration(t *testing.T) {
 		t.Fatalf("failed to backup db: %v", err)
 	}
 
+	// 5.6 Test List, Info, and Edit in test mode
+	os.Setenv("AGILEPANEL_TEST_MODE", "true")
+	err = List()
+	if err != nil {
+		t.Fatalf("failed to list sites: %v", err)
+	}
+	err = Info("test.com")
+	if err != nil {
+		t.Fatalf("failed to show site info: %v", err)
+	}
+	err = Edit("test.com")
+	if err != nil {
+		t.Fatalf("failed to edit site: %v", err)
+	}
+	os.Unsetenv("AGILEPANEL_TEST_MODE")
+
 	// 6. Delete site
 	err = Delete("test.com")
 	if err != nil {
