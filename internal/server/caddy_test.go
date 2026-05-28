@@ -50,6 +50,12 @@ func TestGenerateCaddyfile(t *testing.T) {
 	if !strings.Contains(content, "souin") {
 		t.Error("expected Caddyfile to include Souin caching directives")
 	}
+	if !strings.Contains(content, ":80 {") {
+		t.Error("expected Caddyfile to include default :80 catch-all block")
+	}
+	if !strings.Contains(content, "root * /var/www/default") {
+		t.Error("expected Caddyfile to set default root path to /var/www/default")
+	}
 	if !strings.Contains(content, "basic_auth @admin-tools") {
 		t.Error("expected Caddyfile to include basic_auth configuration")
 	}
