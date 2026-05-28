@@ -1,0 +1,11 @@
+# Binaries
+ap.exe
+ap-linux-amd64
+
+# Local state files
+state.json
+state.json.lock
+
+# Mock directories
+etc/
+var/
