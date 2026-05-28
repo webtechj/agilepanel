@@ -25,6 +25,11 @@ func TuneServer() error {
 		fmt.Printf("Warning: Database optimization failed: %v\n", err)
 	}
 
+	// 3. Optimize Redis Socket Permissions
+	if err := TuneRedis(); err != nil {
+		fmt.Printf("Warning: Redis optimization failed: %v\n", err)
+	}
+
 	fmt.Println("AgilePanel: Server optimization tuning completed successfully.")
 	return nil
 }
@@ -185,4 +190,70 @@ max_connections = 100
 		_ = exec.Command("systemctl", "restart", "mysql").Run()
 	}
 	return nil
+}
+
+// TuneRedis configures Redis socket paths and permissions.
+func TuneRedis() error {
+	if runtime.GOOS != "linux" {
+		fmt.Println("Redis (Mock): Configure UNIX socket in redis.conf")
+		return nil
+	}
+
+	confPath := "/etc/redis/redis.conf"
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		return nil // Redis not installed or different path
+	}
+
+	data, err := ioutil.ReadFile(confPath)
+	if err != nil {
+		return err
+	}
+
+	content := string(data)
+	modified := false
+
+	// Enable unixsocket
+	if strings.Contains(content, "# unixsocket ") || strings.Contains(content, "#unixsocket ") {
+		content = replaceLine(content, "unixsocket ", "unixsocket /var/run/redis/redis-server.sock")
+		modified = true
+	} else if !strings.Contains(content, "unixsocket /var/run/redis/redis-server.sock") {
+		content += "\nunixsocket /var/run/redis/redis-server.sock\n"
+		modified = true
+	}
+
+	// Enable unixsocketperm 777
+	if strings.Contains(content, "# unixsocketperm ") || strings.Contains(content, "#unixsocketperm ") {
+		content = replaceLine(content, "unixsocketperm ", "unixsocketperm 777")
+		modified = true
+	} else if !strings.Contains(content, "unixsocketperm 777") {
+		content += "\nunixsocketperm 777\n"
+		modified = true
+	}
+
+	if modified {
+		if err := ioutil.WriteFile(confPath, []byte(content), 0644); err != nil {
+			return err
+		}
+		fmt.Println("Redis: UNIX socket enabled with permissions 777 in redis.conf.")
+		
+		// Restart service
+		_ = exec.Command("systemctl", "restart", "redis-server").Run()
+		_ = exec.Command("systemctl", "restart", "redis").Run()
+	}
+
+	return nil
+}
+
+func replaceLine(content string, prefix string, newLine string) string {
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "#") {
+			uncommented := strings.TrimSpace(trimmed[1:])
+			if strings.HasPrefix(uncommented, prefix) {
+				lines[i] = newLine
+			}
+		}
+	}
+	return strings.Join(lines, "\n")
 }
