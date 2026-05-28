@@ -25,6 +25,22 @@ const caddyfileTemplateStr = `# Global Options Block
     }
 }
 
+# Default Welcome Page catch-all
+:80 {
+    root * /var/www/default
+    file_server
+
+    # Response Compression
+    encode gzip zstd
+
+    # Strict Security Headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "no-referrer-when-downgrade"
+    }
+}
+
 {{range .Sites}}
 {{.Domain}} {
     root * {{.PublicDir}}
