@@ -14,7 +14,7 @@ import (
 
 type GlobalConfig struct {
 	DefaultPHPVersion    string   `json:"default_php_version"`
-	SupportedPHPVersions []string `json:"php_versions"`
+	SupportedPHPVersions []string `json:"supported_php_versions"`
 	CaddyPath            string   `json:"caddy_path"`
 	CaddyConfigPath      string   `json:"caddy_config_path"`
 	RedisSocketPath      string   `json:"redis_socket_path"`
