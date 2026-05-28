@@ -15,10 +15,34 @@ apt-get update && apt-get install -y curl gpg lsb-release debian-keyring debian-
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
-# 3. Add PHP (Ondřej Surý) repository (for Ubuntu)
-if [ -f /etc/lsb-release ]; then
-    apt-get install -y software-properties-common
-    add-apt-repository -y ppa:ondrej/php
+# 3. Add PHP (Ondřej Surý) repository (for Ubuntu/Debian)
+if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
+    echo "Configuring PHP repository..."
+    apt-get install -y gnupg2 ca-certificates
+    
+    # Check if it is Ubuntu
+    if [ -f /etc/lsb-release ] || grep -q "Ubuntu" /etc/issue 2>/dev/null; then
+        echo "Adding PHP PPA for Ubuntu..."
+        # Import GPG key securely using keyserver
+        gpg --no-default-keyring --keyring /tmp/ondrej.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4F4EA0AAE5267A6C
+        mkdir -p /etc/apt/keyrings
+        gpg --no-default-keyring --keyring /tmp/ondrej.gpg --export --yes -o /etc/apt/keyrings/ondrej-php.gpg
+        rm -f /tmp/ondrej.gpg
+        
+        # Get Ubuntu codename
+        if [ -f /etc/lsb-release ]; then
+            . /etc/lsb-release
+            CODENAME=$DISTRIB_CODENAME
+        else
+            CODENAME=$(lsb_release -sc)
+        fi
+        
+        echo "deb [signed-by=/etc/apt/keyrings/ondrej-php.gpg] http://ppa.launchpad.net/ondrej/php/ubuntu ${CODENAME} main" > /etc/apt/sources.list.d/ondrej-php.list
+    else
+        # Debian
+        echo "Adding PHP package source for Debian..."
+        curl -sSL https://packages.sury.org/php/README.txt | bash
+    fi
 fi
 apt-get update
 
