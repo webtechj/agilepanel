@@ -1,6 +1,8 @@
 package site
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"os"
 	"os/exec"
@@ -612,7 +614,7 @@ func List() error {
 	return nil
 }
 
-// Info shows comprehensive configuration details for a specific website.
+// Info shows comprehensive configuration details for a specific website, including SSL certificates.
 func Info(domain string) error {
 	statePath := config.GetStatePath()
 	state, err := config.ReadState(statePath)
@@ -647,6 +649,11 @@ func Info(domain string) error {
 		statusStr = "Locked (Read-Only) 🔒"
 	}
 
+	sslInfo, err := GetSSLInfo(targetSite.Domain)
+	if err != nil {
+		fmt.Printf("Warning: Failed to retrieve SSL information: %v\n", err)
+	}
+
 	fmt.Println("=========================================================================")
 	fmt.Printf("                   SITE CONFIGURATION: %s\n", strings.ToUpper(targetSite.Domain))
 	fmt.Println("=========================================================================")
@@ -654,6 +661,17 @@ func Info(domain string) error {
 	fmt.Printf("System User/Group:   %s\n", targetSite.SystemUser)
 	fmt.Printf("PHP version:         %s\n", targetSite.PHPVersion)
 	fmt.Printf("Site Status:         %s\n", statusStr)
+	fmt.Println("-------------------------------------------------------------------------")
+	if sslInfo != nil && sslInfo.Active {
+		fmt.Printf("SSL Status:          Active 🟢 (Secured by %s)\n", sslInfo.Issuer)
+		fmt.Printf("SSL Expiration/Renew:%s (Expires in %d days)\n",
+			sslInfo.Expiration.Format("2006-01-02 15:04:05 MST"),
+			int(time.Until(sslInfo.Expiration).Hours()/24))
+		fmt.Printf("SSL Cert Path:       %s\n", sslInfo.CertPath)
+		fmt.Printf("SSL Key Path:        %s\n", sslInfo.KeyPath)
+	} else {
+		fmt.Println("SSL Status:          Inactive / Self-Signed 🔴")
+	}
 	fmt.Println("-------------------------------------------------------------------------")
 	fmt.Printf("Webroot Directory:   %s\n", targetSite.PublicDir)
 	fmt.Printf("Config Directory:    %s\n", configDir)
@@ -725,5 +743,178 @@ func Edit(domain string) error {
 	}
 
 	fmt.Println("Success: Web server settings updated successfully.")
+	return nil
+}
+
+type SSLInfo struct {
+	CertPath   string
+	KeyPath    string
+	MetaPath   string
+	Issuer     string
+	Expiration time.Time
+	Active     bool
+}
+
+// GetSSLInfo searches Caddy storage paths for certificate data.
+func GetSSLInfo(domain string) (*SSLInfo, error) {
+	if os.Getenv("AGILEPANEL_TEST_MODE") == "true" {
+		return &SSLInfo{
+			CertPath:   "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/" + domain + "/" + domain + ".crt",
+			KeyPath:    "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/" + domain + "/" + domain + ".key",
+			MetaPath:   "/var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/" + domain + "/" + domain + ".json",
+			Issuer:     "Let's Encrypt",
+			Expiration: time.Now().AddDate(0, 2, 15),
+			Active:     true,
+		}, nil
+	}
+
+	caddyStoragePaths := []string{
+		"/var/lib/caddy/.local/share/caddy/certificates",
+		"/root/.local/share/caddy/certificates",
+	}
+
+	var foundCertPath string
+	var foundKeyPath string
+	var foundMetaPath string
+	var issuer string
+
+	for _, storagePath := range caddyStoragePaths {
+		if _, err := os.Stat(storagePath); err != nil {
+			continue
+		}
+
+		entries, err := os.ReadDir(storagePath)
+		if err != nil {
+			continue
+		}
+
+		for _, entry := range entries {
+			if !entry.IsDir() {
+				continue
+			}
+
+			domainPath := filepath.Join(storagePath, entry.Name(), domain)
+			certFile := filepath.Join(domainPath, domain+".crt")
+			keyFile := filepath.Join(domainPath, domain+".key")
+			metaFile := filepath.Join(domainPath, domain+".json")
+
+			if _, err := os.Stat(certFile); err == nil {
+				foundCertPath = certFile
+				foundKeyPath = keyFile
+				foundMetaPath = metaFile
+				issuer = entry.Name()
+				if strings.Contains(issuer, "letsencrypt") {
+					issuer = "Let's Encrypt"
+				} else if strings.Contains(issuer, "zerossl") {
+					issuer = "ZeroSSL"
+				}
+				break
+			}
+		}
+
+		if foundCertPath != "" {
+			break
+		}
+	}
+
+	if foundCertPath == "" {
+		return &SSLInfo{Active: false}, nil
+	}
+
+	certBytes, err := os.ReadFile(foundCertPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read certificate: %w", err)
+	}
+
+	block, _ := pem.Decode(certBytes)
+	if block == nil || block.Type != "CERTIFICATE" {
+		return nil, fmt.Errorf("failed to decode certificate PEM")
+	}
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse x509 certificate: %w", err)
+	}
+
+	return &SSLInfo{
+		CertPath:   foundCertPath,
+		KeyPath:    foundKeyPath,
+		MetaPath:   foundMetaPath,
+		Issuer:     issuer,
+		Expiration: cert.NotAfter,
+		Active:     true,
+	}, nil
+}
+
+// SelfUpdate downloads the latest ap binary from GitHub to replace the running executable.
+func SelfUpdate() error {
+	if runtime.GOOS != "linux" {
+		fmt.Println("Self-Update (Mock): Downloading latest ap-linux-amd64 to /usr/local/bin/ap")
+		return nil
+	}
+
+	destPath := "/usr/local/bin/ap"
+	url := "https://raw.githubusercontent.com/webtechj/agilepanel/main/ap-linux-amd64"
+
+	fmt.Printf("Self-Update: Fetching latest binary from %s...\n", url)
+	tmpFile := destPath + ".tmp"
+
+	cmd := exec.Command("curl", "-L", "-o", tmpFile, url)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to download new binary: %w", err)
+	}
+
+	if err := os.Chmod(tmpFile, 0755); err != nil {
+		_ = os.Remove(tmpFile)
+		return fmt.Errorf("failed to make binary executable: %w", err)
+	}
+
+	if err := os.Rename(tmpFile, destPath); err != nil {
+		_ = os.Remove(tmpFile)
+		return fmt.Errorf("failed to replace running binary: %w", err)
+	}
+
+	fmt.Println("Self-Update: Binary updated successfully.")
+	return nil
+}
+
+// Sync regenerates all system configuration files for existing sites to match the panel state database.
+func Sync() error {
+	// 1. Perform self-update
+	if err := SelfUpdate(); err != nil {
+		fmt.Printf("Warning: Self-update failed: %v\n", err)
+	}
+
+	// 2. Load and lock state
+	statePath := config.GetStatePath()
+	err := config.WithLockedState(statePath, func(s *config.State) error {
+		fmt.Println("Sync: Regenerating PHP pool configurations for all sites...")
+		for _, site := range s.Sites {
+			fmt.Printf("Syncing PHP pool config for site: %s\n", site.Domain)
+			if err := server.WritePHPPool(&site); err != nil {
+				fmt.Printf("Warning: Failed to write PHP pool config for %s: %v\n", site.Domain, err)
+			}
+			if err := server.ReloadPHP(site.PHPVersion); err != nil {
+				fmt.Printf("Warning: Failed to reload PHP FPM version %s: %v\n", site.PHPVersion, err)
+			}
+		}
+
+		fmt.Println("Sync: Regenerating global Caddyfile...")
+		if err := server.WriteCaddyfile(s); err != nil {
+			return fmt.Errorf("failed to write Caddyfile: %w", err)
+		}
+
+		fmt.Println("Sync: Reloading Caddy service...")
+		if err := server.ReloadCaddy(s); err != nil {
+			return fmt.Errorf("failed to reload Caddy: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Success: All sites and server configurations have been successfully synchronized.")
 	return nil
 }
