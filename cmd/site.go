@@ -117,6 +117,34 @@ var siteBackupDBCmd = &cobra.Command{
 	},
 }
 
+var siteListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all websites hosted on the server",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return site.List()
+	},
+}
+
+var siteInfoCmd = &cobra.Command{
+	Use:   "info [domain]",
+	Short: "Show details and credentials of a website",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		return site.Info(domain)
+	},
+}
+
+var siteEditCmd = &cobra.Command{
+	Use:   "edit [domain]",
+	Short: "Edit web server configuration for a website",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		return site.Edit(domain)
+	},
+}
+
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically")
@@ -128,6 +156,9 @@ func init() {
 
 	siteCmd.AddCommand(siteCreateCmd)
 	siteCmd.AddCommand(siteDeleteCmd)
+	siteCmd.AddCommand(siteListCmd)
+	siteCmd.AddCommand(siteInfoCmd)
+	siteCmd.AddCommand(siteEditCmd)
 	siteCmd.AddCommand(siteLockCmd)
 	siteCmd.AddCommand(siteUnlockCmd)
 	siteCmd.AddCommand(siteCacheCleanCmd)

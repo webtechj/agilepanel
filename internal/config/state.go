@@ -28,6 +28,7 @@ type SiteConfig struct {
 	PublicDir    string `json:"public_dir"`
 	DatabaseName string `json:"database_name"`
 	DatabaseUser string `json:"db_user"`
+	DatabasePass string `json:"db_pass,omitempty"`
 	SystemUser   string `json:"system_user"`
 	IsLocked     bool   `json:"is_locked"`
 }
