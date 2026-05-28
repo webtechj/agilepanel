@@ -114,20 +114,11 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-# 6. Download the latest compiled AgilePanel binary from GitHub
+# 6. Download the latest compiled AgilePanel binary from GitHub (directly from main branch to ensure latest updates)
 echo "Downloading AgilePanel CLI..."
 GITHUB_REPO="webtechj/agilepanel"
-LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/${GITHUB_REPO}/releases/latest | grep "browser_download_url" | cut -d '"' -f 4 | grep "ap-linux-amd64" || true)
-
-if [ -z "$LATEST_RELEASE_URL" ]; then
-    echo "No compiled release assets found in GitHub releases. Downloading fallback development version..."
-    # Attempt fallback directly from main branch if no releases yet
-    curl -L -o /usr/local/bin/ap "https://raw.githubusercontent.com/${GITHUB_REPO}/main/ap-linux-amd64" || true
-    chmod +x /usr/local/bin/ap || true
-else
-    curl -L -o /usr/local/bin/ap "$LATEST_RELEASE_URL"
-    chmod +x /usr/local/bin/ap
-fi
+curl -L -o /usr/local/bin/ap "https://raw.githubusercontent.com/${GITHUB_REPO}/main/ap-linux-amd64"
+chmod +x /usr/local/bin/ap
 
 # 7. Initialize default AgilePanel State
 mkdir -p /etc/agilepanel
