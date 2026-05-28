@@ -176,6 +176,10 @@ func TestSiteOrchestration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to edit site: %v", err)
 	}
+	err = Sync()
+	if err != nil {
+		t.Fatalf("failed to sync: %v", err)
+	}
 	os.Unsetenv("AGILEPANEL_TEST_MODE")
 
 	// 6. Delete site
