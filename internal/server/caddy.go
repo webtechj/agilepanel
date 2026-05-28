@@ -137,7 +137,7 @@ func WriteCaddyfile(state *config.State) error {
 	return nil
 }
 
-// ReloadCaddy triggers a reload of the Caddy configuration.
+// ReloadCaddy triggers a reload of the Caddy configuration, or starts it if it is not running.
 func ReloadCaddy(state *config.State) error {
 	caddyPath := state.Global.CaddyPath
 	caddyConfig := state.Global.CaddyConfigPath
@@ -147,13 +147,36 @@ func ReloadCaddy(state *config.State) error {
 		return nil
 	}
 
-	cmd := exec.Command(caddyPath, "reload", "--config", caddyConfig)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to reload Caddy: %v (stderr: %s)", err, stderr.String())
+	// Check if Caddy is currently active
+	isActive := false
+	statusCmd := exec.Command("systemctl", "is-active", "caddy")
+	if err := statusCmd.Run(); err == nil {
+		isActive = true
 	}
 
-	fmt.Println("Caddy: Reloaded configuration successfully.")
+	if isActive {
+		// Use caddy reload for zero-downtime config updates
+		cmd := exec.Command(caddyPath, "reload", "--config", caddyConfig)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		if err := cmd.Run(); err != nil {
+			// If reload fails (e.g. admin port issues), fallback to systemctl restart
+			fmt.Printf("Caddy reload failed, falling back to restart: %v (stderr: %s)\n", err, stderr.String())
+			restartCmd := exec.Command("systemctl", "restart", "caddy")
+			if err := restartCmd.Run(); err != nil {
+				return fmt.Errorf("failed to restart Caddy: %w", err)
+			}
+		} else {
+			fmt.Println("Caddy: Reloaded configuration successfully.")
+		}
+	} else {
+		// Caddy is stopped or failed, restart to boot it up
+		fmt.Println("Caddy is not running. Starting Caddy service...")
+		restartCmd := exec.Command("systemctl", "restart", "caddy")
+		if err := restartCmd.Run(); err != nil {
+			return fmt.Errorf("failed to start Caddy: %w", err)
+		}
+	}
+
 	return nil
 }
