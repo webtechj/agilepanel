@@ -2,7 +2,40 @@
 set -e
 
 # AgilePanel Automated VPS Installer
-# Supported OS: Ubuntu 20.04+, Debian 11+
+# Supported OS: Ubuntu 22.04+, Debian 11+
+
+# Check OS compatibility
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [ "$ID" = "ubuntu" ]; then
+        VERSION_MAJOR=$(echo $VERSION_ID | cut -d'.' -f1)
+        if [ "$VERSION_MAJOR" -lt 22 ]; then
+            echo "======================================================================"
+            echo "ERROR: Ubuntu $VERSION_ID is not supported."
+            echo "Ubuntu 20.04 reached End of Standard Support in May 2025, and"
+            echo "the PHP repository (ppa:ondrej/php) has dropped support for Focal."
+            echo "Please upgrade your VPS to Ubuntu 22.04 LTS or 24.04 LTS to continue."
+            echo "======================================================================"
+            exit 1
+        fi
+    elif [ "$ID" = "debian" ]; then
+        VERSION_MAJOR=$(echo $VERSION_ID | cut -d'.' -f1)
+        if [ "$VERSION_MAJOR" -lt 11 ]; then
+            echo "======================================================================"
+            echo "ERROR: Debian $VERSION_ID is not supported."
+            echo "Please upgrade your VPS to Debian 11 (Bullseye) or Debian 12 (Bookworm)."
+            echo "======================================================================"
+            exit 1
+        fi
+    else
+        echo "ERROR: Unsupported OS distribution ($NAME)."
+        echo "AgilePanel officially supports Ubuntu 22.04+ and Debian 11+."
+        exit 1
+    fi
+else
+    echo "ERROR: Could not detect operating system type."
+    exit 1
+fi
 
 echo "========================================="
 echo "       INSTALLING AGILEPANEL (ap)        "
