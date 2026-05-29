@@ -45,14 +45,13 @@ const caddyfileTemplateStr = `# Global Options Block
 
 # phpMyAdmin secured custom port
 :8888 {
+    {{if and .Global.AdminUser .Global.AdminPasswordHash}}
     root * /usr/share/phpmyadmin
     file_server
 
-    {{if and .Global.AdminUser .Global.AdminPasswordHash}}
     basic_auth {
         {{.Global.AdminUser}} "{{.Global.AdminPasswordHash}}"
     }
-    {{end}}
 
     # Connect to default PHP-FPM socket
     php_fastcgi unix//run/php/php{{.Global.DefaultPHPVersion}}-fpm.sock {
@@ -69,6 +68,9 @@ const caddyfileTemplateStr = `# Global Options Block
         X-Frame-Options "SAMEORIGIN"
         Referrer-Policy "no-referrer-when-downgrade"
     }
+    {{else}}
+    respond "Access Denied: Administrative HTTP Basic Authentication has not been configured yet. Run 'ap server auth' to configure credentials." 403
+    {{end}}
 }
 
 {{range .Sites}}
