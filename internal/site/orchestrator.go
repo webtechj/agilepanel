@@ -323,7 +323,15 @@ func Delete(domain string) error {
 		return nil
 	})
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	ui.PrintSuccess("Site Deleted Successfully")
+	ui.PrintInfo("AgilePanel has completely decommissioned " + domain + ". The isolated system user and group were deleted, the MariaDB database was dropped, Caddy virtual host configurations were removed, and all public files were securely erased from disk.")
+	ui.Divider()
+	fmt.Println()
+	return nil
 }
 
 // Lock marks the site folder as immutable and updates the state.
@@ -353,7 +361,15 @@ func Lock(domain string) error {
 		return nil
 	})
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	ui.PrintSuccess("Site Directory Locked")
+	ui.PrintInfo("AgilePanel has marked the file directory of " + domain + " as read-only/immutable. This stops all write operations in the webroot, protecting your WordPress core files from unauthorized creation, modification, or deletion by external attackers.")
+	ui.Divider()
+	fmt.Println()
+	return nil
 }
 
 // Unlock removes the site folder's immutable attributes and updates the state.
@@ -383,7 +399,15 @@ func Unlock(domain string) error {
 		return nil
 	})
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	ui.PrintSuccess("Site Directory Unlocked")
+	ui.PrintInfo("AgilePanel has removed the immutable file attribute for " + domain + ". Standard write permissions are restored, allowing you to run WordPress core upgrades, install plugins, update themes, and edit files normally.")
+	ui.Divider()
+	fmt.Println()
+	return nil
 }
 
 // CacheClean flushes various types of caches: WordPress, Redis, PHP OPcache, and Caddy edge.
@@ -451,7 +475,10 @@ func CacheClean(domain string, cleanWP, cleanRedis, cleanOpcache, cleanCaddy boo
 		}
 	}
 
-	fmt.Printf("Success: Cache cleanup completed for %s.\n", domain)
+	ui.PrintSuccess("Cache Cleared Successfully")
+	ui.PrintInfo("AgilePanel has flushed the requested caching layers (WordPress transients, Redis database queries, PHP FPM bytecode OPcache, and Caddy reverse proxy page cache). All visitors will now see the latest updates instantly.")
+	ui.Divider()
+	fmt.Println()
 	return nil
 }
 
@@ -543,6 +570,7 @@ func Reinstall(domain string) error {
 		ui.Row("New Password", wpAdminPassword)
 		ui.Row("Login URL", "https://"+domain+"/wp-admin")
 		ui.Divider()
+		ui.PrintInfo("WordPress has been successfully reinstalled! AgilePanel deleted the old public folders, dropped and re-provisioned the database tables, and performed a fresh WordPress Core installation including the Redis Cache plugin.")
 		fmt.Println()
 
 		return nil
@@ -593,7 +621,10 @@ func SSLRenew(domain string) error {
 		return err
 	}
 
-	fmt.Printf("Success: SSL renewal sequence triggered for %s.\n", domain)
+	ui.PrintSuccess("SSL Renewal Triggered")
+	ui.PrintInfo("AgilePanel has deleted the local SSL certificate cache for " + domain + " and triggered a Caddy configuration reload. Caddy will dynamically negotiate a new, valid SSL certificate with Let's Encrypt / ZeroSSL on the next connection.")
+	ui.Divider()
+	fmt.Println()
 	return nil
 }
 
@@ -618,8 +649,17 @@ func FixPermissions(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
-	return server.FixPermissions(parentDir, targetSite.SystemUser)
+	parentDir := filepath.Dir(targetSite.PublicDir)
+	err = server.FixPermissions(parentDir, targetSite.SystemUser)
+	if err != nil {
+		return err
+	}
+
+	ui.PrintSuccess("Permissions Restored")
+	ui.PrintInfo("AgilePanel has recursively updated file permissions (0644) and directory permissions (0755) under /var/www/" + domain + " to match the isolated user " + targetSite.SystemUser + " and group. This corrects typical '403 Forbidden' errors.")
+	ui.Divider()
+	fmt.Println()
+	return nil
 }
 
 // BackupDB exports the MySQL/MariaDB database dump to the secure backup folder.
@@ -656,7 +696,10 @@ func BackupDB(domain string) error {
 		return fmt.Errorf("failed to export database: %w", err)
 	}
 
-	fmt.Printf("Success: Database backed up successfully at %s.\n", backupPath)
+	ui.PrintSuccess("Database Backup Completed")
+	ui.PrintInfo("AgilePanel has successfully exported a secure MariaDB database SQL dump using WP-CLI. The backup file is safely stored at " + backupPath + ".")
+	ui.Divider()
+	fmt.Println()
 	return nil
 }
 
