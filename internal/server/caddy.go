@@ -17,7 +17,14 @@ const caddyfileTemplateStr = `# Global Options Block
     {{if .Global.AdminEmail}}email {{.Global.AdminEmail}}{{end}}
     servers {
         protocols h1 h2 h3
+        timeouts {
+            read_body 10s
+            read_header 10s
+            write 30s
+            idle 120s
+        }
     }
+    auto_https disable_redirects
 }
 
 # Default Welcome Page catch-all

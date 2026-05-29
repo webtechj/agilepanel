@@ -21,17 +21,16 @@ listen.owner = caddy
 listen.group = caddy
 listen.mode = 0660
 
-pm = dynamic
-pm.max_children = 10
-pm.start_servers = 2
-pm.min_spare_servers = 1
-pm.max_spare_servers = 3
+pm = ondemand
+pm.max_children = {{.MaxChildren}}
+pm.process_idle_timeout = 10s
+pm.max_requests = 500
 
 php_admin_value[opcache.memory_consumption] = 256
 php_admin_value[opcache.validate_timestamps] = 0
 php_admin_value[opcache.interned_strings_buffer] = 16
 php_admin_value[opcache.max_accelerated_files] = 10000
-php_admin_value[memory_limit] = 256M
+php_admin_value[memory_limit] = 128M
 php_admin_value[upload_max_filesize] = 100M
 php_admin_value[post_max_size] = 100M
 php_admin_value[disable_functions] = exec,shell_exec,system,passthru,popen,proc_open,show_source
@@ -40,13 +39,36 @@ php_admin_value[open_basedir] = /var/www/{{.Domain}}/:/tmp/:/usr/share/phpmyadmi
 
 // GeneratePHPPool generates the PHP-FPM pool configuration string.
 func GeneratePHPPool(site *config.SiteConfig) (string, error) {
+	totalRAM, _, err := readLinuxMemory()
+	maxChildren := 10
+	if err == nil && totalRAM > 0 {
+		// totalRAM is in KB. RAM in MB = totalRAM / 1024.
+		// maxChildren = RAM_MB / 48
+		maxChildren = int((totalRAM / 1024) / 48)
+		if maxChildren < 2 {
+			maxChildren = 2
+		}
+	}
+
 	tmpl, err := template.New("phppool").Parse(phpPoolTemplateStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse PHP pool template: %w", err)
 	}
 
+	data := struct {
+		Domain      string
+		SystemUser  string
+		PHPVersion  string
+		MaxChildren int
+	}{
+		Domain:      site.Domain,
+		SystemUser:  site.SystemUser,
+		PHPVersion:  site.PHPVersion,
+		MaxChildren: maxChildren,
+	}
+
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, site); err != nil {
+	if err := tmpl.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("failed to execute PHP pool template: %w", err)
 	}
 

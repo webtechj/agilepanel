@@ -59,7 +59,7 @@ func TestGeneratePHPPool(t *testing.T) {
 	if !strings.Contains(content, "php_admin_value[opcache.max_accelerated_files] = 10000") {
 		t.Error("expected opcache max accelerated files configuration")
 	}
-	if !strings.Contains(content, "php_admin_value[memory_limit] = 256M") {
+	if !strings.Contains(content, "php_admin_value[memory_limit] = 128M") {
 		t.Error("expected PHP memory limit configuration")
 	}
 	if !strings.Contains(content, "php_admin_value[upload_max_filesize] = 100M") {
