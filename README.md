@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Database-MariaDB-003545?logo=mariadb&logoColor=white" alt="MariaDB Database" />
   <img src="https://img.shields.io/badge/Cache-Redis-dc382d?logo=redis&logoColor=white" alt="Redis Cache" />
   <img src="https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-777bb4?logo=php&logoColor=white" alt="PHP Versions" />
+  <a href="https://github.com/webtechj/agilepanel"><img src="https://img.shields.io/endpoint?url=https://telemetry.agilepanel.io/api/badge?metric=total" alt="Total Installations" /></a>
   <a href="https://github.com/webtechj/agilepanel"><img src="https://img.shields.io/endpoint?url=https://telemetry.agilepanel.io/api/badge?metric=active" alt="Active Servers" /></a>
   <a href="https://github.com/webtechj/agilepanel"><img src="https://img.shields.io/endpoint?url=https://telemetry.agilepanel.io/api/badge?metric=sites" alt="WordPress Sites" /></a>
   <img src="https://img.shields.io/badge/License-MIT-green?logo=open-source-initiative&logoColor=white" alt="MIT License" />
