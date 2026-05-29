@@ -15,6 +15,7 @@ func TestInstallWordPressMock(t *testing.T) {
 		"/var/run/redis/redis-server.sock",
 		"siteadmin",
 		"siteadmin@testsite.com",
+		"wp",
 	)
 	if err != nil {
 		t.Fatalf("expected no error from mocked InstallWordPress, got %v", err)

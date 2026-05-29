@@ -63,11 +63,11 @@ func Create(domain string, phpVersion string, siteType string) error {
 	if siteType == "" {
 		siteType = "wp"
 	}
-	if siteType != "wp" && siteType != "laravel" && siteType != "php" && siteType != "html" {
-		return fmt.Errorf("invalid site type '%s' (supported: wp, laravel, php, html)", siteType)
+	if siteType != "wp" && siteType != "woocommerce" && siteType != "laravel" && siteType != "php" && siteType != "html" {
+		return fmt.Errorf("invalid site type '%s' (supported: wp, woocommerce, laravel, php, html)", siteType)
 	}
 
-	installWP := siteType == "wp"
+	installWP := siteType == "wp" || siteType == "woocommerce"
 
 	// Prompt for WordPress admin credentials BEFORE the locked state transaction
 	var wpAdminUser, wpAdminEmail string
@@ -215,6 +215,7 @@ func Create(domain string, phpVersion string, siteType string) error {
 				s.Global.RedisSocketPath,
 				wpAdminUser,
 				wpAdminEmail,
+				siteType,
 			)
 			if err != nil {
 				_ = server.DeletePHPPool(phpVersion, domain)
@@ -693,7 +694,7 @@ func Reinstall(domain string) error {
 		// 6. Install layouts depending on type
 		var wpAdminPassword string
 		adminUser := targetSite.WPAdminUser
-		isWP := targetSite.Type == "wp" || targetSite.Type == ""
+		isWP := targetSite.Type == "wp" || targetSite.Type == "woocommerce" || targetSite.Type == ""
 		if isWP {
 			if adminUser == "" {
 				adminUser = "admin"
@@ -701,6 +702,10 @@ func Reinstall(domain string) error {
 			adminEmail := targetSite.WPAdminEmail
 			if adminEmail == "" {
 				adminEmail = "admin@" + targetSite.Domain
+			}
+			sType := targetSite.Type
+			if sType == "" {
+				sType = "wp"
 			}
 			wpAdminPassword, err = server.InstallWordPress(
 				targetSite.SystemUser,
@@ -712,6 +717,7 @@ func Reinstall(domain string) error {
 				s.Global.RedisSocketPath,
 				adminUser,
 				adminEmail,
+				sType,
 			)
 			if err != nil {
 				return err
@@ -1040,27 +1046,40 @@ func List() error {
 		return nil
 	}
 
-	for i, site := range state.Sites {
-		var statusIcon string
-		if site.IsLocked {
-			statusIcon = ui.BrightYellow + "⊘" + ui.Reset
-		} else {
-			statusIcon = ui.BrightGreen + "●" + ui.Reset
-		}
-
-		fmt.Printf("  %s  %s\n", statusIcon, ui.Header(site.Domain))
-		ui.Row("PHP Version", site.PHPVersion)
-		ui.Row("System User", site.SystemUser)
-		if site.DatabaseName != "" {
-			ui.Row("Database Name", site.DatabaseName)
-		} else {
-			ui.Row("Database Name", "None (Static/PHP-Only)")
-		}
-
-		if i < len(state.Sites)-1 {
-			fmt.Println()
-		}
+	var cols = []ui.TableColumn{
+		{Header: "Domain", Width: 22},
+		{Header: "Type", Width: 12},
+		{Header: "PHP", Width: 6},
+		{Header: "System User", Width: 15},
+		{Header: "Database", Width: 20},
+		{Header: "Status", Width: 10},
 	}
+
+	var rows [][]string
+	for _, site := range state.Sites {
+		status := ui.BrightGreen + "Active" + ui.Reset
+		if site.IsLocked {
+			status = ui.BrightYellow + "Locked" + ui.Reset
+		}
+		sType := site.Type
+		if sType == "" {
+			sType = "wp"
+		}
+		db := site.DatabaseName
+		if db == "" {
+			db = "-"
+		}
+		rows = append(rows, []string{
+			site.Domain,
+			strings.ToUpper(sType),
+			site.PHPVersion,
+			site.SystemUser,
+			db,
+			status,
+		})
+	}
+
+	ui.PrintTable(cols, rows)
 
 	ui.Divider()
 	fmt.Printf("  %s %d site(s) registered\n", ui.Muted("Total:"), len(state.Sites))
