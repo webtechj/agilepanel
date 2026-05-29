@@ -32,9 +32,29 @@ var toolInstallCmd = &cobra.Command{
 		}
 
 		ui.PrintSuccess("phpMyAdmin Installed Successfully")
-		ui.PrintInfo("phpMyAdmin is accessible securely on any of your site domains via:")
-		ui.PrintInfo("https://[your-domain.com]/phpmyadmin")
-		ui.PrintInfo("Note: Access is protected by the HTTP Basic Auth credentials configured via 'ap server auth'.")
+		ui.PrintInfo("phpMyAdmin is accessible on port 8888:")
+		ui.PrintInfo("http://[your-server-ip]:8888")
+		ui.PrintInfo("Secure it with: ap server auth [username] [password]")
+		ui.Divider()
+		fmt.Println()
+		return nil
+	},
+}
+
+var toolFixPhpMyAdminCmd = &cobra.Command{
+	Use:   "fix-phpmyadmin",
+	Short: "Regenerate phpMyAdmin config.inc.php to fix configuration errors",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ui.Banner("Fix phpMyAdmin Config")
+		ui.PrintInfo("Regenerating a fresh config.inc.php for phpMyAdmin...")
+
+		if err := server.FixPhpMyAdminConfig(); err != nil {
+			return err
+		}
+
+		ui.PrintSuccess("phpMyAdmin Config Fixed")
+		ui.PrintInfo("phpMyAdmin config.inc.php has been regenerated with a fresh blowfish secret.")
+		ui.PrintInfo("Access phpMyAdmin at: http://[your-server-ip]:8888")
 		ui.Divider()
 		fmt.Println()
 		return nil
@@ -43,5 +63,6 @@ var toolInstallCmd = &cobra.Command{
 
 func init() {
 	toolCmd.AddCommand(toolInstallCmd)
+	toolCmd.AddCommand(toolFixPhpMyAdminCmd)
 	rootCmd.AddCommand(toolCmd)
 }

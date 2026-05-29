@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 )
 
@@ -21,7 +20,7 @@ func InstallPhpMyAdmin() error {
 		mockDir := filepath.Join("usr", "share", "phpmyadmin")
 		_ = os.MkdirAll(mockDir, 0755)
 		_ = os.WriteFile(filepath.Join(mockDir, "index.php"), []byte("<?php echo 'phpMyAdmin Mock'; ?>"), 0644)
-		_ = os.WriteFile(filepath.Join(mockDir, "config.sample.inc.php"), []byte("<?php $cfg['blowfish_secret'] = ''; ?>"), 0644)
+		_ = os.WriteFile(filepath.Join(mockDir, "config.inc.php"), []byte("<?php $cfg['blowfish_secret'] = 'mock'; ?>"), 0644)
 		fmt.Println("Tools (Mock): Configured config.inc.php with secure blowfish secret.")
 		return nil
 	}
@@ -66,32 +65,47 @@ func InstallPhpMyAdmin() error {
 		return fmt.Errorf("failed to move phpMyAdmin to destination: %w", err)
 	}
 
-	// Configure blowfish_secret
+	// Generate a cryptographically secure 32-byte blowfish secret
 	fmt.Println("Tools: Generating phpMyAdmin secure config...")
-	secretBytes := make([]byte, 16)
+	secretBytes := make([]byte, 32)
 	_, _ = rand.Read(secretBytes)
 	blowfishSecret := hex.EncodeToString(secretBytes)
 
-	configSamplePath := filepath.Join(destDir, "config.sample.inc.php")
+	// Write a complete config.inc.php from scratch — avoids brittle regex parsing
+	// of config.sample.inc.php which differs across phpMyAdmin versions.
 	configPath := filepath.Join(destDir, "config.inc.php")
+	configContent := "<?php\n" +
+		"/**\n" +
+		" * AgilePanel - phpMyAdmin Configuration\n" +
+		" * Generated automatically. Do not edit manually.\n" +
+		" */\n" +
+		"declare(strict_types=1);\n\n" +
+		"$cfg['blowfish_secret'] = '" + blowfishSecret + "';\n\n" +
+		"$i = 0;\n" +
+		"$i++;\n\n" +
+		"/* Server configuration */\n" +
+		"$cfg['Servers'][$i]['auth_type']      = 'cookie';\n" +
+		"$cfg['Servers'][$i]['host']           = '127.0.0.1';\n" +
+		"$cfg['Servers'][$i]['connect_type']   = 'tcp';\n" +
+		"$cfg['Servers'][$i]['compress']       = false;\n" +
+		"$cfg['Servers'][$i]['AllowNoPassword'] = false;\n\n" +
+		"/* Upload/Save directories */\n" +
+		"$cfg['UploadDir'] = '';\n" +
+		"$cfg['SaveDir']   = '';\n\n" +
+		"/* Temp directory for phpMyAdmin */\n" +
+		"$cfg['TempDir'] = '/tmp/phpmyadmin_tmp/';\n"
 
-	configBytes, err := os.ReadFile(configSamplePath)
-	if err != nil {
-		return fmt.Errorf("failed to read config sample: %w", err)
-	}
-
-	configStr := string(configBytes)
-	// Replace $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'secret';
-	importRegex := regexp.MustCompile(`\$cfg\['blowfish_secret'\]\s*=\s*['"]['"];`)
-	configStr = importRegex.ReplaceAllString(configStr, fmt.Sprintf("$cfg['blowfish_secret'] = '%s';", blowfishSecret))
-
-	if err := os.WriteFile(configPath, []byte(configStr), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(configContent), 0640); err != nil {
 		return fmt.Errorf("failed to write phpMyAdmin config: %w", err)
 	}
 
+	// Create temp dir for phpMyAdmin sessions
+	_ = os.MkdirAll("/tmp/phpmyadmin_tmp", 0777)
+
 	// Set correct permissions
-	_ = exec.Command("chown", "-R", "caddy:caddy", destDir).Run()
+	_ = exec.Command("chown", "-R", "www-data:www-data", destDir).Run()
 	_ = exec.Command("chmod", "-R", "0755", destDir).Run()
+	_ = exec.Command("chmod", "0640", configPath).Run()
 
 	// Configure firewall rules for port 8888
 	if _, err := exec.LookPath("ufw"); err == nil {
@@ -106,3 +120,61 @@ func InstallPhpMyAdmin() error {
 	fmt.Println("Tools: phpMyAdmin successfully installed and secured.")
 	return nil
 }
+
+// FixPhpMyAdminConfig regenerates config.inc.php for an existing phpMyAdmin installation.
+// Use this to recover from config errors without reinstalling.
+func FixPhpMyAdminConfig() error {
+	destDir := "/usr/share/phpmyadmin"
+
+	if runtime.GOOS != "linux" {
+		fmt.Println("Tools (Mock): Regenerating phpMyAdmin config.inc.php")
+		return nil
+	}
+
+	if _, err := os.Stat(destDir); os.IsNotExist(err) {
+		return fmt.Errorf("phpMyAdmin is not installed at %s. Run 'ap tool install phpmyadmin' first", destDir)
+	}
+
+	// Generate a fresh blowfish secret
+	secretBytes := make([]byte, 32)
+	_, _ = rand.Read(secretBytes)
+	blowfishSecret := hex.EncodeToString(secretBytes)
+
+	configPath := filepath.Join(destDir, "config.inc.php")
+	configContent := "<?php\n" +
+		"/**\n" +
+		" * AgilePanel - phpMyAdmin Configuration\n" +
+		" * Regenerated automatically by 'ap tool fix-phpmyadmin'.\n" +
+		" */\n" +
+		"declare(strict_types=1);\n\n" +
+		"$cfg['blowfish_secret'] = '" + blowfishSecret + "';\n\n" +
+		"$i = 0;\n" +
+		"$i++;\n\n" +
+		"/* Server configuration */\n" +
+		"$cfg['Servers'][$i]['auth_type']       = 'cookie';\n" +
+		"$cfg['Servers'][$i]['host']            = '127.0.0.1';\n" +
+		"$cfg['Servers'][$i]['connect_type']    = 'tcp';\n" +
+		"$cfg['Servers'][$i]['compress']        = false;\n" +
+		"$cfg['Servers'][$i]['AllowNoPassword'] = false;\n\n" +
+		"/* Upload/Save directories */\n" +
+		"$cfg['UploadDir'] = '';\n" +
+		"$cfg['SaveDir']   = '';\n\n" +
+		"/* Temp directory for phpMyAdmin */\n" +
+		"$cfg['TempDir'] = '/tmp/phpmyadmin_tmp/';\n"
+
+	if err := os.WriteFile(configPath, []byte(configContent), 0640); err != nil {
+		return fmt.Errorf("failed to write phpMyAdmin config: %w", err)
+	}
+
+	// Ensure temp directory exists
+	_ = os.MkdirAll("/tmp/phpmyadmin_tmp", 0777)
+
+	// Restore ownership and permissions
+	_ = exec.Command("chown", "-R", "www-data:www-data", destDir).Run()
+	_ = exec.Command("chmod", "-R", "0755", destDir).Run()
+	_ = exec.Command("chmod", "0640", configPath).Run()
+
+	fmt.Println("Tools: phpMyAdmin config.inc.php regenerated successfully.")
+	return nil
+}
+
