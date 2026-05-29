@@ -2,6 +2,10 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os/exec"
+	"runtime"
+	"strings"
 
 	"agilepanel/internal/config"
 	"agilepanel/internal/ui"
@@ -37,8 +41,29 @@ func RepairInstallation() error {
 		return fmt.Errorf("failed to regenerate Caddyfile configuration: %w", err)
 	}
 
-	// 5. Reload services to apply repaired configs
-	ui.PrintStep(4, "Reloading Caddy and PHP-FPM services...")
+	// 5. Restore SSH Password Login for recovery
+	if runtime.GOOS == "linux" {
+		ui.PrintStep(4, "Restoring SSH configurations to allow password login (recovery mode)...")
+		sshdPath := "/etc/ssh/sshd_config"
+		if data, err := ioutil.ReadFile(sshdPath); err == nil {
+			content := string(data)
+			modified := false
+			if strings.Contains(content, "PermitRootLogin prohibit-password") {
+				content = strings.ReplaceAll(content, "PermitRootLogin prohibit-password", "PermitRootLogin yes")
+				modified = true
+			}
+			if modified {
+				if err := ioutil.WriteFile(sshdPath, []byte(content), 0644); err == nil {
+					_ = exec.Command("systemctl", "reload", "ssh").Run()
+					_ = exec.Command("systemctl", "reload", "sshd").Run()
+					ui.PrintInfo("SSH Configuration updated to allow password login. Reloaded SSH daemon.")
+				}
+			}
+		}
+	}
+
+	// 6. Reload services to apply repaired configs
+	ui.PrintStep(5, "Reloading Caddy and PHP-FPM services...")
 	
 	// Reload PHP for unique versions used in sites
 	reloadedVersions := make(map[string]bool)
