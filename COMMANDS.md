@@ -114,6 +114,16 @@ Fixes phpMyAdmin config errors.
 
 ---
 
+## 📦 Extensions & Addons (`ap install`)
+Install extension packages.
+
+### `ap install gui`
+Installs the Web GUI Dashboard companion.
+*   **Description**: Downloads the pre-compiled AgilePanel Web GUI binary, provisions a systemd daemon service (`agilepanel-gui.service`) running on port 8889, configures UFW firewall rules, and starts the dashboard.
+
+---
+
+
 ## 🛠️ Diagnostics & Updates
 Manage CLI and package dependencies.
 
