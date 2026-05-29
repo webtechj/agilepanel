@@ -150,10 +150,11 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-# 6. Download the latest compiled AgilePanel binary from GitHub (directly from main branch to ensure latest updates)
+# 6. Download the compiled AgilePanel binary from GitHub
 echo "Downloading AgilePanel CLI..."
 GITHUB_REPO="webtechj/agilepanel"
-curl -L -o /usr/local/bin/ap "https://raw.githubusercontent.com/${GITHUB_REPO}/main/ap-linux-amd64"
+AP_VERSION="${AP_VERSION:-main}"
+curl -L -o /usr/local/bin/ap "https://raw.githubusercontent.com/${GITHUB_REPO}/${AP_VERSION}/ap-linux-amd64"
 chmod +x /usr/local/bin/ap
 
 # 7. Initialize default AgilePanel State
