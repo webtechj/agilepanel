@@ -2,6 +2,7 @@ package site
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -53,10 +54,20 @@ func promptLine(label string) string {
 }
 
 // Create provisions a site's infrastructure.
-func Create(domain string, phpVersion string, installWP bool) error {
+func Create(domain string, phpVersion string, siteType string) error {
 	if err := ValidateDomain(domain); err != nil {
 		return err
 	}
+
+	siteType = strings.ToLower(strings.TrimSpace(siteType))
+	if siteType == "" {
+		siteType = "wp"
+	}
+	if siteType != "wp" && siteType != "laravel" && siteType != "php" && siteType != "html" {
+		return fmt.Errorf("invalid site type '%s' (supported: wp, laravel, php, html)", siteType)
+	}
+
+	installWP := siteType == "wp"
 
 	// Prompt for WordPress admin credentials BEFORE the locked state transaction
 	var wpAdminUser, wpAdminEmail string
@@ -143,18 +154,26 @@ func Create(domain string, phpVersion string, installWP bool) error {
 			return fmt.Errorf("failed to create system user: %w", err)
 		}
 
-		// 5. Provision and set permissions on web folders
+		// Determine public root folder
 		publicDir := fmt.Sprintf("/var/www/%s/htdocs", domain)
+		if siteType == "laravel" {
+			publicDir = fmt.Sprintf("/var/www/%s/htdocs/public", domain)
+		}
+
+		// 5. Provision and set permissions on web folders
 		if err := server.ProvisionSiteDirectory(publicDir, systemUser); err != nil {
 			_ = server.DeleteSystemUser(systemUser)
 			return fmt.Errorf("failed to provision web folders: %w", err)
 		}
 
-		// 6. Create Database
-		if err := server.CreateDatabase(dbName, dbUser, dbPassword); err != nil {
-			_ = server.DeleteSiteDirectory(publicDir)
-			_ = server.DeleteSystemUser(systemUser)
-			return fmt.Errorf("database setup failed: %w", err)
+		// 6. Create Database (skip for HTML)
+		createDB := siteType == "wp" || siteType == "laravel" || siteType == "php"
+		if createDB {
+			if err := server.CreateDatabase(dbName, dbUser, dbPassword); err != nil {
+				_ = server.DeleteSiteDirectory(publicDir)
+				_ = server.DeleteSystemUser(systemUser)
+				return fmt.Errorf("database setup failed: %w", err)
+			}
 		}
 
 		// 7. Write PHP-FPM Pool config
@@ -167,16 +186,24 @@ func Create(domain string, phpVersion string, installWP bool) error {
 			DatabasePass: dbPassword,
 			SystemUser:   systemUser,
 			IsLocked:     false,
+			Type:         siteType,
+		}
+		if !createDB {
+			newSite.DatabaseName = ""
+			newSite.DatabaseUser = ""
+			newSite.DatabasePass = ""
 		}
 
 		if err := server.WritePHPPool(&newSite); err != nil {
-			_ = server.DeleteDatabase(dbName, dbUser)
+			if createDB {
+				_ = server.DeleteDatabase(dbName, dbUser)
+			}
 			_ = server.DeleteSiteDirectory(publicDir)
 			_ = server.DeleteSystemUser(systemUser)
 			return fmt.Errorf("failed to write PHP-FPM config: %w", err)
 		}
 
-		// 8. If WordPress installation is requested, execute WP-CLI routine
+		// 8. Install landing layouts depending on type
 		if installWP {
 			wpAdminPassword, err = server.InstallWordPress(
 				systemUser,
@@ -196,6 +223,126 @@ func Create(domain string, phpVersion string, installWP bool) error {
 				_ = server.DeleteSystemUser(systemUser)
 				return fmt.Errorf("WordPress installation failed: %w", err)
 			}
+		} else {
+			htdocsPath := filepath.Join(server.GetSiteRootDir(publicDir), "htdocs")
+			if siteType == "html" {
+				indexPath := filepath.Join(htdocsPath, "index.html")
+				htmlContent := fmt.Sprintf(`<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to %s</title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #0ea5e9; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel HTML</div>
+        <h1>%s</h1>
+        <p>Your static HTML website has been successfully provisioned and is online.</p>
+        <p style="font-size: 0.9rem; color: #64748b;">Upload your static assets to <code>/var/www/%s/htdocs</code> to replace this page.</p>
+    </div>
+</body>
+</html>`, domain, domain, domain)
+				_ = os.WriteFile(indexPath, []byte(htmlContent), 0644)
+			} else if siteType == "php" {
+				indexPath := filepath.Join(htdocsPath, "index.php")
+				phpContent := fmt.Sprintf(`<?php
+$domain = $_SERVER['HTTP_HOST'];
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to <?php echo htmlspecialchars($domain); ?></title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #10b981; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #10b981; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+        ul { text-align: left; background: #1e293b; padding: 1.5rem 1.5rem 1.5rem 2.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-family: monospace; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel PHP</div>
+        <h1><?php echo htmlspecialchars($domain); ?></h1>
+        <p>Your custom PHP environment is fully configured and online.</p>
+        
+        <h3>Database Credentials</h3>
+        <ul>
+            <li><strong>Host:</strong> localhost (UNIX Socket)</li>
+            <li><strong>Database:</strong> %s</li>
+            <li><strong>Username:</strong> %s</li>
+            <li><strong>Password:</strong> %s</li>
+        </ul>
+
+        <div style="margin-top: 2rem; background: #020617; padding: 1rem; border-radius: 6px; font-size: 0.9rem; text-align: left;">
+            <strong>Database Connection Test:</strong><br/>
+            <?php
+            $conn = @new mysqli('localhost', '%s', '%s', '%s');
+            if ($conn->connect_error) {
+                echo "<span style='color:#f87171;'>❌ Connection Failed: " . htmlspecialchars($conn->connect_error) . "</span>";
+            } else {
+                echo "<span style='color:#34d399;'>✔ Connection Successful!</span>";
+                $conn->close();
+            }
+            ?>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: #64748b; margin-top: 2rem;">Webroot is at <code>/var/www/<?php echo htmlspecialchars($domain); ?>/htdocs</code></p>
+    </div>
+</body>
+</html>`, dbName, dbUser, dbPassword, dbUser, dbPassword, dbName)
+				_ = os.WriteFile(indexPath, []byte(phpContent), 0644)
+			} else if siteType == "laravel" {
+				publicPath := filepath.Join(htdocsPath, "public")
+				_ = os.MkdirAll(publicPath, 0755)
+				indexPath := filepath.Join(publicPath, "index.php")
+				laravelContent := fmt.Sprintf(`<?php
+$domain = $_SERVER['HTTP_HOST'];
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laravel Ready - <?php echo htmlspecialchars($domain); ?></title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #f43f5e; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #f43f5e; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+        pre { text-align: left; background: #020617; padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); color: #38bdf8; font-size: 0.9rem; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel Laravel Ready</div>
+        <h1>%s</h1>
+        <p>Your server environment is fully configured for Laravel.</p>
+        <p>To deploy your Laravel application, configure your <code>.env</code> file in <code>/var/www/%s/htdocs</code> with these settings:</p>
+        
+        <pre>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=%s
+DB_USERNAME=%s
+DB_PASSWORD=%s</pre>
+
+        <p style="font-size: 0.9rem; color: #64748b; margin-top: 2rem;">Caddy is currently serving from: <code>/var/www/%s/htdocs/public</code></p>
+    </div>
+</body>
+</html>`, domain, domain, dbName, dbUser, dbPassword, domain)
+				_ = os.WriteFile(indexPath, []byte(laravelContent), 0644)
+			}
+
+			// Apply correct ownership and permissions
+			_ = server.FixPermissions(server.GetSiteRootDir(publicDir), systemUser)
 		}
 
 		// 9a. Persist admin credentials in site config
@@ -226,6 +373,11 @@ func Create(domain string, phpVersion string, installWP bool) error {
 
 	if err != nil {
 		return err
+	}
+
+	// Trigger telemetry ping
+	if s, err := config.ReadState(statePath); err == nil {
+		config.PingAsync(s)
 	}
 
 	// ── Pretty summary ────────────────────────────────────────────────────────
@@ -325,6 +477,11 @@ func Delete(domain string) error {
 
 	if err != nil {
 		return err
+	}
+
+	// Trigger telemetry ping
+	if s, err := config.ReadState(statePath); err == nil {
+		config.PingAsync(s)
 	}
 
 	ui.PrintSuccess("Site Deleted Successfully")
@@ -431,7 +588,7 @@ func CacheClean(domain string, cleanWP, cleanRedis, cleanOpcache, cleanCaddy boo
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	homeDir := filepath.Dir(targetSite.PublicDir)
+	homeDir := server.GetSiteRootDir(targetSite.PublicDir)
 
 	// 1. Flush WordPress internal cache
 	if cleanWP {
@@ -518,39 +675,166 @@ func Reinstall(domain string) error {
 			return err
 		}
 
-		// 4. Generate new DB password
-		dbPassword, err := server.GenerateSecurePassword()
-		if err != nil {
-			return err
+		// 4. Generate new DB password (only if database exists)
+		dbPassword := ""
+		var err error
+		createDB := targetSite.DatabaseName != ""
+		if createDB {
+			dbPassword, err = server.GenerateSecurePassword()
+			if err != nil {
+				return err
+			}
+			// 5. Update user and database credentials
+			if err := server.CreateDatabase(targetSite.DatabaseName, targetSite.DatabaseUser, dbPassword); err != nil {
+				return err
+			}
 		}
 
-		// 5. Update user and database credentials
-		if err := server.CreateDatabase(targetSite.DatabaseName, targetSite.DatabaseUser, dbPassword); err != nil {
-			return err
-		}
-
-		// 6. Install WordPress again – reuse stored admin user/email
+		// 6. Install layouts depending on type
+		var wpAdminPassword string
 		adminUser := targetSite.WPAdminUser
-		if adminUser == "" {
-			adminUser = "admin"
-		}
-		adminEmail := targetSite.WPAdminEmail
-		if adminEmail == "" {
-			adminEmail = "admin@" + targetSite.Domain
-		}
-		wpAdminPassword, err := server.InstallWordPress(
-			targetSite.SystemUser,
-			targetSite.Domain,
-			targetSite.PublicDir,
-			targetSite.DatabaseName,
-			targetSite.DatabaseUser,
-			dbPassword,
-			s.Global.RedisSocketPath,
-			adminUser,
-			adminEmail,
-		)
-		if err != nil {
-			return err
+		isWP := targetSite.Type == "wp" || targetSite.Type == ""
+		if isWP {
+			if adminUser == "" {
+				adminUser = "admin"
+			}
+			adminEmail := targetSite.WPAdminEmail
+			if adminEmail == "" {
+				adminEmail = "admin@" + targetSite.Domain
+			}
+			wpAdminPassword, err = server.InstallWordPress(
+				targetSite.SystemUser,
+				targetSite.Domain,
+				targetSite.PublicDir,
+				targetSite.DatabaseName,
+				targetSite.DatabaseUser,
+				dbPassword,
+				s.Global.RedisSocketPath,
+				adminUser,
+				adminEmail,
+			)
+			if err != nil {
+				return err
+			}
+		} else {
+			htdocsPath := filepath.Join(server.GetSiteRootDir(targetSite.PublicDir), "htdocs")
+			if targetSite.Type == "html" {
+				indexPath := filepath.Join(htdocsPath, "index.html")
+				htmlContent := fmt.Sprintf(`<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to %s</title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #0ea5e9; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel HTML</div>
+        <h1>%s</h1>
+        <p>Your static HTML website has been successfully provisioned and is online.</p>
+        <p style="font-size: 0.9rem; color: #64748b;">Upload your static assets to <code>/var/www/%s/htdocs</code> to replace this page.</p>
+    </div>
+</body>
+</html>`, targetSite.Domain, targetSite.Domain, targetSite.Domain)
+				_ = os.WriteFile(indexPath, []byte(htmlContent), 0644)
+			} else if targetSite.Type == "php" {
+				indexPath := filepath.Join(htdocsPath, "index.php")
+				phpContent := fmt.Sprintf(`<?php
+$domain = $_SERVER['HTTP_HOST'];
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to <?php echo htmlspecialchars($domain); ?></title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #10b981; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #10b981; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+        ul { text-align: left; background: #1e293b; padding: 1.5rem 1.5rem 1.5rem 2.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-family: monospace; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel PHP</div>
+        <h1><?php echo htmlspecialchars($domain); ?></h1>
+        <p>Your custom PHP environment is fully configured and online.</p>
+        
+        <h3>Database Credentials</h3>
+        <ul>
+            <li><strong>Host:</strong> localhost (UNIX Socket)</li>
+            <li><strong>Database:</strong> %s</li>
+            <li><strong>Username:</strong> %s</li>
+            <li><strong>Password:</strong> %s</li>
+        </ul>
+
+        <div style="margin-top: 2rem; background: #020617; padding: 1rem; border-radius: 6px; font-size: 0.9rem; text-align: left;">
+            <strong>Database Connection Test:</strong><br/>
+            <?php
+            $conn = @new mysqli('localhost', '%s', '%s', '%s');
+            if ($conn->connect_error) {
+                echo "<span style='color:#f87171;'>❌ Connection Failed: " . htmlspecialchars($conn->connect_error) . "</span>";
+            } else {
+                echo "<span style='color:#34d399;'>✔ Connection Successful!</span>";
+                $conn->close();
+            }
+            ?>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: #64748b; margin-top: 2rem;">Webroot is at <code>/var/www/<?php echo htmlspecialchars($domain); ?>/htdocs</code></p>
+    </div>
+</body>
+</html>`, targetSite.DatabaseName, targetSite.DatabaseUser, dbPassword, targetSite.DatabaseUser, dbPassword, targetSite.DatabaseName)
+				_ = os.WriteFile(indexPath, []byte(phpContent), 0644)
+			} else if targetSite.Type == "laravel" {
+				publicPath := filepath.Join(htdocsPath, "public")
+				_ = os.MkdirAll(publicPath, 0755)
+				indexPath := filepath.Join(publicPath, "index.php")
+				laravelContent := fmt.Sprintf(`<?php
+$domain = $_SERVER['HTTP_HOST'];
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laravel Ready - <?php echo htmlspecialchars($domain); ?></title>
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.7); padding: 3rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: #f43f5e; margin-top: 0; }
+        p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+        .badge { background: #f43f5e; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; color: white; display: inline-block; }
+        pre { text-align: left; background: #020617; padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); color: #38bdf8; font-size: 0.9rem; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">AgilePanel Laravel Ready</div>
+        <h1>%s</h1>
+        <p>Your server environment is fully configured for Laravel.</p>
+        <p>To deploy your Laravel application, configure your <code>.env</code> file in <code>/var/www/%s/htdocs</code> with these settings:</p>
+        
+        <pre>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=%s
+DB_USERNAME=%s
+DB_PASSWORD=%s</pre>
+
+        <p style="font-size: 0.9rem; color: #64748b; margin-top: 2rem;">Caddy is currently serving from: <code>/var/www/%s/htdocs/public</code></p>
+    </div>
+</body>
+</html>`, targetSite.Domain, targetSite.Domain, targetSite.DatabaseName, targetSite.DatabaseUser, dbPassword, targetSite.Domain)
+				_ = os.WriteFile(indexPath, []byte(laravelContent), 0644)
+			}
+			// Apply correct ownership and permissions
+			_ = server.FixPermissions(server.GetSiteRootDir(targetSite.PublicDir), targetSite.SystemUser)
 		}
 
 		// 7. Re-lock if it was locked originally
@@ -563,14 +847,22 @@ func Reinstall(domain string) error {
 		ui.PrintSuccess("Reinstall Complete")
 		ui.SectionHeader("SITE")
 		ui.Row("Domain", domain)
-		ui.SectionHeader("DATABASE")
-		ui.Row("New Password", dbPassword)
-		ui.SectionHeader("WORDPRESS ADMIN")
-		ui.Row("Username", adminUser)
-		ui.Row("New Password", wpAdminPassword)
-		ui.Row("Login URL", "https://"+domain+"/wp-admin")
-		ui.Divider()
-		ui.PrintInfo("WordPress has been successfully reinstalled! AgilePanel deleted the old public folders, dropped and re-provisioned the database tables, and performed a fresh WordPress Core installation including the Redis Cache plugin.")
+		ui.Row("Type", targetSite.Type)
+		if createDB {
+			ui.SectionHeader("DATABASE")
+			ui.Row("New Password", dbPassword)
+		}
+		if isWP {
+			ui.SectionHeader("WORDPRESS ADMIN")
+			ui.Row("Username", adminUser)
+			ui.Row("New Password", wpAdminPassword)
+			ui.Row("Login URL", "https://"+domain+"/wp-admin")
+			ui.Divider()
+			ui.PrintInfo("WordPress has been successfully reinstalled! AgilePanel deleted the old public folders, dropped and re-provisioned the database tables, and performed a fresh WordPress Core installation including the Redis Cache plugin.")
+		} else {
+			ui.Divider()
+			ui.PrintInfo("The site has been successfully reinstalled! AgilePanel deleted the old folders, re-provisioned the database credentials (if applicable), and restored the default landing index files.")
+		}
 		fmt.Println()
 
 		return nil
@@ -649,7 +941,7 @@ func FixPermissions(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	parentDir := filepath.Dir(targetSite.PublicDir)
+	parentDir := server.GetSiteRootDir(targetSite.PublicDir)
 	err = server.FixPermissions(parentDir, targetSite.SystemUser)
 	if err != nil {
 		return err
@@ -684,20 +976,48 @@ func BackupDB(domain string) error {
 	}
 
 	timestamp := time.Now().Format("20060102-150405")
-	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
+	parentDir := server.GetSiteRootDir(targetSite.PublicDir) // /var/www/[domain]
 	backupDir := filepath.Join(parentDir, "backup")
 	backupFile := fmt.Sprintf("%s-%s.sql", domain, timestamp)
 	backupPath := filepath.Join(backupDir, backupFile)
 
-	homeDir := filepath.Dir(targetSite.PublicDir)
-	fmt.Printf("WP-CLI: Exporting database dump for %s to %s...\n", domain, backupPath)
-	err = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "db", "export", backupPath, "--path="+targetSite.PublicDir)
+	if targetSite.Type == "html" || targetSite.DatabaseName == "" {
+		return fmt.Errorf("site %s is a static HTML site and does not have a database", domain)
+	}
+
+	homeDir := server.GetSiteRootDir(targetSite.PublicDir)
+	if targetSite.Type == "wp" || targetSite.Type == "" {
+		fmt.Printf("WP-CLI: Exporting database dump for %s to %s...\n", domain, backupPath)
+		err = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "db", "export", backupPath, "--path="+targetSite.PublicDir)
+	} else {
+		fmt.Printf("mysqldump: Exporting database dump for %s to %s...\n", domain, backupPath)
+		if runtime.GOOS != "linux" {
+			fmt.Printf("DB (Mock): mysqldump -u %s -p%s %s > %s\n", targetSite.DatabaseUser, targetSite.DatabasePass, targetSite.DatabaseName, backupPath)
+		} else {
+			cmd := exec.Command("mysqldump", "-u"+targetSite.DatabaseUser, "-p"+targetSite.DatabasePass, targetSite.DatabaseName)
+			outFile, oErr := os.OpenFile(backupPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+			if oErr != nil {
+				return fmt.Errorf("failed to create backup file: %w", oErr)
+			}
+			defer outFile.Close()
+			cmd.Stdout = outFile
+
+			var stderr bytes.Buffer
+			cmd.Stderr = &stderr
+
+			if err = cmd.Run(); err != nil {
+				return fmt.Errorf("mysqldump failed: %w (stderr: %s)", err, stderr.String())
+			}
+			_ = exec.Command("chown", fmt.Sprintf("%s:caddy", targetSite.SystemUser), backupPath).Run()
+		}
+	}
+
 	if err != nil {
 		return fmt.Errorf("failed to export database: %w", err)
 	}
 
 	ui.PrintSuccess("Database Backup Completed")
-	ui.PrintInfo("AgilePanel has successfully exported a secure MariaDB database SQL dump using WP-CLI. The backup file is safely stored at " + backupPath + ".")
+	ui.PrintInfo("AgilePanel has successfully exported a secure MariaDB database SQL dump. The backup file is safely stored at " + backupPath + ".")
 	ui.Divider()
 	fmt.Println()
 	return nil
@@ -769,7 +1089,7 @@ func Info(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	parentDir := filepath.Dir(targetSite.PublicDir)
+	parentDir := server.GetSiteRootDir(targetSite.PublicDir)
 	configDir := filepath.Join(parentDir, "conf")
 	backupDir := filepath.Join(parentDir, "backup")
 
@@ -1081,8 +1401,9 @@ func Sync() error {
 						continue
 					}
 
+					domainPath := filepath.Join(webRoot, name)
 					// Verify it has an htdocs directory
-					htdocsPath := filepath.Join(webRoot, name, "htdocs")
+					htdocsPath := filepath.Join(domainPath, "htdocs")
 					if _, err := os.Stat(htdocsPath); os.IsNotExist(err) {
 						continue
 					}
@@ -1105,28 +1426,51 @@ func Sync() error {
 						}
 					}
 
-					// Parse database settings from wp-config.php if present
+					// Detect site type and set PublicDir
+					publicDir := htdocsPath
+					siteType := "php"
+
+					laravelPublicPath := filepath.Join(htdocsPath, "public")
+					if _, err := os.Stat(laravelPublicPath); err == nil {
+						publicDir = laravelPublicPath
+						siteType = "laravel"
+					} else if _, err := os.Stat(filepath.Join(htdocsPath, "wp-config.php")); err == nil {
+						siteType = "wp"
+					} else if _, err := os.Stat(filepath.Join(domainPath, "wp-config.php")); err == nil {
+						siteType = "wp"
+					} else if _, err := os.Stat(filepath.Join(htdocsPath, "index.html")); err == nil {
+						siteType = "html"
+					}
+
+					// Parse database settings if present
 					dbName := ""
 					dbUser := ""
 					dbPass := ""
 
-					wpConfigPath := filepath.Join(htdocsPath, "wp-config.php")
-					if _, err := os.Stat(wpConfigPath); err == nil {
-						contentBytes, err := os.ReadFile(wpConfigPath)
-						if err == nil {
-							content := string(contentBytes)
-							dbNameRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_NAME['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
-							dbUserRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_USER['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
-							dbPassRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_PASSWORD['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+					// Search for wp-config.php (could be in htdocs or parent domain folder)
+					wpConfigSearchPaths := []string{
+						filepath.Join(htdocsPath, "wp-config.php"),
+						filepath.Join(domainPath, "wp-config.php"),
+					}
+					for _, path := range wpConfigSearchPaths {
+						if _, err := os.Stat(path); err == nil {
+							contentBytes, err := os.ReadFile(path)
+							if err == nil {
+								content := string(contentBytes)
+								dbNameRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_NAME['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+								dbUserRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_USER['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+								dbPassRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_PASSWORD['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
 
-							if match := dbNameRegex.FindStringSubmatch(content); len(match) > 1 {
-								dbName = match[1]
-							}
-							if match := dbUserRegex.FindStringSubmatch(content); len(match) > 1 {
-								dbUser = match[1]
-							}
-							if match := dbPassRegex.FindStringSubmatch(content); len(match) > 1 {
-								dbPass = match[1]
+								if match := dbNameRegex.FindStringSubmatch(content); len(match) > 1 {
+									dbName = match[1]
+								}
+								if match := dbUserRegex.FindStringSubmatch(content); len(match) > 1 {
+									dbUser = match[1]
+								}
+								if match := dbPassRegex.FindStringSubmatch(content); len(match) > 1 {
+									dbPass = match[1]
+								}
+								break
 							}
 						}
 					}
@@ -1134,16 +1478,17 @@ func Sync() error {
 					importedSite := config.SiteConfig{
 						Domain:       domain,
 						PHPVersion:   phpVersion,
-						PublicDir:    htdocsPath,
+						PublicDir:    publicDir,
 						DatabaseName: dbName,
 						DatabaseUser: dbUser,
 						DatabasePass: dbPass,
 						SystemUser:   systemUser,
 						IsLocked:     false,
+						Type:         siteType,
 					}
 
 					s.Sites = append(s.Sites, importedSite)
-					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (PHP %s, DB %s)", domain, phpVersion, dbName))
+					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (Type: %s, PHP %s, DB %s)", domain, siteType, phpVersion, dbName))
 				}
 			}
 		}
@@ -1175,6 +1520,11 @@ func Sync() error {
 		return err
 	}
 
+	// Trigger telemetry ping
+	if s, err := config.ReadState(statePath); err == nil {
+		config.PingAsync(s)
+	}
+
 	ui.PrintSuccess("Synchronization Completed")
 	return nil
 }
@@ -1200,39 +1550,69 @@ func Backup(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
+	parentDir := server.GetSiteRootDir(targetSite.PublicDir) // /var/www/[domain]
 	backupDir := filepath.Join(parentDir, "backup")
 	_ = os.MkdirAll(backupDir, 0755)
 
+	hasDB := targetSite.DatabaseName != "" && targetSite.Type != "html"
 	dbSqlPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
 	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.zip", domain))
 	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files.zip", domain))
 
-	homeDir := filepath.Dir(targetSite.PublicDir)
+	homeDir := server.GetSiteRootDir(targetSite.PublicDir)
 
 	// 1. Export Database
-	ui.PrintStep(1, "Exporting MariaDB database dump...")
-	err = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "db", "export", dbSqlPath, "--path="+targetSite.PublicDir)
-	if err != nil {
-		return fmt.Errorf("failed to export database: %w", err)
-	}
+	if hasDB {
+		ui.PrintStep(1, "Exporting MariaDB database dump...")
+		var err error
+		if targetSite.Type == "wp" || targetSite.Type == "" {
+			err = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "db", "export", dbSqlPath, "--path="+targetSite.PublicDir)
+		} else {
+			if runtime.GOOS != "linux" {
+				fmt.Printf("DB (Mock): mysqldump -u %s -p%s %s > %s\n", targetSite.DatabaseUser, targetSite.DatabasePass, targetSite.DatabaseName, dbSqlPath)
+			} else {
+				cmd := exec.Command("mysqldump", "-u"+targetSite.DatabaseUser, "-p"+targetSite.DatabasePass, targetSite.DatabaseName)
+				outFile, oErr := os.OpenFile(dbSqlPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+				if oErr != nil {
+					return fmt.Errorf("failed to create backup file: %w", oErr)
+				}
+				defer outFile.Close()
+				cmd.Stdout = outFile
 
-	// 2. Compress Database SQL into ZIP
-	ui.PrintStep(2, "Compressing database SQL dump into ZIP...")
-	if runtime.GOOS == "linux" {
-		_ = os.Remove(dbZipPath)
-		zipCmd := exec.Command("zip", "-j", dbZipPath, dbSqlPath)
-		if err := zipCmd.Run(); err != nil {
-			return fmt.Errorf("failed to zip database: %w", err)
+				var stderr bytes.Buffer
+				cmd.Stderr = &stderr
+				err = cmd.Run()
+				if err != nil {
+					err = fmt.Errorf("mysqldump failed: %w (stderr: %s)", err, stderr.String())
+				} else {
+					_ = exec.Command("chown", fmt.Sprintf("%s:caddy", targetSite.SystemUser), dbSqlPath).Run()
+				}
+			}
 		}
-	} else {
-		// Mock compression on Windows
-		_ = os.WriteFile(dbZipPath, []byte("Mock database ZIP content"), 0644)
-	}
-	_ = os.Remove(dbSqlPath) // Clean up raw SQL file
+		if err != nil {
+			return fmt.Errorf("failed to export database: %w", err)
+		}
 
-	// 3. Compress WordPress Files into ZIP
-	ui.PrintStep(3, "Compressing WordPress public files into ZIP...")
+		// 2. Compress Database SQL into ZIP
+		ui.PrintStep(2, "Compressing database SQL dump into ZIP...")
+		if runtime.GOOS == "linux" {
+			_ = os.Remove(dbZipPath)
+			zipCmd := exec.Command("zip", "-j", dbZipPath, dbSqlPath)
+			if err := zipCmd.Run(); err != nil {
+				return fmt.Errorf("failed to zip database: %w", err)
+			}
+		} else {
+			// Mock compression on Windows
+			_ = os.WriteFile(dbZipPath, []byte("Mock database ZIP content"), 0644)
+		}
+		_ = os.Remove(dbSqlPath) // Clean up raw SQL file
+	} else {
+		ui.PrintStep(1, "Skipping database export (static site)...")
+		ui.PrintStep(2, "Skipping database ZIP creation (static site)...")
+	}
+
+	// 3. Compress Website Files into ZIP
+	ui.PrintStep(3, "Compressing website public files into ZIP...")
 	if runtime.GOOS == "linux" {
 		_ = os.Remove(filesZipPath)
 		zipCmd := exec.Command("zip", "-r", "-q", filesZipPath, "htdocs")
@@ -1253,9 +1633,13 @@ func Backup(domain string) error {
 
 	ui.PrintSuccess("Manual Backup Completed")
 	ui.PrintInfo("AgilePanel has successfully generated separate manual ZIP backups:")
-	ui.Row("Database ZIP", dbZipPath)
+	if hasDB {
+		ui.Row("Database ZIP", dbZipPath)
+	} else {
+		ui.Row("Database ZIP", "(None - Static HTML site)")
+	}
 	ui.Row("Web Files ZIP", filesZipPath)
-	ui.PrintInfo("These archives are owned by the site user and are immediately ready for secure download via SFTP/FTP client using the system user credentials.")
+	ui.PrintInfo("These archives are owned by the site user and are ready for download via SFTP/FTP using system user credentials.")
 	ui.Divider()
 	fmt.Println()
 	return nil

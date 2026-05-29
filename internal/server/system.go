@@ -70,15 +70,27 @@ func DeleteSystemUser(username string) error {
 	fmt.Printf("OS: Deleted system user and group %s successfully.\n", username)
 	return nil
 }
+// GetSiteRootDir dynamically locates the root /var/www/[domain] folder from the public path.
+func GetSiteRootDir(publicDir string) string {
+	parent := filepath.Clean(publicDir)
+	for {
+		dir := filepath.Dir(parent)
+		if filepath.Base(dir) == "www" || dir == parent {
+			return parent
+		}
+		parent = dir
+	}
+}
+
 // ProvisionSiteDirectory creates and permissions a site's webroot directory.
 func ProvisionSiteDirectory(path string, systemUser string) error {
-	parentDir := filepath.Dir(path) // /var/www/[domain]
+	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 	htdocsPath := filepath.Join(parentDir, "htdocs")
 	confPath := filepath.Join(parentDir, "conf")
 	backupPath := filepath.Join(parentDir, "backup")
 
-	// Create directories
-	for _, dir := range []string{htdocsPath, confPath, backupPath} {
+	// Create directories (including the target path itself, which might be a public subfolder)
+	for _, dir := range []string{htdocsPath, confPath, backupPath, path} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
@@ -112,7 +124,7 @@ func ProvisionSiteDirectory(path string, systemUser string) error {
 
 // DeleteSiteDirectory deletes the site directory and all content.
 func DeleteSiteDirectory(path string) error {
-	parentDir := filepath.Dir(path) // /var/www/[domain]
+	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 	if _, err := os.Stat(parentDir); err == nil {
 		if err := os.RemoveAll(parentDir); err != nil {
 			return fmt.Errorf("failed to delete site directory %s: %w", parentDir, err)

@@ -65,7 +65,7 @@ func TestSiteOrchestration(t *testing.T) {
 	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
 
 	// 1. Create site
-	err := Create("test.com", "8.3", true)
+	err := Create("test.com", "8.3", "wp")
 	if err != nil {
 		t.Fatalf("failed to create site: %v", err)
 	}
@@ -101,13 +101,13 @@ func TestSiteOrchestration(t *testing.T) {
 	}
 
 	// 2. Duplicate detection
-	err = Create("TEST.com", "8.3", false)
+	err = Create("TEST.com", "8.3", "php")
 	if err == nil {
 		t.Error("expected duplicate error but got nil")
 	}
 
 	// 3. Invalid PHP version
-	err = Create("another.com", "7.4", false)
+	err = Create("another.com", "7.4", "php")
 	if err == nil {
 		t.Error("expected invalid PHP version error but got nil")
 	}
@@ -269,6 +269,75 @@ define( 'DB_PASSWORD', 'pass_mock_secret' );
 
 	if !found {
 		t.Errorf("mocksite.com was not imported during sync")
+	}
+}
+
+func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
+	tempDir := t.TempDir()
+	statePath := filepath.Join(tempDir, "state.json")
+	os.Setenv("AGILEPANEL_STATE_PATH", statePath)
+	os.Setenv("AGILEPANEL_TEST_MODE", "true")
+	defer os.Unsetenv("AGILEPANEL_STATE_PATH")
+	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
+
+	// Initialize state
+	_, _ = config.ReadState(statePath)
+
+	// 1. Create static HTML site
+	err := Create("static-html.com", "8.3", "html")
+	if err != nil {
+		t.Fatalf("failed to create static html site: %v", err)
+	}
+
+	state, _ := config.ReadState(statePath)
+	if len(state.Sites) != 1 {
+		t.Fatalf("expected 1 site, got %d", len(state.Sites))
+	}
+	htmlSite := state.Sites[0]
+	if htmlSite.Type != "html" {
+		t.Errorf("expected type html, got %s", htmlSite.Type)
+	}
+	if htmlSite.DatabaseName != "" {
+		t.Errorf("expected empty database name for html site, got %s", htmlSite.DatabaseName)
+	}
+
+	// 2. Create Laravel site
+	err = Create("my-laravel.com", "8.3", "laravel")
+	if err != nil {
+		t.Fatalf("failed to create laravel site: %v", err)
+	}
+
+	state, _ = config.ReadState(statePath)
+	if len(state.Sites) != 2 {
+		t.Fatalf("expected 2 sites, got %d", len(state.Sites))
+	}
+	laravelSite := state.Sites[1]
+	if laravelSite.Type != "laravel" {
+		t.Errorf("expected type laravel, got %s", laravelSite.Type)
+	}
+	if !strings.HasSuffix(laravelSite.PublicDir, "public") {
+		t.Errorf("expected public dir to end with public, got %s", laravelSite.PublicDir)
+	}
+	if laravelSite.DatabaseName == "" {
+		t.Error("expected database name for laravel site, got empty")
+	}
+
+	// 3. Test backup of HTML site (skips db, only zips htdocs)
+	err = Backup("static-html.com")
+	if err != nil {
+		t.Fatalf("failed to backup html site: %v", err)
+	}
+
+	// 4. Test backup of Laravel site (runs mysqldump fallback mock, zips files)
+	err = Backup("my-laravel.com")
+	if err != nil {
+		t.Fatalf("failed to backup laravel site: %v", err)
+	}
+
+	// 5. Reinstall Laravel site
+	err = Reinstall("my-laravel.com")
+	if err != nil {
+		t.Fatalf("failed to reinstall laravel site: %v", err)
 	}
 }
 

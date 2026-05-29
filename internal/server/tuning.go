@@ -38,7 +38,19 @@ func TuneServer() error {
 		fmt.Printf("Warning: Default webserver initialization failed: %v\n", err)
 	}
 
+	// 5. Install Metrics Cron Job
+	if err := installMetricsCron(); err != nil {
+		fmt.Printf("Warning: Metrics cron job installation failed: %v\n", err)
+	}
+
 	fmt.Println("AgilePanel: Server optimization tuning completed successfully.")
+
+	// Trigger telemetry check-in
+	statePath := config.GetStatePath()
+	if s, err := config.ReadState(statePath); err == nil {
+		config.PingAsync(s)
+	}
+
 	return nil
 }
 
@@ -692,5 +704,23 @@ func SetupDefaultWebserver() error {
 		return err
 	}
 
+	return nil
+}
+
+func installMetricsCron() error {
+	if runtime.GOOS != "linux" {
+		fmt.Println("Cron (Mock): Write metrics cron job to /etc/cron.d/agilepanel-metrics")
+		return nil
+	}
+
+	cronPath := "/etc/cron.d/agilepanel-metrics"
+	cronContent := "*/5 * * * * root /usr/local/bin/ap server log-metrics >/dev/null 2>&1\n"
+
+	err := os.WriteFile(cronPath, []byte(cronContent), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write metrics cron job: %w", err)
+	}
+
+	fmt.Println("Cron: Metrics recording job installed to /etc/cron.d/agilepanel-metrics.")
 	return nil
 }

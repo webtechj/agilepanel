@@ -7,10 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const Version = "0.8.0"
+
 var rootCmd = &cobra.Command{
-	Use:   "ap",
-	Short: "ap (AgilePanel) is a secure, lightweight control panel for WordPress",
-	Long:  `A hyper-fast, secure CLI WordPress control panel designed to replace legacy heavy platforms.`,
+	Use:     "ap",
+	Version: Version,
+	Short:   "ap (AgilePanel) is a secure, lightweight control panel for WordPress",
+	Long:    `A hyper-fast, secure CLI WordPress control panel designed to replace legacy heavy platforms.`,
 }
 
 // Execute runs the root CLI command.

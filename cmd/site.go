@@ -9,6 +9,7 @@ import (
 var (
 	phpVersion   string
 	installWP    bool
+	siteType     string
 	cleanWP      bool
 	cleanRedis   bool
 	cleanOpcache bool
@@ -22,11 +23,16 @@ var siteCmd = &cobra.Command{
 
 var siteCreateCmd = &cobra.Command{
 	Use:   "create [domain]",
-	Short: "Create a new WordPress or PHP site",
+	Short: "Create a new site (WordPress, Laravel, Custom PHP, Static HTML)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
-		return site.Create(domain, phpVersion, installWP)
+		// Map --wp flag to wp type
+		actualType := siteType
+		if installWP {
+			actualType = "wp"
+		}
+		return site.Create(domain, phpVersion, actualType)
 	},
 }
 
@@ -157,7 +163,8 @@ var siteEditCmd = &cobra.Command{
 
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
-	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically")
+	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
+	siteCreateCmd.Flags().StringVar(&siteType, "type", "wp", "Type of site to create: wp, laravel, php, html")
 
 	siteCacheCleanCmd.Flags().BoolVar(&cleanWP, "wp", false, "Clean WordPress transients and internal cache")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanRedis, "redis", false, "Clean Redis Object Cache")
