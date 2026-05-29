@@ -677,32 +677,29 @@ func List() error {
 		return nil
 	}
 
-	cols := []ui.TableColumn{
-		{Header: "DOMAIN", Width: 28},
-		{Header: "PHP", Width: 5},
-		{Header: "SYSTEM USER", Width: 22},
-		{Header: "DATABASE", Width: 28},
-		{Header: "STATUS", Width: 10},
-	}
-
-	var rows [][]string
-	for _, site := range state.Sites {
-		var statusStr string
+	for i, site := range state.Sites {
+		var statusIcon string
 		if site.IsLocked {
-			statusStr = ui.StatusLocked()
+			statusIcon = ui.BrightYellow + "⊘" + ui.Reset
 		} else {
-			statusStr = ui.StatusActive()
+			statusIcon = ui.BrightGreen + "●" + ui.Reset
 		}
-		rows = append(rows, []string{
-			ui.BrightWhite + site.Domain + ui.Reset,
-			site.PHPVersion,
-			ui.Muted(site.SystemUser),
-			ui.Muted(site.DatabaseName),
-			statusStr,
-		})
+
+		fmt.Printf("  %s  %s\n", statusIcon, ui.Header(site.Domain))
+		ui.Row("PHP Version", site.PHPVersion)
+		ui.Row("System User", site.SystemUser)
+		if site.DatabaseName != "" {
+			ui.Row("Database Name", site.DatabaseName)
+		} else {
+			ui.Row("Database Name", "None (Static/PHP-Only)")
+		}
+
+		if i < len(state.Sites)-1 {
+			fmt.Println()
+		}
 	}
 
-	ui.PrintTable(cols, rows)
+	ui.Divider()
 	fmt.Printf("  %s %d site(s) registered\n", ui.Muted("Total:"), len(state.Sites))
 	fmt.Println()
 	return nil
