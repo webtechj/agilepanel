@@ -43,12 +43,15 @@ const caddyfileTemplateStr = `# Global Options Block
 
     {{if and .Global.AdminUser .Global.AdminPasswordHash}}
     basic_auth {
-        {{.Global.AdminUser}} {{.Global.AdminPasswordHash}}
+        {{.Global.AdminUser}} "{{.Global.AdminPasswordHash}}"
     }
     {{end}}
 
     # Connect to default PHP-FPM socket
-    php_fastcgi unix//run/php/php{{.Global.DefaultPHPVersion}}-fpm.sock
+    php_fastcgi unix//run/php/php{{.Global.DefaultPHPVersion}}-fpm.sock {
+        env DOCUMENT_ROOT /usr/share/phpmyadmin
+        index index.php
+    }
 
     # Response Compression
     encode gzip zstd
