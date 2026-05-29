@@ -97,6 +97,7 @@ var serverAuthCmd = &cobra.Command{
 		ui.Row("Username", username)
 		ui.Row("Scope", "phpMyAdmin + server tools")
 		ui.Divider()
+		ui.PrintInfo("Your phpMyAdmin and administrative tools are now secured behind HTTP Basic Authentication. You must enter these credentials when accessing the phpMyAdmin page at http://[your-ip]:8888.")
 		fmt.Println()
 		return nil
 	},
@@ -113,7 +114,15 @@ var serverRestartCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		serviceName := args[0]
-		return server.RestartService(serviceName)
+		err := server.RestartService(serviceName)
+		if err != nil {
+			return err
+		}
+		ui.PrintSuccess(fmt.Sprintf("Service %s Restarted", serviceName))
+		ui.PrintInfo(fmt.Sprintf("AgilePanel has successfully restarted %s systemctl service to apply configuration or memory updates.", serviceName))
+		ui.Divider()
+		fmt.Println()
+		return nil
 	},
 }
 
@@ -136,7 +145,15 @@ var serverTuneCmd = &cobra.Command{
 				return err
 			}
 		}
-		return server.TuneServer()
+		err := server.TuneServer()
+		if err != nil {
+			return err
+		}
+		ui.PrintSuccess("Server Performance Tuning Completed")
+		ui.PrintInfo("AgilePanel has audited your server hardware resources and configured optimized database buffers (30% RAM), Redis UNIX socket connections, persistent swap memories, and strict cache systems.")
+		ui.Divider()
+		fmt.Println()
+		return nil
 	},
 }
 

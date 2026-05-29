@@ -15,8 +15,19 @@ var rootCmd = &cobra.Command{
 
 // Execute runs the root CLI command.
 func Execute() {
+	// Silence default Cobra error printing so we can print our own premium styled error
+	rootCmd.SilenceErrors = true
+	rootCmd.SilenceUsage = true
+
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Println()
+		fmt.Printf("  \033[91m✘  Operation Failed:\033[0m \033[1;97m%s\033[0m\n", err.Error())
+		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")
+		fmt.Println("  \033[34m›\033[0m  \033[2mWhat went wrong:\033[0m The action was stopped due to the error listed above.")
+		fmt.Println("  \033[34m›\033[0m  \033[2mWhat to do next:\033[0m Double-check the command spelling, verify the domain name is")
+		fmt.Println("     correctly formatted and exists, and ensure you are running as root/sudo.")
+		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")
+		fmt.Println()
 		os.Exit(1)
 	}
 }
