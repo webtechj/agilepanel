@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -12,6 +13,8 @@ var (
 	phpVersion   string
 	installWP    bool
 	siteType     string
+	createDBFlag string
+	yesFlag      bool
 	cleanWP      bool
 	cleanRedis   bool
 	cleanOpcache bool
@@ -72,7 +75,26 @@ var siteCreateCmd = &cobra.Command{
 			}
 		}
 
-		return site.Create(domain, actualPHP, actualType)
+		dbOpt := createDBFlag
+		if actualType == "html" {
+			if cmd.Flags().Changed("db") {
+				// use explicitly passed value
+			} else {
+				resp, err := promptString("Do you need a MariaDB database for this HTML site? (y/N): ")
+				if err == nil {
+					resp = strings.ToLower(strings.TrimSpace(resp))
+					if resp == "y" || resp == "yes" {
+						dbOpt = "true"
+					} else {
+						dbOpt = "false"
+					}
+				} else {
+					dbOpt = "false"
+				}
+			}
+		}
+
+		return site.Create(domain, actualPHP, actualType, dbOpt)
 	},
 }
 
@@ -85,12 +107,14 @@ var siteDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		confirmed, err := promptDoubleConfirm(domain, "permanently delete")
-		if err != nil {
-			return err
-		}
-		if !confirmed {
-			return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+		if !yesFlag {
+			confirmed, err := promptDoubleConfirm(domain, "permanently delete")
+			if err != nil {
+				return err
+			}
+			if !confirmed {
+				return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+			}
 		}
 		return site.Delete(domain)
 	},
@@ -105,12 +129,14 @@ var siteLockCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		confirmed, err := promptDoubleConfirm(domain, "lock/deactivate")
-		if err != nil {
-			return err
-		}
-		if !confirmed {
-			return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+		if !yesFlag {
+			confirmed, err := promptDoubleConfirm(domain, "lock/deactivate")
+			if err != nil {
+				return err
+			}
+			if !confirmed {
+				return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+			}
 		}
 		return site.Lock(domain)
 	},
@@ -252,6 +278,10 @@ func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
 	siteCreateCmd.Flags().StringVar(&siteType, "type", "wp", "Type of site to create: wp, woocommerce, laravel, php, html")
+	siteCreateCmd.Flags().StringVar(&createDBFlag, "db", "default", "Create MariaDB database for site: true, false, default")
+
+	siteDeleteCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
+	siteLockCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
 
 	siteCacheCleanCmd.Flags().BoolVar(&cleanWP, "wp", false, "Clean WordPress transients and internal cache")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanRedis, "redis", false, "Clean Redis Object Cache")

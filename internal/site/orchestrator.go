@@ -54,7 +54,7 @@ func promptLine(label string) string {
 }
 
 // Create provisions a site's infrastructure.
-func Create(domain string, phpVersion string, siteType string) error {
+func Create(domain string, phpVersion string, siteType string, dbOpt string) error {
 	if err := ValidateDomain(domain); err != nil {
 		return err
 	}
@@ -166,8 +166,15 @@ func Create(domain string, phpVersion string, siteType string) error {
 			return fmt.Errorf("failed to provision web folders: %w", err)
 		}
 
-		// 6. Create Database (skip for HTML)
-		createDB := siteType == "wp" || siteType == "laravel" || siteType == "php"
+		// 6. Create Database (depends on dbOpt and siteType)
+		var createDB bool
+		if dbOpt == "true" {
+			createDB = true
+		} else if dbOpt == "false" {
+			createDB = false
+		} else {
+			createDB = siteType != "html"
+		}
 		if createDB {
 			if err := server.CreateDatabase(dbName, dbUser, dbPassword); err != nil {
 				_ = server.DeleteSiteDirectory(publicDir)
