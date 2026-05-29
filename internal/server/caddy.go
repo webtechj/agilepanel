@@ -14,6 +14,7 @@ import (
 
 const caddyfileTemplateStr = `# Global Options Block
 {
+    {{if .Global.AdminEmail}}email {{.Global.AdminEmail}}{{end}}
     servers {
         protocols h1 h2 h3
     }

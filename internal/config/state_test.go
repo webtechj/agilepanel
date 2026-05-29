@@ -119,3 +119,30 @@ func TestConcurrentStateLocking(t *testing.T) {
 		t.Errorf("expected %d sites after concurrent updates, got %d", workers, len(state.Sites))
 	}
 }
+
+func TestAdminFields(t *testing.T) {
+	tempDir := t.TempDir()
+	statePath := filepath.Join(tempDir, "state.json")
+
+	err := WithLockedState(statePath, func(s *State) error {
+		s.Global.AdminName = "John Doe"
+		s.Global.AdminEmail = "john@example.com"
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("failed to update state: %v", err)
+	}
+
+	state, err := ReadState(statePath)
+	if err != nil {
+		t.Fatalf("failed to read state: %v", err)
+	}
+
+	if state.Global.AdminName != "John Doe" {
+		t.Errorf("expected AdminName 'John Doe', got '%s'", state.Global.AdminName)
+	}
+	if state.Global.AdminEmail != "john@example.com" {
+		t.Errorf("expected AdminEmail 'john@example.com', got '%s'", state.Global.AdminEmail)
+	}
+}
+

@@ -37,7 +37,8 @@ func RunAsUser(username string, homeDir string, command string, args ...string) 
 }
 
 // InstallWordPress downloads, installs, and configures WordPress and its Redis Object Cache.
-func InstallWordPress(username string, domain string, publicDir string, dbName string, dbUser string, dbPassword string, redisSocket string) (string, error) {
+// adminUser and adminEmail are provided by the operator and must not be empty.
+func InstallWordPress(username string, domain string, publicDir string, dbName string, dbUser string, dbPassword string, redisSocket string, adminUser string, adminEmail string) (string, error) {
 	adminPassword, err := GenerateSecurePassword()
 	if err != nil {
 		return "", err
@@ -45,7 +46,6 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 	if len(adminPassword) > 16 {
 		adminPassword = adminPassword[:16]
 	}
-	adminEmail := fmt.Sprintf("admin@%s", domain)
 	homeDir := filepath.Dir(publicDir)
 
 	// 1. Download WordPress Core
@@ -73,13 +73,13 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 		return "", fmt.Errorf("wp config create failed: %w", err)
 	}
 
-	// 3. Install WordPress
-	fmt.Println("WP-CLI: Installing WordPress database schemas...")
+	// 3. Install WordPress using the operator-supplied admin credentials
+	fmt.Printf("WP-CLI: Installing WordPress database schemas (admin: %s)...\n", adminUser)
 	if err := RunAsUser(username, homeDir, "wp", "core", "install",
 		"--path="+publicDir,
 		"--url=https://"+domain,
 		"--title="+domain,
-		"--admin_user=admin",
+		"--admin_user="+adminUser,
 		"--admin_password="+adminPassword,
 		"--admin_email="+adminEmail,
 	); err != nil {

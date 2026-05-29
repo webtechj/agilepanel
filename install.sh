@@ -41,6 +41,37 @@ echo "========================================="
 echo "       INSTALLING AGILEPANEL (ap)        "
 echo "========================================="
 
+# 0. Ask for Server Admin details (for SSL & configuration)
+if [ -t 0 ]; then
+    IS_INTERACTIVE=true
+else
+    IS_INTERACTIVE=false
+fi
+
+if [ -z "$ADMIN_NAME" ]; then
+    if [ "$IS_INTERACTIVE" = true ]; then
+        read -p "Enter Server Admin Full Name: " ADMIN_NAME
+        while [ -z "$ADMIN_NAME" ]; do
+            echo "Admin name cannot be empty."
+            read -p "Enter Server Admin Full Name: " ADMIN_NAME
+        done
+    else
+        ADMIN_NAME="AgilePanel Admin"
+    fi
+fi
+
+if [ -z "$ADMIN_EMAIL" ]; then
+    if [ "$IS_INTERACTIVE" = true ]; then
+        read -p "Enter Server Admin Email Address: " ADMIN_EMAIL
+        while [ -z "$ADMIN_EMAIL" ]; do
+            echo "Admin email cannot be empty."
+            read -p "Enter Server Admin Email Address: " ADMIN_EMAIL
+        done
+    else
+        ADMIN_EMAIL="admin@localhost"
+    fi
+fi
+
 # 1. Update system package index
 apt-get update && apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo unzip
 
@@ -79,17 +110,20 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
 fi
 apt-get update
 
-# 3.5. Stop conflicting web servers and configure firewall
-echo "Checking for conflicting web servers (apache2/nginx)..."
-if systemctl list-unit-files | grep -q apache2; then
-    echo "Stopping and disabling apache2..."
-    systemctl stop apache2 || true
-    systemctl disable apache2 || true
+# 3.5. Stop, disable and purge conflicting web servers
+echo "Removing and purging conflicting web servers (apache2/nginx) to clear port 80/443..."
+if systemctl list-unit-files | grep -q -E "apache2|nginx"; then
+    systemctl stop apache2 nginx 2>/dev/null || true
+    systemctl disable apache2 nginx 2>/dev/null || true
+    apt-get purge -y apache2 apache2-utils apache2-bin apache2-data apache2.2-common nginx nginx-common nginx-core nginx-full nginx-light 2>/dev/null || true
+    apt-get autoremove -y
 fi
-if systemctl list-unit-files | grep -q nginx; then
-    echo "Stopping and disabling nginx..."
-    systemctl stop nginx || true
-    systemctl disable nginx || true
+
+# Kill any residual process on port 80 or 443
+if command -v fuser &> /dev/null; then
+    echo "Killing any residual processes on ports 80/443..."
+    fuser -k 80/tcp || true
+    fuser -k 443/tcp || true
 fi
 
 echo "Configuring firewall rules for HTTP/HTTPS..."
@@ -130,7 +164,9 @@ if [ ! -f /etc/agilepanel/state.json ]; then
     "supported_php_versions": ["8.1", "8.2", "8.3"],
     "caddy_path": "/usr/bin/caddy",
     "caddy_config_path": "/etc/caddy/Caddyfile",
-    "redis_socket_path": "/var/run/redis/redis-server.sock"
+    "redis_socket_path": "/var/run/redis/redis-server.sock",
+    "admin_name": "${ADMIN_NAME}",
+    "admin_email": "${ADMIN_EMAIL}"
   },
   "sites": []
 }
@@ -140,9 +176,9 @@ fi
 # 8. Run Automatic Server Tuning & Optimization
 echo "Running system optimization..."
 if command -v ap &> /dev/null; then
-    ap server tune
+    ap server tune --admin-name "$ADMIN_NAME" --admin-email "$ADMIN_EMAIL"
 elif [ -f /usr/local/bin/ap ]; then
-    /usr/local/bin/ap server tune
+    /usr/local/bin/ap server tune --admin-name "$ADMIN_NAME" --admin-email "$ADMIN_EMAIL"
 else
     echo "Warning: ap CLI not found. Skipping system tuning."
 fi

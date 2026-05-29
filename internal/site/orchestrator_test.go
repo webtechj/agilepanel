@@ -60,7 +60,9 @@ func TestSiteOrchestration(t *testing.T) {
 	tempDir := t.TempDir()
 	statePath := filepath.Join(tempDir, "state.json")
 	os.Setenv("AGILEPANEL_STATE_PATH", statePath)
+	os.Setenv("AGILEPANEL_TEST_MODE", "true")
 	defer os.Unsetenv("AGILEPANEL_STATE_PATH")
+	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
 
 	// 1. Create site
 	err := Create("test.com", "8.3", true)
@@ -163,7 +165,7 @@ func TestSiteOrchestration(t *testing.T) {
 	}
 
 	// 5.6 Test List, Info, and Edit in test mode
-	os.Setenv("AGILEPANEL_TEST_MODE", "true")
+	// (AGILEPANEL_TEST_MODE is already set at the top of this test)
 	err = List()
 	if err != nil {
 		t.Fatalf("failed to list sites: %v", err)
@@ -180,7 +182,6 @@ func TestSiteOrchestration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to sync: %v", err)
 	}
-	os.Unsetenv("AGILEPANEL_TEST_MODE")
 
 	// 6. Delete site
 	err = Delete("test.com")
@@ -193,3 +194,81 @@ func TestSiteOrchestration(t *testing.T) {
 		t.Errorf("expected 0 sites after deletion, got %d", len(state.Sites))
 	}
 }
+
+func TestSyncImport(t *testing.T) {
+	tempDir := t.TempDir()
+	
+	// Create mock webroot
+	webRoot := filepath.Join(tempDir, "var", "www")
+	err := os.MkdirAll(webRoot, 0755)
+	if err != nil {
+		t.Fatalf("failed to create mock webroot: %v", err)
+	}
+
+	// Create mock site directory
+	domain := "mocksite.com"
+	siteDir := filepath.Join(webRoot, domain, "htdocs")
+	err = os.MkdirAll(siteDir, 0755)
+	if err != nil {
+		t.Fatalf("failed to create site htdocs dir: %v", err)
+	}
+
+	// Create mock wp-config.php
+	wpConfigContent := `<?php
+define( 'DB_NAME', 'db_mock_db' );
+define( 'DB_USER', 'usr_mock_user' );
+define( 'DB_PASSWORD', 'pass_mock_secret' );
+`
+	err = os.WriteFile(filepath.Join(siteDir, "wp-config.php"), []byte(wpConfigContent), 0644)
+	if err != nil {
+		t.Fatalf("failed to write wp-config.php: %v", err)
+	}
+
+	// Setup state path
+	statePath := filepath.Join(tempDir, "state.json")
+	os.Setenv("AGILEPANEL_STATE_PATH", statePath)
+	os.Setenv("AGILEPANEL_WEBROOT", webRoot)
+	os.Setenv("AGILEPANEL_TEST_MODE", "true")
+	defer os.Unsetenv("AGILEPANEL_STATE_PATH")
+	defer os.Unsetenv("AGILEPANEL_WEBROOT")
+	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
+
+	// Initialize state
+	_, err = config.ReadState(statePath)
+	if err != nil {
+		t.Fatalf("failed to init state: %v", err)
+	}
+
+	// Run Sync
+	err = Sync()
+	if err != nil {
+		t.Fatalf("sync failed: %v", err)
+	}
+
+	// Verify imported site is in state
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		t.Fatalf("failed to read state: %v", err)
+	}
+
+	found := false
+	for _, site := range state.Sites {
+		if site.Domain == domain {
+			found = true
+			if site.DatabaseName != "db_mock_db" {
+				t.Errorf("expected DB Name 'db_mock_db', got '%s'", site.DatabaseName)
+			}
+			if site.DatabaseUser != "usr_mock_user" {
+				t.Errorf("expected DB User 'usr_mock_user', got '%s'", site.DatabaseUser)
+			}
+			if site.DatabasePass != "pass_mock_secret" {
+				t.Errorf("expected DB Pass 'pass_mock_secret', got '%s'", site.DatabasePass)
+			}
+		}
+	}
+
+	if !found {
+		t.Errorf("mocksite.com was not imported during sync")
+	}
+}
+
