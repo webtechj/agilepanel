@@ -74,7 +74,7 @@ const caddyfileTemplateStr = `# Global Options Block
 }
 
 {{range .Sites}}
-{{.Domain}} {
+{{.Domain}}{{if $.ServerIP}}, {{.Domain}}.{{$.ServerIP}}.sslip.io{{end}} {
     root * {{.PublicDir}}
     file_server
 
@@ -127,8 +127,20 @@ func GenerateCaddyfile(state *config.State) (string, error) {
 		return "", fmt.Errorf("failed to parse Caddyfile template: %w", err)
 	}
 
+	serverIP := ResolvePublicIP()
+
+	data := struct {
+		Global   config.GlobalConfig
+		Sites    []config.SiteConfig
+		ServerIP string
+	}{
+		Global:   state.Global,
+		Sites:    state.Sites,
+		ServerIP: serverIP,
+	}
+
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, state); err != nil {
+	if err := tmpl.Execute(&buf, data); err != nil {
 		return "", fmt.Errorf("failed to execute Caddyfile template: %w", err)
 	}
 
