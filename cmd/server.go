@@ -2,12 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
 
 	"agilepanel/internal/config"
 	"agilepanel/internal/server"
+	"agilepanel/internal/ui"
 )
 
 var serverCmd = &cobra.Command{
@@ -24,21 +26,33 @@ var serverStatusCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println("=========================================")
-		fmt.Println("             AGILEPANEL STATUS           ")
-		fmt.Println("=========================================")
-		fmt.Printf("Active Sites:  %d\n", status.ActiveSites)
-		fmt.Printf("System Memory: Total: %s, Free/Available: %s\n", status.TotalMemory, status.FreeMemory)
-		fmt.Println("-----------------------------------------")
-		fmt.Println("Service Statuses:")
-		for svc, active := range status.Services {
-			statusStr := "inactive 🔴"
-			if active {
-				statusStr = "active 🟢"
-			}
-			fmt.Printf("  %-15s: %s\n", svc, statusStr)
+		ui.Banner("AgilePanel Server Status")
+
+		ui.SectionHeader("RESOURCES")
+		ui.Row("Active Sites", fmt.Sprintf("%d", status.ActiveSites))
+		ui.Row("Total Memory", status.TotalMemory)
+		ui.Row("Available Memory", status.FreeMemory)
+
+		ui.SectionHeader("SERVICES")
+
+		// Sort service names for consistent output
+		svcs := make([]string, 0, len(status.Services))
+		for svc := range status.Services {
+			svcs = append(svcs, svc)
 		}
-		fmt.Println("=========================================")
+		sort.Strings(svcs)
+
+		for _, svc := range svcs {
+			active := status.Services[svc]
+			if active {
+				ui.RowBadge(svc, "● active", ui.BrightGreen)
+			} else {
+				ui.RowBadge(svc, "○ inactive", ui.BrightRed)
+			}
+		}
+
+		ui.Divider()
+		fmt.Println()
 		return nil
 	},
 }
@@ -78,10 +92,20 @@ var serverAuthCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Success: HTTP Basic Authentication configured. Username: %s\n", username)
+		ui.PrintSuccess("HTTP Basic Auth Configured")
+		ui.SectionHeader("CREDENTIALS")
+		ui.Row("Username", username)
+		ui.Row("Scope", "phpMyAdmin + server tools")
+		ui.Divider()
+		fmt.Println()
 		return nil
 	},
 }
+
+var (
+	adminNameFlag  string
+	adminEmailFlag string
+)
 
 var serverRestartCmd = &cobra.Command{
 	Use:   "restart [service|all]",
@@ -97,11 +121,29 @@ var serverTuneCmd = &cobra.Command{
 	Use:   "tune",
 	Short: "Optimize system configurations (Swap memory allocation, MariaDB buffer pool sizes, kernel cache swappiness)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if adminNameFlag != "" || adminEmailFlag != "" {
+			statePath := config.GetStatePath()
+			err := config.WithLockedState(statePath, func(s *config.State) error {
+				if adminNameFlag != "" {
+					s.Global.AdminName = adminNameFlag
+				}
+				if adminEmailFlag != "" {
+					s.Global.AdminEmail = adminEmailFlag
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+		}
 		return server.TuneServer()
 	},
 }
 
 func init() {
+	serverTuneCmd.Flags().StringVar(&adminNameFlag, "admin-name", "", "Admin name for the server")
+	serverTuneCmd.Flags().StringVar(&adminEmailFlag, "admin-email", "", "Admin email for SSL installation")
+
 	serverCmd.AddCommand(serverStatusCmd)
 	serverCmd.AddCommand(serverAuthCmd)
 	serverCmd.AddCommand(serverRestartCmd)

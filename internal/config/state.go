@@ -20,6 +20,8 @@ type GlobalConfig struct {
 	RedisSocketPath      string   `json:"redis_socket_path"`
 	AdminUser            string   `json:"admin_user"`
 	AdminPasswordHash    string   `json:"admin_password_hash"`
+	AdminName            string   `json:"admin_name,omitempty"`
+	AdminEmail           string   `json:"admin_email,omitempty"`
 }
 
 type SiteConfig struct {
@@ -31,6 +33,8 @@ type SiteConfig struct {
 	DatabasePass string `json:"db_pass,omitempty"`
 	SystemUser   string `json:"system_user"`
 	IsLocked     bool   `json:"is_locked"`
+	WPAdminUser  string `json:"wp_admin_user,omitempty"`
+	WPAdminEmail string `json:"wp_admin_email,omitempty"`
 }
 
 type State struct {
@@ -57,6 +61,8 @@ func DefaultState() *State {
 			RedisSocketPath:      "/var/run/redis/redis-server.sock",
 			AdminUser:            "",
 			AdminPasswordHash:    "",
+			AdminName:            "",
+			AdminEmail:           "",
 		},
 		Sites: []SiteConfig{},
 	}

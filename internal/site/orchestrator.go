@@ -1,6 +1,7 @@
 package site
 
 import (
+	"bufio"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 
 	"agilepanel/internal/config"
 	"agilepanel/internal/server"
+	"agilepanel/internal/ui"
 )
 
 var domainRegex = regexp.MustCompile(`^(?i)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,63}$`)
@@ -37,10 +39,52 @@ func SanitizeUser(domain string) string {
 	return username
 }
 
+// promptLine reads a non-empty line from stdin with a prompt label.
+func promptLine(label string) string {
+	fmt.Printf("  %s%s%s  ", ui.Cyan, label, ui.Reset)
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		v := strings.TrimSpace(scanner.Text())
+		if v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
 // Create provisions a site's infrastructure.
 func Create(domain string, phpVersion string, installWP bool) error {
 	if err := ValidateDomain(domain); err != nil {
 		return err
+	}
+
+	// Prompt for WordPress admin credentials BEFORE the locked state transaction
+	var wpAdminUser, wpAdminEmail string
+	if installWP {
+		if os.Getenv("AGILEPANEL_TEST_MODE") == "true" {
+			// In test mode, skip interactive prompts and use safe defaults
+			wpAdminUser = "testadmin"
+			wpAdminEmail = "testadmin@" + domain
+		} else {
+			ui.Banner("WordPress Admin Setup")
+			ui.PrintInfo("Enter the details for the WordPress administrator account.")
+			ui.PrintInfo("These credentials will be used to log in to wp-admin.")
+			fmt.Println()
+			wpAdminName := promptLine("Full Name         :")
+			if wpAdminName == "" {
+				return fmt.Errorf("admin full name cannot be empty")
+			}
+			wpAdminUser = promptLine("Username          :")
+			if wpAdminUser == "" {
+				return fmt.Errorf("admin username cannot be empty")
+			}
+			wpAdminEmail = promptLine("Email Address     :")
+			if wpAdminEmail == "" {
+				return fmt.Errorf("admin email cannot be empty")
+			}
+			_ = wpAdminName // stored for display only; WP-CLI uses user+email
+			fmt.Println()
+		}
 	}
 
 	statePath := config.GetStatePath()
@@ -142,6 +186,8 @@ func Create(domain string, phpVersion string, installWP bool) error {
 				dbUser,
 				dbPassword,
 				s.Global.RedisSocketPath,
+				wpAdminUser,
+				wpAdminEmail,
 			)
 			if err != nil {
 				_ = server.DeletePHPPool(phpVersion, domain)
@@ -150,6 +196,12 @@ func Create(domain string, phpVersion string, installWP bool) error {
 				_ = server.DeleteSystemUser(systemUser)
 				return fmt.Errorf("WordPress installation failed: %w", err)
 			}
+		}
+
+		// 9a. Persist admin credentials in site config
+		if installWP {
+			newSite.WPAdminUser = wpAdminUser
+			newSite.WPAdminEmail = wpAdminEmail
 		}
 
 		// 9. Append configuration to state
@@ -176,22 +228,31 @@ func Create(domain string, phpVersion string, installWP bool) error {
 		return err
 	}
 
-	// Print credentials for user
-	fmt.Println("\n==================================================")
-	fmt.Println("             SITE CREATED SUCCESSFULLY            ")
-	fmt.Println("==================================================")
-	fmt.Printf("Domain:          %s\n", domain)
-	fmt.Printf("PHP Version:     %s\n", phpVersion)
-	fmt.Printf("System User:     %s\n", SanitizeUser(domain))
-	fmt.Printf("Database Name:   %s\n", dbName)
-	fmt.Printf("Database User:   %s\n", dbUser)
-	fmt.Printf("Database Pass:   %s\n", dbPassword)
+	// ── Pretty summary ────────────────────────────────────────────────────────
+	ui.PrintSuccess("Site Created Successfully")
+
+	ui.SectionHeader("SITE")
+	ui.Row("Domain", domain)
+	ui.Row("PHP Version", phpVersion)
+	ui.Row("System User", SanitizeUser(domain))
+	ui.Row("Public Directory", fmt.Sprintf("/var/www/%s/htdocs", domain))
+
+	ui.SectionHeader("DATABASE")
+	ui.Row("Name", dbName)
+	ui.Row("User", dbUser)
+	ui.Row("Password", dbPassword)
+
 	if installWP {
-		fmt.Printf("WP Admin User:   admin\n")
-		fmt.Printf("WP Admin Pass:   %s\n", wpAdminPassword)
-		fmt.Printf("WP Admin Email:  admin@%s\n", domain)
+		ui.SectionHeader("WORDPRESS ADMIN")
+		ui.Row("Username", wpAdminUser)
+		ui.Row("Email", wpAdminEmail)
+		ui.Row("Password", wpAdminPassword)
+		ui.Row("Login URL", "https://"+domain+"/wp-admin")
 	}
-	fmt.Println("==================================================")
+
+	ui.Divider()
+	ui.PrintInfo("Save these credentials — the password cannot be retrieved later.")
+	fmt.Println()
 
 	return nil
 }
@@ -441,7 +502,15 @@ func Reinstall(domain string) error {
 			return err
 		}
 
-		// 6. Install WordPress again
+		// 6. Install WordPress again – reuse stored admin user/email
+		adminUser := targetSite.WPAdminUser
+		if adminUser == "" {
+			adminUser = "admin"
+		}
+		adminEmail := targetSite.WPAdminEmail
+		if adminEmail == "" {
+			adminEmail = "admin@" + targetSite.Domain
+		}
 		wpAdminPassword, err := server.InstallWordPress(
 			targetSite.SystemUser,
 			targetSite.Domain,
@@ -450,6 +519,8 @@ func Reinstall(domain string) error {
 			targetSite.DatabaseUser,
 			dbPassword,
 			s.Global.RedisSocketPath,
+			adminUser,
+			adminEmail,
 		)
 		if err != nil {
 			return err
@@ -458,19 +529,21 @@ func Reinstall(domain string) error {
 		// 7. Re-lock if it was locked originally
 		if targetSite.IsLocked {
 			if err := server.LockDirectory(targetSite.PublicDir); err != nil {
-				fmt.Printf("Warning: Failed to re-lock site directory: %v\n", err)
+				ui.PrintWarning(fmt.Sprintf("Failed to re-lock site directory: %v", err))
 			}
 		}
 
-		fmt.Printf("Success: Reinstalled WordPress for %s successfully.\n", domain)
-		fmt.Println("\n==================================================")
-		fmt.Println("             REINSTALL COMPLETE                   ")
-		fmt.Println("==================================================")
-		fmt.Printf("Domain:          %s\n", domain)
-		fmt.Printf("Database Pass:   %s\n", dbPassword)
-		fmt.Printf("WP Admin User:   admin\n")
-		fmt.Printf("WP Admin Pass:   %s\n", wpAdminPassword)
-		fmt.Println("==================================================")
+		ui.PrintSuccess("Reinstall Complete")
+		ui.SectionHeader("SITE")
+		ui.Row("Domain", domain)
+		ui.SectionHeader("DATABASE")
+		ui.Row("New Password", dbPassword)
+		ui.SectionHeader("WORDPRESS ADMIN")
+		ui.Row("Username", adminUser)
+		ui.Row("New Password", wpAdminPassword)
+		ui.Row("Login URL", "https://"+domain+"/wp-admin")
+		ui.Divider()
+		fmt.Println()
 
 		return nil
 	})
@@ -595,22 +668,43 @@ func List() error {
 		return err
 	}
 
+	ui.Banner("Hosted Websites")
+
 	if len(state.Sites) == 0 {
-		fmt.Println("No websites have been created yet on this server.")
+		ui.PrintInfo("No websites have been created yet on this server.")
+		ui.PrintInfo("Run: " + ui.Accent("ap site create domain.com --wp") + " to deploy your first site.")
+		fmt.Println()
 		return nil
 	}
 
-	fmt.Println("=========================================================================")
-	fmt.Printf("%-24s %-12s %-12s %-12s %-8s\n", "DOMAIN", "SYSTEM USER", "PHP VERSION", "DB NAME", "STATUS")
-	fmt.Println("=========================================================================")
-	for _, site := range state.Sites {
-		statusStr := "active 🟢"
-		if site.IsLocked {
-			statusStr = "locked 🔒"
-		}
-		fmt.Printf("%-24s %-12s %-12s %-12s %-8s\n", site.Domain, site.SystemUser, site.PHPVersion, site.DatabaseName, statusStr)
+	cols := []ui.TableColumn{
+		{Header: "DOMAIN", Width: 28},
+		{Header: "PHP", Width: 5},
+		{Header: "SYSTEM USER", Width: 22},
+		{Header: "DATABASE", Width: 28},
+		{Header: "STATUS", Width: 10},
 	}
-	fmt.Println("=========================================================================")
+
+	var rows [][]string
+	for _, site := range state.Sites {
+		var statusStr string
+		if site.IsLocked {
+			statusStr = ui.StatusLocked()
+		} else {
+			statusStr = ui.StatusActive()
+		}
+		rows = append(rows, []string{
+			ui.BrightWhite + site.Domain + ui.Reset,
+			site.PHPVersion,
+			ui.Muted(site.SystemUser),
+			ui.Muted(site.DatabaseName),
+			statusStr,
+		})
+	}
+
+	ui.PrintTable(cols, rows)
+	fmt.Printf("  %s %d site(s) registered\n", ui.Muted("Total:"), len(state.Sites))
+	fmt.Println()
 	return nil
 }
 
@@ -635,52 +729,75 @@ func Info(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
-	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
+	parentDir := filepath.Dir(targetSite.PublicDir)
 	configDir := filepath.Join(parentDir, "conf")
 	backupDir := filepath.Join(parentDir, "backup")
 
 	dbPassword := targetSite.DatabasePass
 	if dbPassword == "" {
-		dbPassword = "[not stored in state]"
-	}
-
-	statusStr := "Active 🟢"
-	if targetSite.IsLocked {
-		statusStr = "Locked (Read-Only) 🔒"
+		dbPassword = ui.Muted("[not stored in state]")
 	}
 
 	sslInfo, err := GetSSLInfo(targetSite.Domain)
 	if err != nil {
-		fmt.Printf("Warning: Failed to retrieve SSL information: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Failed to retrieve SSL information: %v", err))
 	}
 
-	fmt.Println("=========================================================================")
-	fmt.Printf("                   SITE CONFIGURATION: %s\n", strings.ToUpper(targetSite.Domain))
-	fmt.Println("=========================================================================")
-	fmt.Printf("Domain Name:         %s\n", targetSite.Domain)
-	fmt.Printf("System User/Group:   %s\n", targetSite.SystemUser)
-	fmt.Printf("PHP version:         %s\n", targetSite.PHPVersion)
-	fmt.Printf("Site Status:         %s\n", statusStr)
-	fmt.Println("-------------------------------------------------------------------------")
+	ui.Banner("Site Configuration: " + strings.ToUpper(targetSite.Domain))
+
+	ui.SectionHeader("GENERAL")
+	ui.Row("Domain", targetSite.Domain)
+	ui.Row("PHP Version", targetSite.PHPVersion)
+	ui.Row("System User", targetSite.SystemUser)
+	ui.RowBadge("Status", func() string {
+		if targetSite.IsLocked {
+			return "Locked (Read-Only)"
+		}
+		return "Active"
+	}(), func() string {
+		if targetSite.IsLocked {
+			return ui.BrightYellow
+		}
+		return ui.BrightGreen
+	}())
+
+	ui.SectionHeader("SSL / TLS")
 	if sslInfo != nil && sslInfo.Active {
-		fmt.Printf("SSL Status:          Active 🟢 (Secured by %s)\n", sslInfo.Issuer)
-		fmt.Printf("SSL Expiration/Renew:%s (Expires in %d days)\n",
-			sslInfo.Expiration.Format("2006-01-02 15:04:05 MST"),
-			int(time.Until(sslInfo.Expiration).Hours()/24))
-		fmt.Printf("SSL Cert Path:       %s\n", sslInfo.CertPath)
-		fmt.Printf("SSL Key Path:        %s\n", sslInfo.KeyPath)
+		ui.RowBadge("Status", "Active — "+sslInfo.Issuer, ui.BrightGreen)
+		daysLeft := int(time.Until(sslInfo.Expiration).Hours() / 24)
+		expColor := ui.BrightGreen
+		if daysLeft < 14 {
+			expColor = ui.BrightRed
+		} else if daysLeft < 30 {
+			expColor = ui.BrightYellow
+		}
+		ui.RowBadge("Expiry", fmt.Sprintf("%s  (%d days remaining)",
+			sslInfo.Expiration.Format("2006-01-02"), daysLeft), expColor)
+		ui.Row("Certificate", sslInfo.CertPath)
+		ui.Row("Private Key", sslInfo.KeyPath)
 	} else {
-		fmt.Println("SSL Status:          Inactive / Self-Signed 🔴")
+		ui.RowBadge("Status", "Inactive / Self-Signed", ui.BrightRed)
 	}
-	fmt.Println("-------------------------------------------------------------------------")
-	fmt.Printf("Webroot Directory:   %s\n", targetSite.PublicDir)
-	fmt.Printf("Config Directory:    %s\n", configDir)
-	fmt.Printf("Backup Directory:    %s\n", backupDir)
-	fmt.Println("-------------------------------------------------------------------------")
-	fmt.Printf("Database Name:       %s\n", targetSite.DatabaseName)
-	fmt.Printf("Database User:       %s\n", targetSite.DatabaseUser)
-	fmt.Printf("Database Password:   %s\n", dbPassword)
-	fmt.Println("=========================================================================")
+
+	ui.SectionHeader("DIRECTORIES")
+	ui.Row("Webroot", targetSite.PublicDir)
+	ui.Row("Config", configDir)
+	ui.Row("Backups", backupDir)
+
+	ui.SectionHeader("DATABASE")
+	ui.Row("Name", targetSite.DatabaseName)
+	ui.Row("User", targetSite.DatabaseUser)
+	ui.Row("Password", dbPassword)
+
+	if targetSite.WPAdminUser != "" {
+		ui.SectionHeader("WORDPRESS ADMIN")
+		ui.Row("Username", targetSite.WPAdminUser)
+		ui.Row("Email", targetSite.WPAdminEmail)
+		ui.Row("Login URL", "https://"+targetSite.Domain+"/wp-admin")
+	}
+
+	ui.Divider()
+	fmt.Println()
 	return nil
 }
 
@@ -882,29 +999,132 @@ func SelfUpdate() error {
 func Sync() error {
 	// 1. Perform self-update
 	if err := SelfUpdate(); err != nil {
-		fmt.Printf("Warning: Self-update failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Self-update failed: %v", err))
 	}
 
 	// 2. Load and lock state
 	statePath := config.GetStatePath()
 	err := config.WithLockedState(statePath, func(s *config.State) error {
-		fmt.Println("Sync: Regenerating PHP pool configurations for all sites...")
-		for _, site := range s.Sites {
-			fmt.Printf("Syncing PHP pool config for site: %s\n", site.Domain)
-			if err := server.WritePHPPool(&site); err != nil {
-				fmt.Printf("Warning: Failed to write PHP pool config for %s: %v\n", site.Domain, err)
-			}
-			if err := server.ReloadPHP(site.PHPVersion); err != nil {
-				fmt.Printf("Warning: Failed to reload PHP FPM version %s: %v\n", site.PHPVersion, err)
+		// Scan for pre-existing site installations
+		ui.PrintStep(1, "Scanning /var/www for pre-existing site directories...")
+		var webRoot = "/var/www"
+		if runtime.GOOS != "linux" {
+			if val := os.Getenv("AGILEPANEL_WEBROOT"); val != "" {
+				webRoot = val
+			} else {
+				webRoot = filepath.Join("var", "www")
 			}
 		}
 
-		fmt.Println("Sync: Regenerating global Caddyfile...")
+		if _, err := os.Stat(webRoot); err == nil {
+			entries, err := os.ReadDir(webRoot)
+			if err == nil {
+				for _, entry := range entries {
+					if !entry.IsDir() {
+						continue
+					}
+					name := entry.Name()
+					if err := ValidateDomain(name); err != nil {
+						continue
+					}
+					domain := strings.ToLower(name)
+
+					// Check if already registered
+					alreadyTracked := false
+					for _, site := range s.Sites {
+						if strings.EqualFold(site.Domain, domain) {
+							alreadyTracked = true
+							break
+						}
+					}
+					if alreadyTracked {
+						continue
+					}
+
+					// Verify it has an htdocs directory
+					htdocsPath := filepath.Join(webRoot, name, "htdocs")
+					if _, err := os.Stat(htdocsPath); os.IsNotExist(err) {
+						continue
+					}
+
+					// Auto-detect system user and default configs
+					systemUser := SanitizeUser(domain)
+
+					// Detect PHP version
+					phpVersion := s.Global.DefaultPHPVersion
+					for _, v := range s.Global.SupportedPHPVersions {
+						var poolPath string
+						if runtime.GOOS == "linux" {
+							poolPath = fmt.Sprintf("/etc/php/%s/fpm/pool.d/%s.conf", v, domain)
+						} else {
+							poolPath = filepath.Join("etc", "php", v, "fpm", "pool.d", domain+".conf")
+						}
+						if _, err := os.Stat(poolPath); err == nil {
+							phpVersion = v
+							break
+						}
+					}
+
+					// Parse database settings from wp-config.php if present
+					dbName := ""
+					dbUser := ""
+					dbPass := ""
+
+					wpConfigPath := filepath.Join(htdocsPath, "wp-config.php")
+					if _, err := os.Stat(wpConfigPath); err == nil {
+						contentBytes, err := os.ReadFile(wpConfigPath)
+						if err == nil {
+							content := string(contentBytes)
+							dbNameRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_NAME['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+							dbUserRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_USER['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+							dbPassRegex := regexp.MustCompile(`define\s*\(\s*['"]DB_PASSWORD['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+
+							if match := dbNameRegex.FindStringSubmatch(content); len(match) > 1 {
+								dbName = match[1]
+							}
+							if match := dbUserRegex.FindStringSubmatch(content); len(match) > 1 {
+								dbUser = match[1]
+							}
+							if match := dbPassRegex.FindStringSubmatch(content); len(match) > 1 {
+								dbPass = match[1]
+							}
+						}
+					}
+
+					importedSite := config.SiteConfig{
+						Domain:       domain,
+						PHPVersion:   phpVersion,
+						PublicDir:    htdocsPath,
+						DatabaseName: dbName,
+						DatabaseUser: dbUser,
+						DatabasePass: dbPass,
+						SystemUser:   systemUser,
+						IsLocked:     false,
+					}
+
+					s.Sites = append(s.Sites, importedSite)
+					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (PHP %s, DB %s)", domain, phpVersion, dbName))
+				}
+			}
+		}
+
+		ui.PrintStep(2, "Regenerating PHP FPM configurations...")
+		for _, site := range s.Sites {
+			ui.PrintInfo(fmt.Sprintf("Syncing PHP pool for site: %s", site.Domain))
+			if err := server.WritePHPPool(&site); err != nil {
+				ui.PrintWarning(fmt.Sprintf("Failed to write PHP pool config for %s: %v", site.Domain, err))
+			}
+			if err := server.ReloadPHP(site.PHPVersion); err != nil {
+				ui.PrintWarning(fmt.Sprintf("Failed to reload PHP FPM version %s: %v", site.PHPVersion, err))
+			}
+		}
+
+		ui.PrintStep(3, "Regenerating global Caddyfile...")
 		if err := server.WriteCaddyfile(s); err != nil {
 			return fmt.Errorf("failed to write Caddyfile: %w", err)
 		}
 
-		fmt.Println("Sync: Reloading Caddy service...")
+		ui.PrintStep(4, "Reloading Caddy service...")
 		if err := server.ReloadCaddy(s); err != nil {
 			return fmt.Errorf("failed to reload Caddy: %w", err)
 		}
@@ -915,6 +1135,6 @@ func Sync() error {
 		return err
 	}
 
-	fmt.Println("Success: All sites and server configurations have been successfully synchronized.")
+	ui.PrintSuccess("Synchronization Completed")
 	return nil
 }
