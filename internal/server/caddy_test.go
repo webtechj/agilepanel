@@ -53,11 +53,11 @@ func TestGenerateCaddyfile(t *testing.T) {
 	if !strings.Contains(content, "root * /var/www/default") {
 		t.Error("expected Caddyfile to set default root path to /var/www/default")
 	}
-	if !strings.Contains(content, "basic_auth @admin-tools") {
+	if !strings.Contains(content, "basic_auth {") {
 		t.Error("expected Caddyfile to include basic_auth configuration")
 	}
-	if !strings.Contains(content, "route /phpmyadmin*") {
-		t.Error("expected Caddyfile to include phpMyAdmin route configuration")
+	if !strings.Contains(content, ":8888 {") {
+		t.Error("expected Caddyfile to include phpMyAdmin port 8888 server block")
 	}
 
 	// Verify siteone.com configurations

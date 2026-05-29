@@ -126,16 +126,18 @@ if command -v fuser &> /dev/null; then
     fuser -k 443/tcp || true
 fi
 
-echo "Configuring firewall rules for HTTP/HTTPS..."
+echo "Configuring firewall rules for HTTP/HTTPS/phpMyAdmin..."
 if command -v ufw &> /dev/null; then
-    echo "UFW detected. Allowing port 80 and 443..."
+    echo "UFW detected. Allowing ports 22, 80, 443, and 8888..."
     ufw allow 22/tcp || true
     ufw allow 80/tcp || true
     ufw allow 443/tcp || true
+    ufw allow 8888/tcp || true
 elif command -v firewall-cmd &> /dev/null; then
-    echo "Firewalld detected. Allowing HTTP and HTTPS..."
+    echo "Firewalld detected. Allowing HTTP, HTTPS, and port 8888..."
     firewall-cmd --permanent --add-service=http || true
     firewall-cmd --permanent --add-service=https || true
+    firewall-cmd --permanent --add-port=8888/tcp || true
     firewall-cmd --reload || true
 fi
 
