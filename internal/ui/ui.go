@@ -220,7 +220,7 @@ func PrintTable(columns []TableColumn, rows [][]string) {
 	// Header row
 	headerLine := BrightBlue + vline + Reset
 	for i, col := range columns {
-		cell := padRight(BrightWhite+Bold+col.Header+Reset, widths[i]+len(BrightWhite)+len(Bold)+len(Reset))
+		cell := padRight(BrightWhite+Bold+col.Header+Reset, widths[i])
 		headerLine += " " + cell + " " + BrightBlue + vline + Reset
 	}
 	fmt.Println(headerLine)
