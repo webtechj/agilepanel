@@ -384,8 +384,12 @@ DB_PASSWORD=%s</pre>
 	// ── Pretty summary ────────────────────────────────────────────────────────
 	ui.PrintSuccess("Site Created Successfully")
 
-	ui.SectionHeader("SITE")
+	serverIP := server.ResolvePublicIP()
+	stagingURL := fmt.Sprintf("http://%s.%s.sslip.io", domain, serverIP)
+
+	ui.SectionHeader("SITE & STAGING")
 	ui.Row("Domain", domain)
+	ui.Row("Staging URL", stagingURL)
 	ui.Row("PHP Version", phpVersion)
 	ui.Row("System User", SanitizeUser(domain))
 	ui.Row("Public Directory", fmt.Sprintf("/var/www/%s/htdocs", domain))
@@ -401,6 +405,7 @@ DB_PASSWORD=%s</pre>
 		ui.Row("Email", wpAdminEmail)
 		ui.Row("Password", wpAdminPassword)
 		ui.Row("Login URL", "https://"+domain+"/wp-admin")
+		ui.Row("Staging Login", stagingURL+"/wp-admin")
 	}
 
 	ui.Divider()

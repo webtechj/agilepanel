@@ -3,10 +3,15 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"time"
 )
 
 // CreateSystemUser creates a Linux system user and user group specific to the domain.
@@ -209,4 +214,35 @@ func FixPermissions(parentDir string, systemUser string) error {
 
 	fmt.Printf("OS: Fixed file/directory permissions recursively under %s.\n", parentDir)
 	return nil
+}
+
+// ResolvePublicIP queries a public API or local interfaces to determine the server's public IPv4.
+func ResolvePublicIP() string {
+	client := http.Client{
+		Timeout: 2 * time.Second,
+	}
+	resp, err := client.Get("https://api.ipify.org")
+	if err == nil {
+		defer resp.Body.Close()
+		ipBytes, err := ioutil.ReadAll(resp.Body)
+		if err == nil {
+			ip := strings.TrimSpace(string(ipBytes))
+			if net.ParseIP(ip) != nil {
+				return ip
+			}
+		}
+	}
+
+	// Fallback: check network interfaces
+	addrs, err := net.InterfaceAddrs()
+	if err == nil {
+		for _, addr := range addrs {
+			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					return ipnet.IP.String()
+				}
+			}
+		}
+	}
+	return "127.0.0.1"
 }
