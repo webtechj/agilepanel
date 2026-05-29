@@ -56,3 +56,25 @@ func getServiceArg(args []string) (string, error) {
 	}
 	return svc, nil
 }
+
+func promptConfirm(prompt string) (bool, error) {
+	resp, err := promptString(prompt)
+	if err != nil {
+		return false, err
+	}
+	resp = strings.ToLower(resp)
+	return resp == "y" || resp == "yes", nil
+}
+
+func promptDoubleConfirm(domain string, action string) (bool, error) {
+	ok, err := promptConfirm(fmt.Sprintf("Are you sure you want to %s site '%s'? (y/N): ", action, domain))
+	if err != nil || !ok {
+		return false, err
+	}
+	
+	typed, err := promptString(fmt.Sprintf("WARNING: This action is destructive/restrictive! To confirm, type the domain name '%s': ", domain))
+	if err != nil {
+		return false, err
+	}
+	return typed == domain, nil
+}

@@ -85,6 +85,13 @@ var siteDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		confirmed, err := promptDoubleConfirm(domain, "permanently delete")
+		if err != nil {
+			return err
+		}
+		if !confirmed {
+			return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+		}
 		return site.Delete(domain)
 	},
 }
@@ -97,6 +104,13 @@ var siteLockCmd = &cobra.Command{
 		domain, err := getDomainArg(args)
 		if err != nil {
 			return err
+		}
+		confirmed, err := promptDoubleConfirm(domain, "lock/deactivate")
+		if err != nil {
+			return err
+		}
+		if !confirmed {
+			return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
 		}
 		return site.Lock(domain)
 	},
