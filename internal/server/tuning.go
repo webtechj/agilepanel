@@ -11,39 +11,49 @@ import (
 	"strings"
 
 	"agilepanel/internal/config"
+	"agilepanel/internal/ui"
 )
 
 // TuneServer auto-tunes system swap memory and database parameters based on hardware resources.
 func TuneServer() error {
-	fmt.Println("AgilePanel: Starting server optimization checklist...")
+	ui.PrintInfo("Starting AgilePanel Server Optimization checklist...")
 
 	// 1. Optimize Swap File
+	ui.PrintStep(1, "Configuring system swap memory and kernel cache swappiness parameters...")
+	ui.PrintInfo("Explanatory Note: Adequate swap space prevents Linux out-of-memory (OOM) crashes. Tweaking swappiness and cache pressure keeps the server highly responsive under load.")
 	if err := TuneSwap(); err != nil {
-		fmt.Printf("Warning: Swap optimization failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Swap optimization failed: %v", err))
 	}
 
 	// 2. Optimize Database (MariaDB/MySQL)
+	ui.PrintStep(2, "Auditing hardware memory resources and auto-tuning MariaDB configuration...")
+	ui.PrintInfo("Explanatory Note: We dynamically allocate 30% of system RAM to the InnoDB buffer pool, reduce max connections to 50 for resource safety, and optimize caches for fast query resolution.")
 	if err := TuneDatabase(); err != nil {
-		fmt.Printf("Warning: Database optimization failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Database optimization failed: %v", err))
 	}
 
 	// 3. Optimize Redis Socket Permissions
+	ui.PrintStep(3, "Configuring Redis Socket permissions and scaling policies...")
+	ui.PrintInfo("Explanatory Note: Using local UNIX socket paths instead of TCP loopbacks cuts down latency. Eviction policies ensure Redis stays memory-safe.")
 	if err := TuneRedis(); err != nil {
-		fmt.Printf("Warning: Redis optimization failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Redis optimization failed: %v", err))
 	}
 
 	// 4. Setup Default Webserver and Landing Page
-	fmt.Println("AgilePanel: Initializing default webserver configuration...")
+	ui.PrintStep(4, "Initializing Caddy default webserver block and security headers...")
+	ui.PrintInfo("Explanatory Note: Caddy is configured with strict security headers (no-referrer, X-Frame-Options) and default port 80 catch-all filters.")
 	if err := SetupDefaultWebserver(); err != nil {
-		fmt.Printf("Warning: Default webserver initialization failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Default webserver initialization failed: %v", err))
 	}
 
 	// 5. Install Metrics Cron Job
+	ui.PrintStep(5, "Installing real-time system metrics logging daemon...")
+	ui.PrintInfo("Explanatory Note: A cron job runs every 5 minutes under root to capture performance snapshots, helping you visualize real-time resource trends.")
 	if err := installMetricsCron(); err != nil {
-		fmt.Printf("Warning: Metrics cron job installation failed: %v\n", err)
+		ui.PrintWarning(fmt.Sprintf("Metrics cron job installation failed: %v", err))
 	}
 
-	fmt.Println("AgilePanel: Server optimization tuning completed successfully.")
+	ui.PrintSuccess("Server Performance Tuning Completed Successfully")
 
 	// Trigger telemetry check-in
 	statePath := config.GetStatePath()
