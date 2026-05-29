@@ -9,12 +9,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=version" alt="Release Version" /></a>
-  <img src="https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-777bb4?logo=php" alt="PHP Versions" />
-  <img src="https://img.shields.io/badge/Web_Server-Caddy-00a2db?logo=caddy" alt="Caddy Web Server" />
-  <img src="https://img.shields.io/badge/Database-MariaDB-003545?logo=mariadb" alt="MariaDB Database" />
-  <img src="https://img.shields.io/badge/Cache-Redis-dc382d?logo=redis" alt="Redis Cache" />
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License" />
+  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=version&logo=github" alt="Release Version" /></a>
+  <img src="https://img.shields.io/badge/Language-Go-00add8?logo=go&logoColor=white" alt="Go Language" />
+  <img src="https://img.shields.io/badge/OS-Ubuntu%20%7C%20Debian-E95420?logo=ubuntu&logoColor=white" alt="OS Support" />
+  <img src="https://img.shields.io/badge/Web_Server-Caddy-00a2db?logo=caddy&logoColor=white" alt="Caddy Web Server" />
+  <img src="https://img.shields.io/badge/Database-MariaDB-003545?logo=mariadb&logoColor=white" alt="MariaDB Database" />
+  <img src="https://img.shields.io/badge/Cache-Redis-dc382d?logo=redis&logoColor=white" alt="Redis Cache" />
+  <img src="https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-777bb4?logo=php&logoColor=white" alt="PHP Versions" />
+  <a href="https://github.com/webtechj/agilepanel"><img src="https://img.shields.io/endpoint?url=https://telemetry.agilepanel.io/api/badge?metric=active" alt="Active Servers" /></a>
+  <a href="https://github.com/webtechj/agilepanel"><img src="https://img.shields.io/endpoint?url=https://telemetry.agilepanel.io/api/badge?metric=sites" alt="WordPress Sites" /></a>
+  <img src="https://img.shields.io/badge/License-MIT-green?logo=open-source-initiative&logoColor=white" alt="MIT License" />
 </p>
 
 ---
@@ -140,6 +144,28 @@ AgilePanel is managed entirely via the `ap` command. It is designed to be friend
 
 ---
 
+## 📊 Privacy & Telemetry
+
+AgilePanel collects anonymous usage telemetry to track active installations and display live status badges on this repository.
+
+### What is collected?
+- A randomly generated unique server ID (`uuid` stored in `/etc/agilepanel/state.json`)
+- System OS and Architecture (e.g. `linux`, `amd64`)
+- Current AgilePanel version (e.g. `0.8.0`)
+- The number of WordPress sites hosted on the server
+
+> [!NOTE]
+> We **never** collect, transmit, or store server IPs, site domains, administrator credentials, database configurations, or files. The telemetry system is fully anonymous.
+
+### Opting Out
+Telemetry runs asynchronously and will never block or slow down your commands. However, you can opt out of telemetry completely at any time by setting the `AGILEPANEL_TELEMETRY_URL` environment variable to `"none"`. E.g.:
+```bash
+export AGILEPANEL_TELEMETRY_URL="none"
+```
+
+---
+
 ## 📄 License
 
 AgilePanel is open-source software licensed under the [MIT License](LICENSE).
+

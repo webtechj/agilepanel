@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
@@ -17,6 +18,31 @@ var serverCmd = &cobra.Command{
 	Short: "Manage global server settings and status",
 }
 
+func renderProgressBar(pct float64, width int) string {
+	if pct < 0 {
+		pct = 0
+	} else if pct > 100 {
+		pct = 100
+	}
+	filled := int((pct / 100.0) * float64(width))
+	if filled > width {
+		filled = width
+	}
+	empty := width - filled
+
+	var color string
+	if pct < 60 {
+		color = ui.BrightGreen
+	} else if pct < 85 {
+		color = ui.BrightYellow
+	} else {
+		color = ui.BrightRed
+	}
+
+	bar := color + strings.Repeat("█", filled) + ui.Reset + ui.Muted(strings.Repeat("░", empty))
+	return fmt.Sprintf("[%s] %.1f%%", bar, pct)
+}
+
 var serverStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show status of global server dependencies and resources",
@@ -27,11 +53,6 @@ var serverStatusCmd = &cobra.Command{
 		}
 
 		ui.Banner("AgilePanel Server Status")
-
-		ui.SectionHeader("RESOURCES")
-		ui.Row("Active Sites", fmt.Sprintf("%d", status.ActiveSites))
-		ui.Row("Total Memory", status.TotalMemory)
-		ui.Row("Available Memory", status.FreeMemory)
 
 		ui.SectionHeader("SERVICES")
 
@@ -49,6 +70,70 @@ var serverStatusCmd = &cobra.Command{
 			} else {
 				ui.RowBadge(svc, "○ inactive", ui.BrightRed)
 			}
+		}
+
+		ui.SectionHeader("REAL-TIME RESOURCES")
+		ui.Row("Active Sites", fmt.Sprintf("%d", status.ActiveSites))
+		ui.Row("CPU Usage", renderProgressBar(status.RealtimeCPU, 15))
+		ui.Row("Load Averages", fmt.Sprintf("%.2f, %.2f, %.2f (1m, 5m, 15m)", status.Load1m, status.Load5m, status.Load15m))
+		ui.Row("TCP Connections", fmt.Sprintf("%d active sockets", status.TCPConnections))
+
+		memVal := fmt.Sprintf("%s / %.2f GB used (total %.2f GB)", renderProgressBar(status.MemoryPercentage, 15), status.UsedMemoryGB, status.TotalMemoryGB)
+		ui.Row("RAM Memory", memVal)
+
+		swapVal := fmt.Sprintf("%s / %.2f GB used (total %.2f GB)", renderProgressBar(status.SwapPercentage, 15), status.UsedSwapGB, status.TotalSwapGB)
+		ui.Row("Swap Memory", swapVal)
+
+		diskVal := fmt.Sprintf("%s / %.2f GB used (total %.2f GB)", renderProgressBar(status.DiskPercentage, 15), status.UsedDiskGB, status.TotalDiskGB)
+		ui.Row("Disk Usage (/)", diskVal)
+
+		ui.SectionHeader("TOP 5 REAL-TIME PROCESSES (CPU)")
+		if len(status.TopProcesses) == 0 {
+			ui.PrintWarning("No active processes detected.")
+		} else {
+			var cols = []ui.TableColumn{
+				{Header: "PID", Width: 8},
+				{Header: "CPU %", Width: 8},
+				{Header: "MEM %", Width: 8},
+				{Header: "Command", Width: 20},
+			}
+			var rows [][]string
+			for _, p := range status.TopProcesses {
+				rows = append(rows, []string{
+					fmt.Sprintf("%d", p.PID),
+					fmt.Sprintf("%.1f%%", p.CPU),
+					fmt.Sprintf("%.1f%%", p.Mem),
+					p.Comm,
+				})
+			}
+			ui.PrintTable(cols, rows)
+		}
+
+		ui.SectionHeader("LAST 24 HOURS METRICS SUMMARY")
+		if !status.HasHistorical {
+			ui.PrintWarning("Historical metrics log is empty or collecting first data point.")
+			ui.PrintInfo("Run 'ap server log-metrics' or wait for the cron job to collect historical usage snapshots.")
+		} else {
+			ui.Row("Peak CPU Usage", fmt.Sprintf("%.1f%%", status.PeakCPU24h))
+			ui.Row("Peak RAM Usage", fmt.Sprintf("%.1f%%", status.PeakMemory24h))
+			ui.Row("Peak Swap Usage", fmt.Sprintf("%.1f%%", status.PeakSwap24h))
+
+			fmt.Println()
+			ui.PrintInfo("Top 5 Resource Consuming Processes (Peak CPU):")
+			var cols = []ui.TableColumn{
+				{Header: "Command", Width: 25},
+				{Header: "Peak CPU %", Width: 12},
+				{Header: "Peak MEM %", Width: 12},
+			}
+			var rows [][]string
+			for _, p := range status.TopProcesses24h {
+				rows = append(rows, []string{
+					p.Comm,
+					fmt.Sprintf("%.1f%%", p.CPU),
+					fmt.Sprintf("%.1f%%", p.Mem),
+				})
+			}
+			ui.PrintTable(cols, rows)
 		}
 
 		ui.Divider()
@@ -157,6 +242,15 @@ var serverTuneCmd = &cobra.Command{
 	},
 }
 
+var serverLogMetricsCmd = &cobra.Command{
+	Use:    "log-metrics",
+	Short:  "Record system resource snapshot metrics (run by cron)",
+	Hidden: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return server.LogMetrics()
+	},
+}
+
 func init() {
 	serverTuneCmd.Flags().StringVar(&adminNameFlag, "admin-name", "", "Admin name for the server")
 	serverTuneCmd.Flags().StringVar(&adminEmailFlag, "admin-email", "", "Admin email for SSL installation")
@@ -165,5 +259,6 @@ func init() {
 	serverCmd.AddCommand(serverAuthCmd)
 	serverCmd.AddCommand(serverRestartCmd)
 	serverCmd.AddCommand(serverTuneCmd)
+	serverCmd.AddCommand(serverLogMetricsCmd)
 	rootCmd.AddCommand(serverCmd)
 }

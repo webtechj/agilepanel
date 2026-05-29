@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +13,9 @@ import (
 	"github.com/gofrs/flock"
 )
 
+
 type GlobalConfig struct {
+	UUID                 string   `json:"uuid,omitempty"`
 	DefaultPHPVersion    string   `json:"default_php_version"`
 	SupportedPHPVersions []string `json:"supported_php_versions"`
 	CaddyPath            string   `json:"caddy_path"`
@@ -23,6 +26,7 @@ type GlobalConfig struct {
 	AdminName            string   `json:"admin_name,omitempty"`
 	AdminEmail           string   `json:"admin_email,omitempty"`
 }
+
 
 type SiteConfig struct {
 	Domain       string `json:"domain"`
@@ -35,6 +39,7 @@ type SiteConfig struct {
 	IsLocked     bool   `json:"is_locked"`
 	WPAdminUser  string `json:"wp_admin_user,omitempty"`
 	WPAdminEmail string `json:"wp_admin_email,omitempty"`
+	Type         string `json:"type,omitempty"`
 }
 
 type State struct {
@@ -50,10 +55,28 @@ func GetStatePath() string {
 	return "/etc/agilepanel/state.json"
 }
 
+// GenerateUUID generates a random UUID v4.
+func GenerateUUID() (string, error) {
+	uuid := make([]byte, 16)
+	_, err := rand.Read(uuid)
+	if err != nil {
+		return "", err
+	}
+	// Set version to 4
+	uuid[6] = (uuid[6] & 0x0f) | 0x40
+	// Set variant to RFC4122
+	uuid[8] = (uuid[8] & 0x3f) | 0x80
+
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%12x",
+		uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
+}
+
 // DefaultState returns a populated State struct with baseline values.
 func DefaultState() *State {
+	uuidStr, _ := GenerateUUID()
 	return &State{
 		Global: GlobalConfig{
+			UUID:                 uuidStr,
 			DefaultPHPVersion:    "8.3",
 			SupportedPHPVersions: []string{"8.1", "8.2", "8.3"},
 			CaddyPath:            "/usr/sbin/caddy",
@@ -67,6 +90,7 @@ func DefaultState() *State {
 		Sites: []SiteConfig{},
 	}
 }
+
 
 // WithLockedState locks the state lockfile, reads state, invokes fn, writes modified state, and unlocks.
 func WithLockedState(statePath string, fn func(*State) error) error {
@@ -173,8 +197,16 @@ func readState(statePath string) (*State, error) {
 		return nil, err
 	}
 
+	// Ensure UUID is present (migration for older state versions)
+	if state.Global.UUID == "" {
+		if u, err := GenerateUUID(); err == nil {
+			state.Global.UUID = u
+		}
+	}
+
 	return &state, nil
 }
+
 
 func writeState(statePath string, state *State) error {
 	data, err := json.MarshalIndent(state, "", "  ")

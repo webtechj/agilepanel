@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"agilepanel/internal/config"
 	"agilepanel/internal/server"
 	"agilepanel/internal/site"
 	"agilepanel/internal/ui"
@@ -33,6 +34,11 @@ var updateCmd = &cobra.Command{
 		ui.PrintStep(2, "Checking and downloading latest AgilePanel CLI binary...")
 		if err := site.SelfUpdate(); err != nil {
 			return err
+		}
+
+		// Trigger telemetry ping
+		if s, err := config.ReadState(config.GetStatePath()); err == nil {
+			config.PingAsync(s)
 		}
 
 		ui.PrintSuccess("AgilePanel update completed successfully.")
