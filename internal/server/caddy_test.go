@@ -61,7 +61,7 @@ func TestGenerateCaddyfile(t *testing.T) {
 	}
 
 	// Verify siteone.com configurations
-	if !strings.Contains(content, "siteone.com, siteone.com.") || !strings.Contains(content, ".sslip.io {") {
+	if !strings.Contains(content, "siteone.com, http://siteone.com.") || !strings.Contains(content, ".sslip.io {") {
 		t.Error("expected siteone.com domain block")
 	}
 	if !strings.Contains(content, "root * /var/www/siteone.com/public") {
@@ -88,7 +88,7 @@ func TestGenerateCaddyfile(t *testing.T) {
 	}
 
 	// Verify sitetwo.net configurations
-	if !strings.Contains(content, "sitetwo.net, sitetwo.net.") || !strings.Contains(content, ".sslip.io {") {
+	if !strings.Contains(content, "sitetwo.net, http://sitetwo.net.") || !strings.Contains(content, ".sslip.io {") {
 		t.Error("expected sitetwo.net domain block")
 	}
 	if !strings.Contains(content, "root * /var/www/sitetwo.net/public") {

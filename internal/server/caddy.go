@@ -74,7 +74,7 @@ const caddyfileTemplateStr = `# Global Options Block
 }
 
 {{range .Sites}}
-{{.Domain}}{{if $.ServerIP}}, {{.Domain}}.{{$.ServerIP}}.sslip.io{{end}} {
+{{.Domain}}{{if $.ServerIP}}, http://{{.Domain}}.{{$.ServerIP}}.sslip.io{{end}} {
     root * {{.PublicDir}}
     file_server
 
