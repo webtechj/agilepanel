@@ -73,7 +73,7 @@ if [ -z "$ADMIN_EMAIL" ]; then
 fi
 
 # 1. Update system package index
-apt-get update && apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo unzip
+apt-get update && apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo zip unzip
 
 # 2. Add Caddy official repository
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg

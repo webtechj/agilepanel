@@ -187,6 +187,10 @@ func InstallGui() error {
 		return nil
 	}
 
+	// Ensure system dependencies for backup/restore (zip/unzip) are present
+	fmt.Println("Tools: Ensuring system zip and unzip utility packages are installed...")
+	_ = exec.Command("apt-get", "install", "-y", "zip", "unzip").Run()
+
 	// Stop service if running and remove old binary to prevent "Text file busy" (exit status 23)
 	fmt.Println("Tools: Stopping existing agilepanel-gui daemon...")
 	_ = exec.Command("systemctl", "stop", "agilepanel-gui").Run()
