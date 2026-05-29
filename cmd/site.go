@@ -117,6 +117,16 @@ var siteBackupDBCmd = &cobra.Command{
 	},
 }
 
+var siteBackupCmd = &cobra.Command{
+	Use:   "backup [domain]",
+	Short: "Create separate manual ZIP backups of WordPress files and MariaDB database",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		return site.Backup(domain)
+	},
+}
+
 var siteListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all websites hosted on the server",
@@ -166,6 +176,7 @@ func init() {
 	siteCmd.AddCommand(siteSSLRenewCmd)
 	siteCmd.AddCommand(siteFixPermissionsCmd)
 	siteCmd.AddCommand(siteBackupDBCmd)
+	siteCmd.AddCommand(siteBackupCmd)
 
 	rootCmd.AddCommand(siteCmd)
 }

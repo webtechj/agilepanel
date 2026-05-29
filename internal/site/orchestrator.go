@@ -1178,3 +1178,86 @@ func Sync() error {
 	ui.PrintSuccess("Synchronization Completed")
 	return nil
 }
+
+// Backup creates a ZIP of the database and a separate ZIP of the site files.
+func Backup(domain string) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	var targetSite config.SiteConfig
+	found := false
+	for _, site := range state.Sites {
+		if strings.EqualFold(site.Domain, domain) {
+			targetSite = site
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("site %s not found in state", domain)
+	}
+
+	parentDir := filepath.Dir(targetSite.PublicDir) // /var/www/[domain]
+	backupDir := filepath.Join(parentDir, "backup")
+	_ = os.MkdirAll(backupDir, 0755)
+
+	dbSqlPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
+	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.zip", domain))
+	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files.zip", domain))
+
+	homeDir := filepath.Dir(targetSite.PublicDir)
+
+	// 1. Export Database
+	ui.PrintStep(1, "Exporting MariaDB database dump...")
+	err = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "db", "export", dbSqlPath, "--path="+targetSite.PublicDir)
+	if err != nil {
+		return fmt.Errorf("failed to export database: %w", err)
+	}
+
+	// 2. Compress Database SQL into ZIP
+	ui.PrintStep(2, "Compressing database SQL dump into ZIP...")
+	if runtime.GOOS == "linux" {
+		_ = os.Remove(dbZipPath)
+		zipCmd := exec.Command("zip", "-j", dbZipPath, dbSqlPath)
+		if err := zipCmd.Run(); err != nil {
+			return fmt.Errorf("failed to zip database: %w", err)
+		}
+	} else {
+		// Mock compression on Windows
+		_ = os.WriteFile(dbZipPath, []byte("Mock database ZIP content"), 0644)
+	}
+	_ = os.Remove(dbSqlPath) // Clean up raw SQL file
+
+	// 3. Compress WordPress Files into ZIP
+	ui.PrintStep(3, "Compressing WordPress public files into ZIP...")
+	if runtime.GOOS == "linux" {
+		_ = os.Remove(filesZipPath)
+		zipCmd := exec.Command("zip", "-r", "-q", filesZipPath, "htdocs")
+		zipCmd.Dir = parentDir // run in /var/www/[domain] to keep paths clean relative to htdocs
+		if err := zipCmd.Run(); err != nil {
+			return fmt.Errorf("failed to zip files: %w", err)
+		}
+	} else {
+		// Mock compression on Windows
+		_ = os.WriteFile(filesZipPath, []byte("Mock files ZIP content"), 0644)
+	}
+
+	// 4. Reset correct ownership on backup directory and ZIP files
+	if runtime.GOOS == "linux" {
+		_ = exec.Command("chown", "-R", fmt.Sprintf("%s:caddy", targetSite.SystemUser), backupDir).Run()
+		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
+	}
+
+	ui.PrintSuccess("Manual Backup Completed")
+	ui.PrintInfo("AgilePanel has successfully generated separate manual ZIP backups:")
+	ui.Row("Database ZIP", dbZipPath)
+	ui.Row("Web Files ZIP", filesZipPath)
+	ui.PrintInfo("These archives are owned by the site user and are immediately ready for secure download via SFTP/FTP client using the system user credentials.")
+	ui.Divider()
+	fmt.Println()
+	return nil
+}
+

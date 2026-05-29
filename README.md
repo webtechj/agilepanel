@@ -112,6 +112,13 @@ Exports a secure database SQL dump file into the site's private backup directory
 ap site backup-db example.com
 ```
 
+#### Manual Site Backup
+Generates separate manual ZIP backups of both public WordPress files and MariaDB database schemas:
+```bash
+ap site backup example.com
+```
+*These files are saved inside `/var/www/example.com/backup/` and can be immediately downloaded securely via any SFTP/FTP client using the system user credentials.*
+
 ---
 
 ### 🖥️ Server Administration
