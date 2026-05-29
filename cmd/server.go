@@ -280,6 +280,25 @@ var serverLogMetricsCmd = &cobra.Command{
 	},
 }
 
+var serverSecureCmd = &cobra.Command{
+	Use:   "secure",
+	Short: "Audit and harden server security (SSH policies, UFW firewall, password aging)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := server.SecureServer()
+		if err != nil {
+			return err
+		}
+		ui.PrintSuccess("Server Security Hardening Completed")
+		ui.SectionHeader("UBUNTU SERVER SECURITY GUIDANCE")
+		ui.PrintInfo("1. Password Aging Enforced: The 'root' user is now subject to a 30-day password rotation policy.")
+		ui.PrintInfo("2. SSH Hardening: Root password login is disabled. Please ensure you have added your SSH Public Key to '/root/.ssh/authorized_keys' to access the server as root.")
+		ui.PrintInfo("3. Firewall Active: UFW firewall is active and restricting traffic to ports 22 (SSH), 80 (HTTP), 443 (HTTPS), and 8888 (AgilePanel Admin).")
+		ui.Divider()
+		fmt.Println()
+		return nil
+	},
+}
+
 func init() {
 	serverTuneCmd.Flags().StringVar(&adminNameFlag, "admin-name", "", "Admin name for the server")
 	serverTuneCmd.Flags().StringVar(&adminEmailFlag, "admin-email", "", "Admin email for SSL installation")
@@ -288,6 +307,7 @@ func init() {
 	serverCmd.AddCommand(serverAuthCmd)
 	serverCmd.AddCommand(serverRestartCmd)
 	serverCmd.AddCommand(serverTuneCmd)
+	serverCmd.AddCommand(serverSecureCmd)
 	serverCmd.AddCommand(serverLogMetricsCmd)
 	rootCmd.AddCommand(serverCmd)
 }
