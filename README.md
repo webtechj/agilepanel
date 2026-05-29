@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=version&logo=github" alt="Release Version" /></a>
+  <a href="https://github.com/webtechj/agilepanel/tags"><img src="https://img.shields.io/github/v/tag/webtechj/agilepanel?color=blue&label=version&logo=github" alt="Release Version" /></a>
   <img src="https://img.shields.io/badge/Language-Go-00add8?logo=go&logoColor=white" alt="Go Language" />
   <img src="https://img.shields.io/badge/OS-Ubuntu%20%7C%20Debian-E95420?logo=ubuntu&logoColor=white" alt="OS Support" />
   <img src="https://img.shields.io/badge/Web_Server-Caddy-00a2db?logo=caddy&logoColor=white" alt="Caddy Web Server" />
