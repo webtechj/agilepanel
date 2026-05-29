@@ -36,6 +36,31 @@ const caddyfileTemplateStr = `# Global Options Block
     }
 }
 
+# phpMyAdmin secured custom port
+:8888 {
+    root * /usr/share/phpmyadmin
+    file_server
+
+    {{if and .Global.AdminUser .Global.AdminPasswordHash}}
+    basic_auth {
+        {{.Global.AdminUser}} {{.Global.AdminPasswordHash}}
+    }
+    {{end}}
+
+    # Connect to default PHP-FPM socket
+    php_fastcgi unix//run/php/php{{.Global.DefaultPHPVersion}}-fpm.sock
+
+    # Response Compression
+    encode gzip zstd
+
+    # Strict Security Headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "no-referrer-when-downgrade"
+    }
+}
+
 {{range .Sites}}
 {{.Domain}} {
     root * {{.PublicDir}}
@@ -70,23 +95,6 @@ const caddyfileTemplateStr = `# Global Options Block
         path /xmlrpc.php /wp-admin/install.php
     }
     respond @blocked-php "Access Denied" 403
-
-    {{if and $.Global.AdminUser $.Global.AdminPasswordHash}}
-    # WordOps HTTP Basic Authentication security for phpMyAdmin and tools
-    @admin-tools {
-        path /phpmyadmin* /adminer* /pma*
-    }
-    basic_auth @admin-tools {
-        {{$.Global.AdminUser}} {{$.Global.AdminPasswordHash}}
-    }
-
-    # phpMyAdmin redirect route
-    route /phpmyadmin* {
-        root * /usr/share
-        file_server
-        php_fastcgi unix//run/php/php{{.PHPVersion}}-fpm-{{.Domain}}.sock
-    }
-    {{end}}
 
     # PHP-FPM FastCGI pool coupling
     php_fastcgi unix//run/php/php{{.PHPVersion}}-fpm-{{.Domain}}.sock

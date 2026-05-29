@@ -93,6 +93,16 @@ func InstallPhpMyAdmin() error {
 	_ = exec.Command("chown", "-R", "caddy:caddy", destDir).Run()
 	_ = exec.Command("chmod", "-R", "0755", destDir).Run()
 
+	// Configure firewall rules for port 8888
+	if _, err := exec.LookPath("ufw"); err == nil {
+		fmt.Println("Tools: Opening port 8888 in UFW...")
+		_ = exec.Command("ufw", "allow", "8888/tcp").Run()
+	} else if _, err := exec.LookPath("firewall-cmd"); err == nil {
+		fmt.Println("Tools: Opening port 8888 in firewalld...")
+		_ = exec.Command("firewall-cmd", "--permanent", "--add-port=8888/tcp").Run()
+		_ = exec.Command("firewall-cmd", "--reload").Run()
+	}
+
 	fmt.Println("Tools: phpMyAdmin successfully installed and secured.")
 	return nil
 }
