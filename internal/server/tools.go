@@ -187,6 +187,11 @@ func InstallGui() error {
 		return nil
 	}
 
+	// Stop service if running and remove old binary to prevent "Text file busy" (exit status 23)
+	fmt.Println("Tools: Stopping existing agilepanel-gui daemon...")
+	_ = exec.Command("systemctl", "stop", "agilepanel-gui").Run()
+	_ = os.Remove(destPath)
+
 	fmt.Println("Tools: Downloading AgilePanel GUI companion binary...")
 	downloadCmd := exec.Command("curl", "-L", "-o", destPath, "https://raw.githubusercontent.com/webtechj/agilepanel-gui/main/agilepanel-gui-linux-amd64")
 	if err := downloadCmd.Run(); err != nil {
