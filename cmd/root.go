@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -27,6 +28,26 @@ func Execute() {
 		fmt.Printf("  \033[91m✘  Operation Failed:\033[0m \033[1;97m%s\033[0m\n", err.Error())
 		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")
 		fmt.Println("  \033[34m›\033[0m  \033[2mWhat went wrong:\033[0m The action was stopped due to the error listed above.")
+		
+		// If command typo is detected, suggest the closest matching command nomenclature
+		if strings.Contains(err.Error(), "unknown command") {
+			quoteParts := strings.Split(err.Error(), "\"")
+			if len(quoteParts) >= 2 {
+				unknownCmd := quoteParts[1]
+				parent := rootCmd
+				for _, arg := range os.Args[1:] {
+					sub, _, _ := parent.Find([]string{arg})
+					if sub != nil && sub != parent {
+						parent = sub
+					}
+				}
+				suggestions := parent.SuggestionsFor(unknownCmd)
+				if len(suggestions) > 0 {
+					fmt.Printf("  \033[34m›\033[0m  \033[93mDid you mean:\033[0m \033[1;32m%s %s\033[0m?\n", parent.CommandPath(), strings.Join(suggestions, ", "))
+				}
+			}
+		}
+
 		fmt.Println("  \033[34m›\033[0m  \033[2mWhat to do next:\033[0m Double-check the command spelling, verify the domain name is")
 		fmt.Println("     correctly formatted and exists, and ensure you are running as root/sudo.")
 		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")

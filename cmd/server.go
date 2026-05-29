@@ -222,10 +222,13 @@ var (
 var serverRestartCmd = &cobra.Command{
 	Use:   "restart [service|all]",
 	Short: "Restart system services (caddy, mariadb, redis, php-fpm, or all)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		serviceName := args[0]
-		err := server.RestartService(serviceName)
+		serviceName, err := getServiceArg(args)
+		if err != nil {
+			return err
+		}
+		err = server.RestartService(serviceName)
 		if err != nil {
 			return err
 		}

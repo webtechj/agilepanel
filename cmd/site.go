@@ -79,9 +79,12 @@ var siteCreateCmd = &cobra.Command{
 var siteDeleteCmd = &cobra.Command{
 	Use:   "delete [domain]",
 	Short: "Delete a site and all its assets",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Delete(domain)
 	},
 }
@@ -89,9 +92,12 @@ var siteDeleteCmd = &cobra.Command{
 var siteLockCmd = &cobra.Command{
 	Use:   "lock [domain]",
 	Short: "Lock a site directory (changes permissions/attributes to immutable)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Lock(domain)
 	},
 }
@@ -99,9 +105,12 @@ var siteLockCmd = &cobra.Command{
 var siteUnlockCmd = &cobra.Command{
 	Use:   "unlock [domain]",
 	Short: "Unlock a site directory (removes immutable attributes)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Unlock(domain)
 	},
 }
@@ -109,9 +118,12 @@ var siteUnlockCmd = &cobra.Command{
 var siteCacheCleanCmd = &cobra.Command{
 	Use:   "cache-clean [domain]",
 	Short: "Clean various caching layers (WordPress transients, Redis query cache, PHP OPcache, Caddy edge)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		wp := cleanWP
 		redis := cleanRedis
 		opcache := cleanOpcache
@@ -126,9 +138,12 @@ var siteCacheCleanCmd = &cobra.Command{
 var siteReinstallCmd = &cobra.Command{
 	Use:   "reinstall [domain]",
 	Short: "Reinstall WordPress core files and database schemas for a site",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Reinstall(domain)
 	},
 }
@@ -136,9 +151,12 @@ var siteReinstallCmd = &cobra.Command{
 var siteSSLRenewCmd = &cobra.Command{
 	Use:   "ssl-renew [domain]",
 	Short: "Force Caddy to request a fresh Let's Encrypt / ZeroSSL certificate for a site",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.SSLRenew(domain)
 	},
 }
@@ -146,9 +164,12 @@ var siteSSLRenewCmd = &cobra.Command{
 var siteFixPermissionsCmd = &cobra.Command{
 	Use:   "fix-permissions [domain]",
 	Short: "Restore correct owners and file/directory permissions for a site",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.FixPermissions(domain)
 	},
 }
@@ -156,9 +177,12 @@ var siteFixPermissionsCmd = &cobra.Command{
 var siteBackupDBCmd = &cobra.Command{
 	Use:   "backup-db [domain]",
 	Short: "Create a database SQL backup inside the site's secure backup folder",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.BackupDB(domain)
 	},
 }
@@ -166,9 +190,12 @@ var siteBackupDBCmd = &cobra.Command{
 var siteBackupCmd = &cobra.Command{
 	Use:   "backup [domain]",
 	Short: "Create separate manual ZIP backups of WordPress files and MariaDB database",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Backup(domain)
 	},
 }
@@ -184,9 +211,12 @@ var siteListCmd = &cobra.Command{
 var siteInfoCmd = &cobra.Command{
 	Use:   "info [domain]",
 	Short: "Show details and credentials of a website",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Info(domain)
 	},
 }
@@ -194,9 +224,12 @@ var siteInfoCmd = &cobra.Command{
 var siteEditCmd = &cobra.Command{
 	Use:   "edit [domain]",
 	Short: "Edit web server configuration for a website",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
 		return site.Edit(domain)
 	},
 }
