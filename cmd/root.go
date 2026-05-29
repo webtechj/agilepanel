@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -22,6 +23,19 @@ func Execute() {
 	// Silence default Cobra error printing so we can print our own premium styled error
 	rootCmd.SilenceErrors = true
 	rootCmd.SilenceUsage = true
+
+	// Check for root privileges on Linux to guide newbies
+	if runtime.GOOS == "linux" && os.Getuid() != 0 {
+		fmt.Println()
+		fmt.Printf("  \033[91m✘  Permission Denied:\033[0m \033[1;97mAgilePanel must be run with root privileges.\033[0m\n")
+		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")
+		fmt.Println("  \033[34m›\033[0m  \033[93m💡 Ubuntu Server Tip:\033[0m Most commands (like managing services, editing configuration")
+		fmt.Println("     files, and configuring firewall/SSH rules) require root-level permissions.")
+		fmt.Printf("  \033[34m›\033[0m  \033[2mWhat to do next:\033[0m Prefix your command with 'sudo', e.g., \033[1;32msudo ap %s\033[0m\n", strings.Join(os.Args[1:], " "))
+		fmt.Println("  \033[90m────────────────────────────────────────────────────────────────────────\033[0m")
+		fmt.Println()
+		os.Exit(1)
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println()
