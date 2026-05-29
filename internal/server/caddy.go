@@ -32,11 +32,20 @@ const caddyfileTemplateStr = `# Global Options Block
     root * /var/www/default
     file_server
 
+    {{if and .Global.AdminUser .Global.AdminPasswordHash}}
+    basic_auth {
+        {{.Global.AdminUser}} "{{.Global.AdminPasswordHash}}"
+    }
+    {{else}}
+    respond "Access Denied: Administrative HTTP Basic Authentication has not been configured yet." 403
+    {{end}}
+
     # Response Compression
     encode gzip zstd
 
-    # Strict Security Headers
+    # Strict Security Headers & Search Engine Blocking
     header {
+        X-Robots-Tag "noindex, nofollow, nosnippet, noarchive"
         X-Content-Type-Options "nosniff"
         X-Frame-Options "SAMEORIGIN"
         Referrer-Policy "no-referrer-when-downgrade"
@@ -74,7 +83,8 @@ const caddyfileTemplateStr = `# Global Options Block
 }
 
 {{range .Sites}}
-{{.Domain}}{{if $.ServerIP}}, http://{{.Domain}}.{{$.ServerIP}}.sslip.io{{end}} {
+# Live website block
+{{.Domain}} {
     root * {{.PublicDir}}
     file_server
 
@@ -117,6 +127,62 @@ const caddyfileTemplateStr = `# Global Options Block
     }
     rewrite @wp-uploaded-files /wp-content/uploads/{re.wp-uploads.1}
 }
+
+# Protected Staging website block
+{{if $.ServerIP}}
+http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
+    root * {{.PublicDir}}
+    file_server
+
+    # Enforce basic authentication for staging
+    {{if and $.Global.AdminUser $.Global.AdminPasswordHash}}
+    basic_auth {
+        {{$.Global.AdminUser}} "{{$.Global.AdminPasswordHash}}"
+    }
+    {{else}}
+    respond "Access Denied: Administrative HTTP Basic Authentication has not been configured yet. Run 'ap server auth' to configure credentials." 403
+    {{end}}
+
+    # Response Compression
+    encode gzip zstd
+
+    # Strict Security Headers & Search Engine Blocking
+    header {
+        X-Robots-Tag "noindex, nofollow, nosnippet, noarchive"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "no-referrer-when-downgrade"
+    }
+
+    # Block access to hidden files/directories except .well-known
+    @hidden-files {
+        path */.*
+        not path */.well-known/*
+    }
+    respond @hidden-files "Access Denied" 403
+
+    # Block PHP execution in uploads directory
+    @uploads-php {
+        path_regexp (?i)^/wp-content/uploads/.*\.php$
+    }
+    respond @uploads-php "Access Denied" 403
+
+    # Block access to xmlrpc.php and install.php
+    @blocked-php {
+        path /xmlrpc.php /wp-admin/install.php
+    }
+    respond @blocked-php "Access Denied" 403
+
+    # PHP-FPM FastCGI pool coupling
+    php_fastcgi unix//run/php/php{{.PHPVersion}}-fpm-{{.Domain}}.sock
+
+    # WordPress Rewrite Rules (implicit in php_fastcgi, fallback below)
+    @wp-uploaded-files {
+        path_regexp wp-uploads ^/wp-content/uploads/(.*)$
+    }
+    rewrite @wp-uploaded-files /wp-content/uploads/{re.wp-uploads.1}
+}
+{{end}}
 {{end}}
 `
 
