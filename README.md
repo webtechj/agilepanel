@@ -1,27 +1,51 @@
-# AgilePanel (ap)
+<p align="center">
+  <img src="agilepanel_logo.png" alt="AgilePanel Logo" width="240" />
+</p>
 
-AgilePanel is a secure, lightweight, and hyper-fast CLI-based WordPress control panel written in Go. Designed as a modern, high-performance alternative to legacy platforms (like WordOps or Webinoly), AgilePanel manages native **Caddy**, **PHP-FPM**, **MariaDB**, and **Redis** directly on bare-metal Linux without complex web UI overhead.
+<h1 align="center">AgilePanel (ap)</h1>
+
+<p align="center">
+  <strong>A Secure, Lightweight, and Hyper-Fast CLI Control Panel for WordPress</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=version" alt="Release Version" /></a>
+  <img src="https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-777bb4?logo=php" alt="PHP Versions" />
+  <img src="https://img.shields.io/badge/Web_Server-Caddy-00a2db?logo=caddy" alt="Caddy Web Server" />
+  <img src="https://img.shields.io/badge/Database-MariaDB-003545?logo=mariadb" alt="MariaDB Database" />
+  <img src="https://img.shields.io/badge/Cache-Redis-dc382d?logo=redis" alt="Redis Cache" />
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License" />
+</p>
 
 ---
 
-## 🚀 Key Features
+## ⚡ What is AgilePanel?
 
-- **Dynamic & Beautiful CLI**: Built with ANSI colors and structured box layouts for a modern, professional terminal experience.
-- **System Isolation**: Automatically creates isolated system users (`wp_[sanitized_domain]`) for each website.
-- **Robust Security**:
-  - Automatically configured HTTP/3 (HTTP/1, HTTP/2, and HTTP/3 support).
-  - Pre-configured security filters in Caddy (blocking hidden files, preventing PHP execution in `/wp-content/uploads/` recursively, blocking `xmlrpc.php` and `/wp-admin/install.php`).
-  - PHP pool hardening (`open_basedir` locks, disabled dangerous system functions like `exec`, `shell_exec`, etc.).
-  - Unique database & user prefixes (e.g. `db_prefix_`) and random WordPress table prefixes (e.g. `wp_prefix_`) to protect against SQL injections and discovery attacks.
-- **High Performance Tuning**:
-  - Scaling database buffer pools to 30% of system RAM dynamically.
-  - Custom transactional database commit configs (`innodb_flush_log_at_trx_commit = 2`, `O_DIRECT`).
-  - Automatic response compression (`encode gzip zstd`) and Redis UNIX socket caching.
-  - Swap file creation (2GB swapfile + kernel sysctl pressure optimizations) on resource-constrained servers.
-- **On-Demand phpMyAdmin**: Install phpMyAdmin on-demand and hide it behind a custom global port (`IP:8888`) guarded by bcrypt-based HTTP Basic Authentication.
-- **Non-Destructive Repairs**: Run `ap repair` to restore all system configurations and pools without disturbing databases or site directories.
-- **Auto-Sync Scanning**: Scan `/var/www/` for pre-existing website directories and import them back into `state.json` automatically, extracting database details from `wp-config.php`.
-- **Easy Maintenance**: Single-command system package updates/upgrades and CLI self-updates.
+**AgilePanel** is a modern, high-performance, and minimal WordPress VPS manager built in Go. It directly manages native server services—**Caddy**, **PHP-FPM**, **MariaDB**, and **Redis**—on bare-metal Linux (Ubuntu/Debian) via a fast, interactive command-line interface. 
+
+By eliminating bloated web UIs and heavy daemon overhead (typical in platforms like cPanel or Plesk), AgilePanel secures your system, reduces memory footprints, and accelerates page load times out of the box.
+
+---
+
+## 🌟 Key Features
+
+### 🔒 Security-First Architecture
+*   **System User Isolation**: Automatically provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
+*   **Hardened PHP Configurations**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
+*   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes to block generic SQL injection and automated path guessing.
+*   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/`, and shield sensitive scripts (`xmlrpc.php`, `install.php`).
+
+### 🚀 High-Performance Optimizations
+*   **Hardware-Aware Tuning**: The `ap server tune` command automatically scales the MariaDB InnoDB buffer pool (allocated to 30% of system RAM), configures high-speed transaction flushes, and disables unnecessary replication logging.
+*   **Built-in Compression**: Delivers resources instantly using automated Gzip and Zstd compression engines (`encode gzip zstd`).
+*   **UNIX Socket Coupling**: Connects PHP-FPM, WordPress Redis object caches, and Caddy database queries directly through high-speed local UNIX sockets instead of slower TCP ports.
+*   **Swap File Allocator**: Automatically provisions a persistent 2GB `/swapfile` and tweaks kernel swappiness boundaries to keep low-resource VPS nodes running smoothly under high traffic.
+
+### 🛠️ Developer-Centric Operations
+*   **On-Demand phpMyAdmin**: Install phpMyAdmin with one command. Access is hidden behind a dedicated global port (`IP:8888`) and shielded behind bcrypt-based HTTP Basic Authentication.
+*   **Non-Destructive Repair System**: Run `ap repair` to completely recreate all configuration files, verify swap buffers, re-generate PHP pools, and reload services without touching databases, site files, or data.
+*   **Automatic Directory Synchronization**: The `ap sync` command scans `/var/www/` for pre-existing website folders, reads their database settings directly from `wp-config.php`, and automatically registers them back into the panel's locked `state.json` file.
+*   **Zero-Dependency Deployment**: Compiled as a standalone static Go binary with no Python or third-party runtime package dependencies required.
 
 ---
 
@@ -30,158 +54,92 @@ AgilePanel is a secure, lightweight, and hyper-fast CLI-based WordPress control 
 Ensure your server is running a clean install of **Ubuntu 22.04+ LTS** or **Debian 11+**.
 
 ### Standard Installation (Latest Version)
-Run the one-liner installer script:
+Run the automated one-liner installer:
 ```bash
 curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/main/install.sh | sudo bash
 ```
 
 ### Installation from Specific Release (e.g. v0.8)
+You can choose to install specific tagged releases:
 ```bash
 curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/v0.8/install.sh | AP_VERSION=v0.8 sudo -E bash
 ```
 
-*The installer will ask for the administrator name and email to configure SSL registration and default admin details.*
+*The installer will prompt you for the server administrator's Name and Email. This email will be registered with Let's Encrypt / ZeroSSL for SSL certificate renewals.*
 
 ---
 
-## 🛠️ CLI Commands & Usage
+## 🛠️ CLI Reference & Command Set
 
-AgilePanel is controlled entirely via the `ap` executable.
+AgilePanel is managed entirely via the `ap` command. It is designed to be friendly for newbies and powerful for CLI experts.
 
 ### 🌐 Site Management
 
-#### Create a Site
-Create a standard PHP or WordPress site with Redis cache enabled:
-```bash
-ap site create example.com --php=8.3 --wp
-```
-*If `--wp` is set, it will prompt for the WordPress admin details (Full Name, Username, Email) and output a secure password along with database credentials.*
-
-#### Delete a Site
-Deletes the database, system user/group, PHP configuration pools, public webroot directory, and Caddyfile bindings:
-```bash
-ap site delete example.com
-```
-
-#### List Sites
-Renders a grid displaying all domain names, PHP versions, database namespaces, and locks:
-```bash
-ap site list
-```
-
-#### Site Information
-Displays comprehensive settings, directory locations, database credentials, and Caddy ACME SSL certificate renew details:
-```bash
-ap site info example.com
-```
-
-#### Lock/Unlock a Site
-Changes site folders to read-only/immutable (using system attributes) or unlocks them for updates:
-```bash
-ap site lock example.com
-ap site unlock example.com
-```
-
-#### Cache Cleaning
-Flushes static Caddy page caches, Redis object caches, bytecode OPcaches, and WordPress transient states:
-```bash
-ap site cache-clean example.com
-```
-
-#### Edit Configuration
-Opens the site's PHP-FPM configuration pool inside the system's text editor (respecting `EDITOR` variable) and reloads FPM upon exit:
-```bash
-ap site edit example.com
-```
-
-#### Reinstall WordPress
-Recreates database schemas, resets public directories, and reinstalls WordPress core files using the existing site config:
-```bash
-ap site reinstall example.com
-```
-
-#### SSL Force Renewal
-Bypasses local certificates cache and forces Caddy to request a fresh SSL certificate:
-```bash
-ap site ssl-renew example.com
-```
-
-#### Backup Database
-Exports a secure database SQL dump file into the site's private backup directory:
-```bash
-ap site backup-db example.com
-```
-
-#### Manual Site Backup
-Generates separate manual ZIP backups of both public WordPress files and MariaDB database schemas:
-```bash
-ap site backup example.com
-```
-*These files are saved inside `/var/www/example.com/backup/` and can be immediately downloaded securely via any SFTP/FTP client using the system user credentials.*
+| Command | Description |
+| :--- | :--- |
+| `ap site create [domain] --wp` | Creates a new PHP/WordPress site with automated system users, databases, and SSL. |
+| `ap site delete [domain]` | Completely decommissions a website, drops its database, and cleans directory files. |
+| `ap site list` | Renders a clean, responsive, stacked list of all hosted sites and their active status. |
+| `ap site info [domain]` | Queries directories, database credentials, active FPM versions, and SSL certificates. |
+| `ap site lock [domain]` | Sets site files to immutable/read-only to protect against write exploits. |
+| `ap site unlock [domain]` | Restores standard write access to install plugins or run core upgrades. |
+| `ap site cache-clean [domain]` | Flushes WordPress transients, Redis caches, PHP OPcache, and Caddy edge caches. |
+| `ap site backup [domain]` | Generates separate manual ZIP backups of both web files and database schemas. |
+| `ap site backup-db [domain]` | Creates a raw SQL database backup inside the site's secure `/backup` folder. |
+| `ap site edit [domain]` | Opens the site's PHP-FPM configuration pool in your system's text editor. |
+| `ap site reinstall [domain]` | Freshly reinstalls WordPress core files and database schemas under existing configs. |
+| `ap site ssl-renew [domain]` | Clears the local Caddy certificates cache and forces Caddy to request a fresh SSL. |
+| `ap site fix-permissions [domain]` | Recursively restores correct file (0644) and folder (0755) permissions. |
 
 ---
 
 ### 🖥️ Server Administration
 
-#### Status Monitoring
-Monitor CPU, RAM usage, active website counts, and the operational status of Caddy, MariaDB, Redis, and active PHP-FPM pool versions:
-```bash
-ap server status
-```
-
-#### Configure Basic Authentication
-Setup global Basic Auth credentials to secure phpMyAdmin and backend administrator utilities:
-```bash
-ap server auth [username] [password]
-```
-
-#### Service Management
-Restart global services:
-```bash
-ap server restart caddy
-ap server restart php8.3-fpm
-ap server restart mariadb
-ap server restart redis
-ap server restart all
-```
-
-#### Optimization Tuning
-Re-run resource audits to tune MySQL buffers, Redis sockets, and Swap:
-```bash
-ap server tune
-```
+*   **Monitor Status**: Check system CPU load, memory usage, site count, and active services:
+    ```bash
+    ap server status
+    ```
+*   **Configure Administrator Auth**: Configure basic auth credentials used to secure phpMyAdmin and backend tools:
+    ```bash
+    ap server auth [username] [password]
+    ```
+*   **Hardware Optimization**: Audit resources to re-tune buffers, Redis sockets, and Swap memory:
+    ```bash
+    ap server tune
+    ```
+*   **Service Restarts**: Restart web server stack components:
+    ```bash
+    ap server restart [caddy|mariadb|redis|php8.3-fpm|all]
+    ```
 
 ---
 
-### 🔧 Tools & Maintenance
+### 🔧 Maintenance & Tools
 
-#### Install phpMyAdmin
-Downloads, configures, and secures phpMyAdmin dynamically:
-```bash
-ap tool install phpmyadmin
-```
-*Once installed, access it at `http://[your-server-ip]:8888` using the credentials configured via `ap server auth`.*
+*   **Install phpMyAdmin**: Install phpMyAdmin on-demand:
+    ```bash
+    ap tool install phpmyadmin
+    ```
+    *Access securely at `http://[your-server-ip]:8888` using the credentials configured in `ap server auth`.*
+*   **Repair Configurations**: Verify and rebuild your server configs and PHP pools instantly:
+    ```bash
+    ap repair
+    ```
+*   **System Update**: Refresh apt repositories and self-update the `ap` executable to the latest build:
+    ```bash
+    ap update
+    ```
+*   **System Upgrade**: Upgrade all OS packages and run `ap repair` to ensure compatibility:
+    ```bash
+    ap upgrade
+    ```
+*   **Configuration Sync**: Synchronize configuration files and auto-import untracked site folders:
+    ```bash
+    ap sync
+    ```
 
-#### Repair Installation
-Runs a non-destructive audit to rebuild all configurations, re-verify system optimizations, rewrite Caddyfile directories, re-create PHP pools, and reload services:
-```bash
-ap repair
-```
+---
 
-#### System Update
-Updates system apt repositories and self-updates the `ap` executable to the latest codebase:
-```bash
-ap update
-```
+## 📄 License
 
-#### System Upgrade
-Upgrades all OS system packages and re-runs `ap repair` to ensure configurations align with upgraded software:
-```bash
-ap upgrade
-```
-
-#### Configuration Sync
-Synchronizes all server services and scans `/var/www/` to auto-detect and import pre-existing site installations:
-```bash
-ap sync
-```
+AgilePanel is open-source software licensed under the [MIT License](LICENSE).
