@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"agilepanel/internal/site"
@@ -24,15 +26,53 @@ var siteCmd = &cobra.Command{
 var siteCreateCmd = &cobra.Command{
 	Use:   "create [domain]",
 	Short: "Create a new site (WordPress, Laravel, Custom PHP, Static HTML)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		domain := args[0]
-		// Map --wp flag to wp type
-		actualType := siteType
-		if installWP {
-			actualType = "wp"
+		var domain string
+		if len(args) >= 1 {
+			domain = args[0]
+		} else {
+			var err error
+			domain, err = promptString("Enter domain name: ")
+			if err != nil {
+				return err
+			}
+			if domain == "" {
+				return fmt.Errorf("domain name cannot be empty")
+			}
 		}
-		return site.Create(domain, phpVersion, actualType)
+
+		actualType := siteType
+		if cmd.Flags().Changed("type") || cmd.Flags().Changed("wp") {
+			if installWP {
+				actualType = "wp"
+			}
+		} else {
+			pt, err := promptString("Enter site type (wp, laravel, php, html) [wp]: ")
+			if err != nil {
+				return err
+			}
+			if pt != "" {
+				actualType = pt
+			} else {
+				actualType = "wp"
+			}
+		}
+
+		actualPHP := phpVersion
+		if !cmd.Flags().Changed("php") {
+			pp, err := promptString("Enter PHP version (e.g. 8.2, 8.3) [8.3]: ")
+			if err != nil {
+				return err
+			}
+			if pp != "" {
+				actualPHP = pp
+			} else {
+				actualPHP = "8.3"
+			}
+		}
+
+		return site.Create(domain, actualPHP, actualType)
 	},
 }
 

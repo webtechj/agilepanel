@@ -123,12 +123,23 @@ func TuneSwap() error {
 	}
 
 	// Optimize Sysctl parameters
-	fmt.Println("Swap: Tuning kernel swappiness and cache settings...")
+	fmt.Println("Swap: Tuning kernel network stack and cache settings...")
 	_ = exec.Command("sysctl", "vm.swappiness=10").Run()
 	_ = exec.Command("sysctl", "vm.vfs_cache_pressure=50").Run()
+	_ = exec.Command("sysctl", "net.core.somaxconn=65535").Run()
+	_ = exec.Command("sysctl", "net.ipv4.tcp_max_syn_backlog=65535").Run()
+	_ = exec.Command("sysctl", "net.ipv4.tcp_tw_reuse=1").Run()
+	_ = exec.Command("sysctl", "net.core.netdev_max_backlog=5000").Run()
+	_ = exec.Command("sysctl", "fs.file-max=200000").Run()
 
 	sysctlConfPath := "/etc/sysctl.d/99-agilepanel.conf"
-	sysctlContent := "vm.swappiness=10\nvm.vfs_cache_pressure=50\n"
+	sysctlContent := "vm.swappiness=10\n" +
+		"vm.vfs_cache_pressure=50\n" +
+		"net.core.somaxconn=65535\n" +
+		"net.ipv4.tcp_max_syn_backlog=65535\n" +
+		"net.ipv4.tcp_tw_reuse=1\n" +
+		"net.core.netdev_max_backlog=5000\n" +
+		"fs.file-max=200000\n"
 	_ = ioutil.WriteFile(sysctlConfPath, []byte(sysctlContent), 0644)
 
 	return nil
@@ -166,7 +177,16 @@ innodb_flush_log_at_trx_commit = 2
 innodb_flush_method = O_DIRECT
 query_cache_type = 0
 query_cache_size = 0
-max_connections = 100
+key_buffer_size = 32M
+thread_cache_size = 8
+table_open_cache = 400
+tmp_table_size = 32M
+max_heap_table_size = 32M
+max_connections = 50
+max_allowed_packet = 64M
+join_buffer_size = 256K
+sort_buffer_size = 256K
+read_rnd_buffer_size = 512K
 `, bufferPoolMB, logFileMB)
 
 	if runtime.GOOS != "linux" {
@@ -215,7 +235,7 @@ max_connections = 100
 // TuneRedis configures Redis socket paths and permissions.
 func TuneRedis() error {
 	if runtime.GOOS != "linux" {
-		fmt.Println("Redis (Mock): Configure UNIX socket in redis.conf")
+		fmt.Println("Redis (Mock): Configure UNIX socket and RAM optimizations in redis.conf")
 		return nil
 	}
 
@@ -250,11 +270,30 @@ func TuneRedis() error {
 		modified = true
 	}
 
+	// Dynamic RAM/eviction configurations
+	redisConfigs := map[string]string{
+		"maxmemory":              "128mb",
+		"maxmemory-policy":      "allkeys-lru",
+		"save":                   `""`,
+		"appendonly":             "no",
+		"lazyfree-lazy-eviction": "yes",
+		"hz":                     "15",
+		"dynamic-hz":             "yes",
+	}
+
+	for key, val := range redisConfigs {
+		var changed bool
+		content, changed = setOrAppendRedisConfig(content, key, val)
+		if changed {
+			modified = true
+		}
+	}
+
 	if modified {
 		if err := ioutil.WriteFile(confPath, []byte(content), 0644); err != nil {
 			return err
 		}
-		fmt.Println("Redis: UNIX socket enabled with permissions 777 in redis.conf.")
+		fmt.Println("Redis: Socket and RAM optimizations applied to redis.conf.")
 		
 		// Restart service
 		_ = exec.Command("systemctl", "restart", "redis-server").Run()
@@ -262,6 +301,53 @@ func TuneRedis() error {
 	}
 
 	return nil
+}
+
+func setOrAppendRedisConfig(content string, key string, value string) (string, bool) {
+	lines := strings.Split(content, "\n")
+	found := false
+	newLineStr := fmt.Sprintf("%s %s", key, value)
+	
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		fields := strings.Fields(trimmed)
+		if len(fields) > 0 && fields[0] == key {
+			if trimmed == newLineStr {
+				return content, false
+			}
+			lines[i] = newLineStr
+			found = true
+			break
+		}
+	}
+	
+	if !found {
+		for i, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if strings.HasPrefix(trimmed, "#") {
+				uncommented := strings.TrimSpace(trimmed[1:])
+				fields := strings.Fields(uncommented)
+				if len(fields) > 0 && fields[0] == key {
+					lines[i] = newLineStr
+					found = true
+					break
+				}
+			}
+		}
+	}
+	
+	if found {
+		return strings.Join(lines, "\n"), true
+	}
+	
+	if !strings.HasSuffix(content, "\n") {
+		content += "\n"
+	}
+	content += newLineStr + "\n"
+	return content, true
 }
 
 func replaceLine(content string, prefix string, newLine string) string {

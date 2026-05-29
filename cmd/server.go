@@ -145,10 +145,36 @@ var serverStatusCmd = &cobra.Command{
 var serverAuthCmd = &cobra.Command{
 	Use:   "auth [username] [password]",
 	Short: "Configure HTTP Basic Auth credentials for phpMyAdmin and server tools",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.RangeArgs(0, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		username := args[0]
-		password := args[1]
+		var username string
+		var password string
+
+		if len(args) >= 1 {
+			username = args[0]
+		} else {
+			var err error
+			username, err = promptString("Enter username: ")
+			if err != nil {
+				return err
+			}
+			if username == "" {
+				return fmt.Errorf("username cannot be empty")
+			}
+		}
+
+		if len(args) >= 2 {
+			password = args[1]
+		} else {
+			var err error
+			password, err = promptPassword("Enter password: ")
+			if err != nil {
+				return err
+			}
+			if password == "" {
+				return fmt.Errorf("password cannot be empty")
+			}
+		}
 
 		hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
