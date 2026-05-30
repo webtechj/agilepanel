@@ -50,6 +50,7 @@ type SiteConfig struct {
 	LastBackupTime    time.Time `json:"last_backup_time,omitempty"`
 	BackupDestination string    `json:"backup_destination,omitempty"`
 	S3BackupVersions  int       `json:"s3_backup_versions,omitempty"`
+	S3Enabled         bool      `json:"s3_enabled,omitempty"`
 }
 
 type State struct {
