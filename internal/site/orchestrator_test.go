@@ -65,7 +65,7 @@ func TestSiteOrchestration(t *testing.T) {
 	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
 
 	// 1. Create site
-	err := Create("test.com", "8.3", "wp", "default")
+	err := Create("test.com", "8.3", "wp", "default", "", "")
 	if err != nil {
 		t.Fatalf("failed to create site: %v", err)
 	}
@@ -101,13 +101,13 @@ func TestSiteOrchestration(t *testing.T) {
 	}
 
 	// 2. Duplicate detection
-	err = Create("TEST.com", "8.3", "php", "default")
+	err = Create("TEST.com", "8.3", "php", "default", "", "")
 	if err == nil {
 		t.Error("expected duplicate error but got nil")
 	}
 
 	// 3. Invalid PHP version
-	err = Create("another.com", "7.4", "php", "default")
+	err = Create("another.com", "7.4", "php", "default", "", "")
 	if err == nil {
 		t.Error("expected invalid PHP version error but got nil")
 	}
@@ -284,7 +284,7 @@ func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
 	_, _ = config.ReadState(statePath)
 
 	// 1. Create static HTML site
-	err := Create("static-html.com", "8.3", "html", "default")
+	err := Create("static-html.com", "8.3", "html", "default", "", "")
 	if err != nil {
 		t.Fatalf("failed to create static html site: %v", err)
 	}
@@ -302,7 +302,7 @@ func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
 	}
 
 	// 2. Create Laravel site
-	err = Create("my-laravel.com", "8.3", "laravel", "default")
+	err = Create("my-laravel.com", "8.3", "laravel", "default", "", "")
 	if err != nil {
 		t.Fatalf("failed to create laravel site: %v", err)
 	}
@@ -341,7 +341,7 @@ func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
 	}
 
 	// 6. Test static HTML site with explicit database
-	err = Create("html-with-db.com", "8.3", "html", "true")
+	err = Create("html-with-db.com", "8.3", "html", "true", "", "")
 	if err != nil {
 		t.Fatalf("failed to create static html site with db: %v", err)
 	}
@@ -359,7 +359,7 @@ func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
 	}
 
 	// 7. Test static HTML site with explicit no database
-	err = Create("html-no-db.com", "8.3", "html", "false")
+	err = Create("html-no-db.com", "8.3", "html", "false", "", "")
 	if err != nil {
 		t.Fatalf("failed to create static html site with no db: %v", err)
 	}

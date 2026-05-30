@@ -41,13 +41,16 @@ func RunAsUser(username string, homeDir string, command string, args ...string) 
 
 // InstallWordPress downloads, installs, and configures WordPress and its Redis Object Cache.
 // adminUser and adminEmail are provided by the operator and must not be empty.
-func InstallWordPress(username string, domain string, publicDir string, dbName string, dbUser string, dbPassword string, redisSocket string, adminUser string, adminEmail string, siteType string) (string, error) {
-	adminPassword, err := GenerateSecurePassword()
-	if err != nil {
-		return "", err
-	}
-	if len(adminPassword) > 16 {
-		adminPassword = adminPassword[:16]
+func InstallWordPress(username string, domain string, publicDir string, dbName string, dbUser string, dbPassword string, redisSocket string, adminUser string, adminEmail string, adminPassword string, siteType string) (string, error) {
+	if adminPassword == "" {
+		var err error
+		adminPassword, err = GenerateSecurePassword()
+		if err != nil {
+			return "", err
+		}
+		if len(adminPassword) > 16 {
+			adminPassword = adminPassword[:16]
+		}
 	}
 	homeDir := filepath.Dir(publicDir)
 

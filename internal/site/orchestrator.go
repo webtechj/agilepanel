@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -56,7 +57,7 @@ func promptLine(label string) string {
 }
 
 // Create provisions a site's infrastructure.
-func Create(domain string, phpVersion string, siteType string, dbOpt string) error {
+func Create(domain string, phpVersion string, siteType string, dbOpt string, importFiles string, importDB string, wpUser string, wpPass string, wpEmail string, wpName string) error {
 	if err := ValidateDomain(domain); err != nil {
 		return err
 	}
@@ -72,9 +73,13 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string) err
 	installWP := siteType == "wp" || siteType == "woocommerce"
 
 	// Prompt for WordPress admin credentials BEFORE the locked state transaction
-	var wpAdminUser, wpAdminEmail string
+	var wpAdminUser, wpAdminEmail, wpAdminPassword string
 	if installWP {
-		if os.Getenv("AGILEPANEL_TEST_MODE") == "true" {
+		if wpUser != "" {
+			wpAdminUser = wpUser
+			wpAdminEmail = wpEmail
+			wpAdminPassword = wpPass
+		} else if os.Getenv("AGILEPANEL_TEST_MODE") == "true" {
 			// In test mode, skip interactive prompts and use safe defaults
 			wpAdminUser = "testadmin"
 			wpAdminEmail = "testadmin@" + domain
@@ -102,7 +107,6 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string) err
 
 	statePath := config.GetStatePath()
 	var dbPassword string
-	var wpAdminPassword string
 	var dbName string
 	var dbUser string
 
@@ -212,8 +216,109 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string) err
 			return fmt.Errorf("failed to write PHP-FPM config: %w", err)
 		}
 
-		// 8. Install landing layouts depending on type
-		if installWP {
+		// 8. Install landing layouts depending on type OR import from files/db
+		hasImports := importFiles != "" || importDB != ""
+		if hasImports {
+			htdocsPath := filepath.Join(server.GetSiteRootDir(publicDir), "htdocs")
+			if importFiles != "" {
+				if _, err := os.Stat(importFiles); err == nil {
+					ui.PrintStep(8, "Importing web public files from ZIP...")
+					if runtime.GOOS == "linux" {
+						_ = os.MkdirAll(htdocsPath, 0755)
+						unzipCmd := exec.Command("unzip", "-o", "-q", importFiles, "-d", htdocsPath)
+						if err := unzipCmd.Run(); err != nil {
+							_ = server.DeletePHPPool(phpVersion, domain)
+							if createDB {
+								_ = server.DeleteDatabase(dbName, dbUser)
+							}
+							_ = server.DeleteSiteDirectory(publicDir)
+							_ = server.DeleteSystemUser(systemUser)
+							return fmt.Errorf("failed to extract import files ZIP: %w", err)
+						}
+					} else {
+						fmt.Printf("Mock: Unzipped %s to %s\n", importFiles, htdocsPath)
+					}
+				} else {
+					_ = server.DeletePHPPool(phpVersion, domain)
+					if createDB {
+						_ = server.DeleteDatabase(dbName, dbUser)
+					}
+					_ = server.DeleteSiteDirectory(publicDir)
+					_ = server.DeleteSystemUser(systemUser)
+					return fmt.Errorf("import files ZIP not found: %s", importFiles)
+				}
+			}
+
+			if importDB != "" && createDB {
+				if _, err := os.Stat(importDB); err == nil {
+					ui.PrintStep(9, "Importing database backup...")
+					sqlFile := importDB
+					var tempDir string
+
+					if strings.HasSuffix(strings.ToLower(importDB), ".zip") {
+						tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("import_db_%s_%d", domain, time.Now().Unix()))
+						_ = os.MkdirAll(tempDir, 0755)
+						defer os.RemoveAll(tempDir)
+
+						if runtime.GOOS == "linux" {
+							cmd := exec.Command("unzip", "-o", "-q", importDB, "-d", tempDir)
+							if err := cmd.Run(); err == nil {
+								entries, err := os.ReadDir(tempDir)
+								if err == nil {
+									for _, entry := range entries {
+										if strings.HasSuffix(strings.ToLower(entry.Name()), ".sql") {
+											sqlFile = filepath.Join(tempDir, entry.Name())
+											break
+										}
+									}
+								}
+							}
+						} else {
+							mockSql := filepath.Join(tempDir, "mock.sql")
+							_ = os.WriteFile(mockSql, []byte("CREATE TABLE mock (id int);"), 0644)
+							sqlFile = mockSql
+						}
+					}
+
+					if runtime.GOOS == "linux" {
+						mysqlCmd := exec.Command("mysql", "-u"+dbUser, "-p"+dbPassword, dbName)
+						f, err := os.Open(sqlFile)
+						if err != nil {
+							_ = server.DeletePHPPool(phpVersion, domain)
+							_ = server.DeleteDatabase(dbName, dbUser)
+							_ = server.DeleteSiteDirectory(publicDir)
+							_ = server.DeleteSystemUser(systemUser)
+							return fmt.Errorf("failed to open import SQL file: %w", err)
+						}
+						defer f.Close()
+						mysqlCmd.Stdin = f
+
+						var stderr bytes.Buffer
+						mysqlCmd.Stderr = &stderr
+						if err := mysqlCmd.Run(); err != nil {
+							_ = server.DeletePHPPool(phpVersion, domain)
+							_ = server.DeleteDatabase(dbName, dbUser)
+							_ = server.DeleteSiteDirectory(publicDir)
+							_ = server.DeleteSystemUser(systemUser)
+							return fmt.Errorf("database import failed: %w (stderr: %s)", err, stderr.String())
+						}
+					} else {
+						fmt.Printf("Mock: Imported database dump %s into db %s\n", sqlFile, dbName)
+					}
+				} else {
+					_ = server.DeletePHPPool(phpVersion, domain)
+					_ = server.DeleteDatabase(dbName, dbUser)
+					_ = server.DeleteSiteDirectory(publicDir)
+					_ = server.DeleteSystemUser(systemUser)
+					return fmt.Errorf("import db file not found: %s", importDB)
+				}
+			}
+
+			if runtime.GOOS == "linux" {
+				_ = exec.Command("chown", "-R", systemUser+":www-data", htdocsPath).Run()
+				_ = exec.Command("chmod", "-R", "0755", htdocsPath).Run()
+			}
+		} else if installWP {
 			wpAdminPassword, err = server.InstallWordPress(
 				systemUser,
 				domain,
@@ -224,6 +329,7 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string) err
 				s.Global.RedisSocketPath,
 				wpAdminUser,
 				wpAdminEmail,
+				wpAdminPassword,
 				siteType,
 			)
 			if err != nil {
@@ -731,6 +837,7 @@ func Reinstall(domain string) error {
 				s.Global.RedisSocketPath,
 				adminUser,
 				adminEmail,
+				"",
 				sType,
 			)
 			if err != nil {
@@ -1563,7 +1670,7 @@ func Sync() error {
 }
 
 // Backup creates a ZIP of the database and a separate ZIP of the site files.
-func Backup(domain string) error {
+func Backup(domain string) (retErr error) {
 	statePath := config.GetStatePath()
 	state, err := config.ReadState(statePath)
 	if err != nil {
@@ -1583,12 +1690,24 @@ func Backup(domain string) error {
 		return fmt.Errorf("site %s not found in state", domain)
 	}
 
+	dest := targetSite.BackupDestination
+	if dest == "" {
+		dest = "local"
+	}
+	s3Enabled := targetSite.S3Enabled
+	isS3 := dest == "s3" && s3Enabled
+	timestamp := time.Now().Format("20060102-150405")
+
+	defer func() {
+		notifyBackup(domain, timestamp, isS3, state, retErr)
+	}()
+
+
 	parentDir := server.GetSiteRootDir(targetSite.PublicDir) // /var/www/[domain]
 	backupDir := filepath.Join(parentDir, "backup")
 	_ = os.MkdirAll(backupDir, 0755)
 
 	hasDB := targetSite.DatabaseName != "" && targetSite.Type != "html"
-	timestamp := time.Now().Format("20060102-150405")
 	dbSqlPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
 	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db-%s.zip", domain, timestamp))
 	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files-%s.zip", domain, timestamp))
@@ -1666,7 +1785,7 @@ func Backup(domain string) error {
 	}
 
 	// 5. Perform S3 upload if destination is "s3" (and S3 credentials are configured, and site has S3 access enabled)
-	dest := targetSite.BackupDestination
+	dest = targetSite.BackupDestination
 	if dest == "" {
 		dest = "local" // Default to local
 	}
@@ -1674,8 +1793,8 @@ func Backup(domain string) error {
 		dest = "local" // Treat legacy 'both' as local — storage is now exclusive
 	}
 
-	s3Enabled := targetSite.S3Enabled
-	isS3 := dest == "s3" && s3Enabled
+	s3Enabled = targetSite.S3Enabled
+	isS3 = dest == "s3" && s3Enabled
 	isLocal := !isS3 // strictly one or the other
 
 	if isS3 && state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
@@ -1973,4 +2092,92 @@ func DownloadS3BackupCLI(domain string, timestamp string) error {
 	fmt.Println()
 	return nil
 }
+
+// DeleteS3BackupCLI deletes S3 backup files from the S3 cloud storage bucket.
+func DeleteS3BackupCLI(domain string, timestamp string) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	filesS3Key := fmt.Sprintf("backups/%s/%s-files-%s.zip", domain, domain, timestamp)
+	dbS3Key := fmt.Sprintf("backups/%s/%s-db-%s.zip", domain, domain, timestamp)
+
+	ui.PrintInfo(fmt.Sprintf("S3: Deleting remote S3 backups for timestamp: %s...", timestamp))
+
+	errFiles := server.DeleteFromS3(filesS3Key, state)
+	errDB := server.DeleteFromS3(dbS3Key, state)
+
+	if errFiles != nil {
+		ui.PrintWarning(fmt.Sprintf("S3: Failed to delete files backup from S3: %v", errFiles))
+	} else {
+		ui.PrintSuccess(fmt.Sprintf("S3: Successfully deleted files backup: %s", filesS3Key))
+	}
+
+	if errDB != nil {
+		// Only warn if the site is not static html
+		var targetSite config.SiteConfig
+		for _, s := range state.Sites {
+			if strings.EqualFold(s.Domain, domain) {
+				targetSite = s
+				break
+			}
+		}
+		if targetSite.DatabaseName != "" && targetSite.Type != "html" {
+			ui.PrintWarning(fmt.Sprintf("S3: Failed to delete database backup from S3: %v", errDB))
+		}
+	} else {
+		ui.PrintSuccess(fmt.Sprintf("S3: Successfully deleted database backup: %s", dbS3Key))
+	}
+
+	ui.Divider()
+	return nil
+}
+
+func sendTelegramNotification(state *config.State, message string) {
+	token := state.Global.TelegramBotToken
+	chatID := state.Global.TelegramChatID
+	if token == "" || chatID == "" {
+		return
+	}
+
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+	payload := map[string]interface{}{
+		"chat_id":    chatID,
+		"text":       message,
+		"parse_mode": "HTML",
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+
+	resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(body))
+	if err == nil {
+		resp.Body.Close()
+	}
+}
+
+func notifyBackup(domain string, timestamp string, isS3 bool, state *config.State, err error) {
+	if state == nil {
+		return
+	}
+	var dest string
+	if isS3 {
+		dest = "S3 Cloud Storage"
+	} else {
+		dest = "Local Storage"
+	}
+	var msg string
+	if err != nil {
+		msg = fmt.Sprintf("❌ <b>AgilePanel Backup Failed</b>\n\n<b>Domain:</b> %s\n<b>Destination:</b> %s\n<b>Timestamp:</b> %s\n<b>Error:</b> %v", domain, dest, timestamp, err)
+	} else {
+		msg = fmt.Sprintf("✅ <b>AgilePanel Backup Successful</b>\n\n<b>Domain:</b> %s\n<b>Destination:</b> %s\n<b>Timestamp:</b> %s", domain, dest, timestamp)
+	}
+	sendTelegramNotification(state, msg)
+}
+
+
 
