@@ -2,12 +2,40 @@ package server
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"runtime"
 	"strings"
 )
+
+// UnlockGuiPanel disables the secondary session lock layer by writing enabled=false to gui_auth.json.
+func UnlockGuiPanel() error {
+	path := "/etc/agilepanel/gui_auth.json"
+	if runtime.GOOS == "windows" {
+		path = "./gui_auth.json"
+	}
+
+	type guiAuth struct {
+		Enabled      bool   `json:"enabled"`
+		Username     string `json:"username"`
+		PasswordHash string `json:"password_hash"`
+	}
+
+	config := guiAuth{Enabled: false}
+	if data, err := ioutil.ReadFile(path); err == nil {
+		_ = json.Unmarshal(data, &config)
+	}
+
+	config.Enabled = false
+	newData, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal gui auth: %w", err)
+	}
+
+	return ioutil.WriteFile(path, newData, 0644)
+}
 
 // SecureServer audits and seals security loopholes on Ubuntu Server.
 func SecureServer() error {
