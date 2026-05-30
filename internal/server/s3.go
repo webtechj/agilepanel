@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -191,7 +192,13 @@ func ListS3Backups(domain string, state *config.State) ([]string, error) {
 	}
 
 	prefix := fmt.Sprintf("backups/%s/", domain)
-	urlStr := getS3URL(endpoint, bucket, "") + "?prefix=" + prefix
+
+	// Build the base URL and add the prefix as a properly encoded query parameter.
+	// It must be part of the URL before signing so SigV4 covers the query string.
+	baseURL := getS3URL(endpoint, bucket, "")
+	params := url.Values{}
+	params.Set("prefix", prefix)
+	urlStr := baseURL + "?" + params.Encode()
 
 	req, err := buildS3Request("GET", urlStr, "", region, bucket, accessKey, secretKey, nil, 0, "")
 	if err != nil {
