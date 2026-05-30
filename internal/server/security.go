@@ -19,8 +19,9 @@ func UnlockGuiPanel() error {
 
 	type guiAuth struct {
 		Enabled      bool   `json:"enabled"`
-		Username     string `json:"username"`
-		PasswordHash string `json:"password_hash"`
+		Username     string `json:"username,omitempty"`
+		PasswordHash string `json:"password_hash,omitempty"`
+		PinHash      string `json:"pin_hash,omitempty"`
 	}
 
 	config := guiAuth{Enabled: false}
