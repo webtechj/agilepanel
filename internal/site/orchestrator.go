@@ -1712,19 +1712,23 @@ func Backup(domain string) error {
 
 		s3Keys, err := server.ListS3Backups(domain, state)
 		if err == nil {
-			// Group S3 keys by timestamp
+			// Group S3 keys by timestamp (use basename to avoid false matches on folder path)
 			tsMap := make(map[string][]string)
 			for _, k := range s3Keys {
-				idxFiles := strings.Index(k, "-files-")
-				idxDB := strings.Index(k, "-db-")
+				baseName := k
+				if idx := strings.LastIndex(k, "/"); idx != -1 {
+					baseName = k[idx+1:]
+				}
+				idxFiles := strings.Index(baseName, "-files-")
+				idxDB := strings.Index(baseName, "-db-")
 				var ts string
 				if idxFiles != -1 {
-					ts = k[idxFiles+len("-files-"):]
+					ts = baseName[idxFiles+len("-files-"):]
 				} else if idxDB != -1 {
-					ts = k[idxDB+len("-db-"):]
+					ts = baseName[idxDB+len("-db-"):]
 				}
 				ts = strings.TrimSuffix(ts, ".zip")
-				if len(ts) == 15 && strings.Contains(ts, "-") {
+				if len(ts) >= 13 && strings.Contains(ts, "-") {
 					tsMap[ts] = append(tsMap[ts], k)
 				}
 			}
@@ -1849,16 +1853,23 @@ func ListS3BackupsCLI(domain string, formatJSON bool) error {
 
 	timestampsMap := make(map[string]bool)
 	for _, key := range keys {
-		idxFiles := strings.Index(key, "-files-")
-		idxDB := strings.Index(key, "-db-")
+		// Use the basename only to avoid false matches on folder path segments
+		baseName := key
+		if idx := strings.LastIndex(key, "/"); idx != -1 {
+			baseName = key[idx+1:]
+		}
+
+		idxFiles := strings.Index(baseName, "-files-")
+		idxDB := strings.Index(baseName, "-db-")
 		var ts string
 		if idxFiles != -1 {
-			ts = key[idxFiles+len("-files-"):]
+			ts = baseName[idxFiles+len("-files-"):]
 		} else if idxDB != -1 {
-			ts = key[idxDB+len("-db-"):]
+			ts = baseName[idxDB+len("-db-"):]
 		}
 		ts = strings.TrimSuffix(ts, ".zip")
-		if len(ts) == 15 && strings.Contains(ts, "-") {
+		// Accept any timestamp-like string: at least 13 chars and contains a dash
+		if len(ts) >= 13 && strings.Contains(ts, "-") {
 			timestampsMap[ts] = true
 		}
 	}
