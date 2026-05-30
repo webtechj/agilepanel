@@ -315,6 +315,22 @@ var serverUnlockGuiCmd = &cobra.Command{
 	},
 }
 
+var serverCleanCmd = &cobra.Command{
+	Use:   "clean",
+	Short: "Clear log files, old backup files, and unused cache to free up space",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := server.CleanServer()
+		if err != nil {
+			return err
+		}
+		ui.PrintSuccess("Server Disk Cleanup Completed")
+		ui.PrintInfo("AgilePanel has successfully cleared log files, deleted expired backups, and purged unused caching directories.")
+		ui.Divider()
+		fmt.Println()
+		return nil
+	},
+}
+
 func init() {
 	serverTuneCmd.Flags().StringVar(&adminNameFlag, "admin-name", "", "Admin name for the server")
 	serverTuneCmd.Flags().StringVar(&adminEmailFlag, "admin-email", "", "Admin email for SSL installation")
@@ -326,5 +342,6 @@ func init() {
 	serverCmd.AddCommand(serverSecureCmd)
 	serverCmd.AddCommand(serverLogMetricsCmd)
 	serverCmd.AddCommand(serverUnlockGuiCmd)
+	serverCmd.AddCommand(serverCleanCmd)
 	rootCmd.AddCommand(serverCmd)
 }

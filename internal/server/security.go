@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 // UnlockGuiPanel disables the secondary session lock layer by writing enabled=false to gui_auth.json.
@@ -132,5 +135,76 @@ func SecureServer() error {
 		fmt.Println("Security (Mock): Hardened PermitRootLogin inside sshd_config.")
 	}
 
+	return nil
+}
+
+// CleanServer purges system/app logs, old backup zip files, and package caches
+func CleanServer() error {
+	fmt.Println("AgilePanel: Starting system disk space cleanup...")
+
+	// 1. Clear system and application logs (Linux)
+	if runtime.GOOS == "linux" {
+		fmt.Println("Cleanup: Truncating system log files and removing rotated logs...")
+		_ = filepath.Walk("/var/log", func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if !info.IsDir() {
+				name := info.Name()
+				if strings.HasSuffix(name, ".gz") || strings.Contains(name, ".log.") || strings.HasSuffix(name, ".old") {
+					_ = os.Remove(path)
+				} else if strings.HasSuffix(name, ".log") {
+					_ = os.Truncate(path, 0)
+				}
+			}
+			return nil
+		})
+	} else {
+		fmt.Println("Cleanup (Mock): Truncated log files in /var/log.")
+	}
+
+	// 2. Clear old backup files (any backup zip files older than 3 days)
+	baseDir := "/var/www"
+	if runtime.GOOS == "windows" {
+		baseDir = "./var/www"
+	}
+	fmt.Println("Cleanup: Scanning for backup zip files older than 3 days in " + baseDir + "...")
+	_ = filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() {
+			name := info.Name()
+			if strings.HasSuffix(name, ".zip") && strings.Contains(filepath.ToSlash(path), "/backup/") {
+				if time.Since(info.ModTime()) > 3*24*time.Hour {
+					fmt.Printf("Cleanup: Deleting old backup: %s (modTime: %s)\n", name, info.ModTime().Format("2006-01-02"))
+					_ = os.Remove(path)
+				}
+			}
+		}
+		return nil
+	})
+
+	// 3. Clear package manager cache and temporary files (Linux)
+	if runtime.GOOS == "linux" {
+		fmt.Println("Cleanup: Clearing package manager caches (apt-get clean)...")
+		_ = exec.Command("apt-get", "clean").Run()
+		_ = exec.Command("apt-get", "autoremove", "-y").Run()
+
+		fmt.Println("Cleanup: Clearing temporary directories (/tmp and /var/tmp)...")
+		_ = filepath.Walk("/tmp", func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if path != "/tmp" && time.Since(info.ModTime()) > 24*time.Hour {
+				_ = os.RemoveAll(path)
+			}
+			return nil
+		})
+	} else {
+		fmt.Println("Cleanup (Mock): Cleared package manager cache and temp directories.")
+	}
+
+	fmt.Println("AgilePanel: System cleanup finished successfully.")
 	return nil
 }
