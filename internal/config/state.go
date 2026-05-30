@@ -25,6 +25,11 @@ type GlobalConfig struct {
 	AdminPasswordHash    string   `json:"admin_password_hash"`
 	AdminName            string   `json:"admin_name,omitempty"`
 	AdminEmail           string   `json:"admin_email,omitempty"`
+	S3Endpoint           string   `json:"s3_endpoint,omitempty"`
+	S3Region             string   `json:"s3_region,omitempty"`
+	S3Bucket             string   `json:"s3_bucket,omitempty"`
+	S3AccessKey          string   `json:"s3_access_key,omitempty"`
+	S3SecretKey          string   `json:"s3_secret_key,omitempty"`
 }
 
 
@@ -36,10 +41,13 @@ type SiteConfig struct {
 	DatabaseUser string `json:"db_user"`
 	DatabasePass string `json:"db_pass,omitempty"`
 	SystemUser   string `json:"system_user"`
-	IsLocked     bool   `json:"is_locked"`
-	WPAdminUser  string `json:"wp_admin_user,omitempty"`
-	WPAdminEmail string `json:"wp_admin_email,omitempty"`
-	Type         string `json:"type,omitempty"`
+	IsLocked             bool      `json:"is_locked"`
+	WPAdminUser          string    `json:"wp_admin_user,omitempty"`
+	WPAdminEmail         string    `json:"wp_admin_email,omitempty"`
+	Type                 string    `json:"type,omitempty"`
+	StagingUnlocked      bool      `json:"staging_unlocked,omitempty"`
+	BackupInterval       string    `json:"backup_interval,omitempty"`
+	LastBackupTime       time.Time `json:"last_backup_time,omitempty"`
 }
 
 type State struct {

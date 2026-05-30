@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -1662,8 +1664,31 @@ func Backup(domain string) error {
 		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
 	}
 
-	ui.PrintSuccess("Manual Backup Completed")
-	ui.PrintInfo("AgilePanel has successfully generated separate manual ZIP backups:")
+	// 5. If S3 cloud configurations are available, upload timestamped versions to S3
+	if state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
+		ui.PrintStep(5, "Uploading backups to remote S3 Cloud Storage...")
+		timestamp := time.Now().Format("20060102-150405")
+
+		filesS3Key := fmt.Sprintf("backups/%s/%s-files-%s.zip", domain, domain, timestamp)
+		fmt.Printf("S3: Uploading files ZIP version as: %s\n", filesS3Key)
+		err := server.UploadToS3(filesZipPath, filesS3Key, state)
+		if err != nil {
+			return fmt.Errorf("S3 cloud files backup upload failed: %w", err)
+		}
+
+		if hasDB {
+			dbS3Key := fmt.Sprintf("backups/%s/%s-db-%s.zip", domain, domain, timestamp)
+			fmt.Printf("S3: Uploading database ZIP version as: %s\n", dbS3Key)
+			err := server.UploadToS3(dbZipPath, dbS3Key, state)
+			if err != nil {
+				return fmt.Errorf("S3 cloud database backup upload failed: %w", err)
+			}
+		}
+		ui.PrintSuccess("S3 Cloud Backups Uploaded Successfully")
+	}
+
+	ui.PrintSuccess("Backup Operations Completed")
+	ui.PrintInfo("AgilePanel has successfully generated separate ZIP backups (and uploaded versions to S3 if configured):")
 	if hasDB {
 		ui.Row("Database ZIP", dbZipPath)
 	} else {
@@ -1671,6 +1696,135 @@ func Backup(domain string) error {
 	}
 	ui.Row("Web Files ZIP", filesZipPath)
 	ui.PrintInfo("These archives are owned by the site user and are ready for download via SFTP/FTP using system user credentials.")
+	ui.Divider()
+	fmt.Println()
+	return nil
+}
+
+// ListS3BackupsCLI prints S3 backups for a domain as a JSON list or text output
+func ListS3BackupsCLI(domain string, formatJSON bool) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	keys, err := server.ListS3Backups(domain, state)
+	if err != nil {
+		return err
+	}
+
+	timestampsMap := make(map[string]bool)
+	for _, key := range keys {
+		idxFiles := strings.Index(key, "-files-")
+		idxDB := strings.Index(key, "-db-")
+		var ts string
+		if idxFiles != -1 {
+			ts = key[idxFiles+len("-files-"):]
+		} else if idxDB != -1 {
+			ts = key[idxDB+len("-db-"):]
+		}
+		ts = strings.TrimSuffix(ts, ".zip")
+		if len(ts) == 15 && strings.Contains(ts, "-") {
+			timestampsMap[ts] = true
+		}
+	}
+
+	var timestamps []string
+	for ts := range timestampsMap {
+		timestamps = append(timestamps, ts)
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(timestamps)))
+
+	if formatJSON {
+		bytes, err := json.Marshal(timestamps)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(bytes))
+		return nil
+	}
+
+	ui.Banner("S3 Cloud Backups for " + domain)
+	if len(timestamps) == 0 {
+		ui.PrintWarning("No S3 backup history found.")
+		return nil
+	}
+
+	ui.PrintInfo("Available S3 backup versions:")
+	for _, ts := range timestamps {
+		var year, month, day, hour, min, sec string
+		if len(ts) == 15 {
+			year = ts[0:4]
+			month = ts[4:6]
+			day = ts[6:8]
+			hour = ts[9:11]
+			min = ts[11:13]
+			sec = ts[13:15]
+			fmt.Printf("  • Version: %s  (%s-%s-%s %s:%s:%s)\n", ts, year, month, day, hour, min, sec)
+		} else {
+			fmt.Printf("  • Version: %s\n", ts)
+		}
+	}
+	ui.Divider()
+	fmt.Println()
+	return nil
+}
+
+// DownloadS3BackupCLI pulls the backup zip files from S3 and saves them locally.
+func DownloadS3BackupCLI(domain string, timestamp string) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		return err
+	}
+
+	var targetSite config.SiteConfig
+	found := false
+	for _, site := range state.Sites {
+		if strings.EqualFold(site.Domain, domain) {
+			targetSite = site
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("site %s not found in state", domain)
+	}
+
+	parentDir := server.GetSiteRootDir(targetSite.PublicDir)
+	backupDir := filepath.Join(parentDir, "backup")
+	_ = os.MkdirAll(backupDir, 0755)
+
+	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files.zip", domain))
+	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.zip", domain))
+
+	filesS3Key := fmt.Sprintf("backups/%s/%s-files-%s.zip", domain, domain, timestamp)
+	dbS3Key := fmt.Sprintf("backups/%s/%s-db-%s.zip", domain, domain, timestamp)
+
+	ui.PrintStep(1, "Downloading files backup ZIP from S3 Cloud...")
+	err = server.DownloadFromS3(filesS3Key, filesZipPath, state)
+	if err != nil {
+		return fmt.Errorf("failed to download files ZIP from S3: %w", err)
+	}
+
+	hasDB := targetSite.DatabaseName != "" && targetSite.Type != "html"
+	if hasDB {
+		ui.PrintStep(2, "Downloading database backup ZIP from S3 Cloud...")
+		err = server.DownloadFromS3(dbS3Key, dbZipPath, state)
+		if err != nil {
+			fmt.Printf("Warning: Database backup ZIP download failed: %v. Continuing...\n", err)
+			_ = os.Remove(dbZipPath)
+		}
+	}
+
+	if runtime.GOOS == "linux" {
+		_ = exec.Command("chown", "-R", fmt.Sprintf("%s:caddy", targetSite.SystemUser), backupDir).Run()
+		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
+	}
+
+	ui.PrintSuccess("S3 Backup Download Completed")
+	ui.PrintInfo("The requested S3 version backups have been pulled and staged locally. Ready to run restore.")
 	ui.Divider()
 	fmt.Println()
 	return nil

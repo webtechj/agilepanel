@@ -134,13 +134,15 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
     root * {{.PublicDir}}
     file_server
 
-    # Enforce basic authentication for staging
+    # Enforce basic authentication for staging if not unlocked
+    {{if not .StagingUnlocked}}
     {{if and $.Global.AdminUser $.Global.AdminPasswordHash}}
     basic_auth {
         {{$.Global.AdminUser}} "{{$.Global.AdminPasswordHash}}"
     }
     {{else}}
     respond "Access Denied: Administrative HTTP Basic Authentication has not been configured yet. Run 'ap server auth' to configure credentials." 403
+    {{end}}
     {{end}}
 
     # Response Compression
