@@ -1664,14 +1664,15 @@ func Backup(domain string) error {
 		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
 	}
 
-	// 5. Perform S3 upload if destination is "s3" or "both" (and S3 credentials are configured)
+	// 5. Perform S3 upload if destination is "s3" or "both" (and S3 credentials are configured, and site has S3 access enabled)
 	dest := targetSite.BackupDestination
 	if dest == "" {
 		dest = "local" // Default to local
 	}
 
-	isS3 := dest == "s3" || dest == "both"
-	isLocal := dest == "local" || dest == "both"
+	s3Enabled := targetSite.S3Enabled
+	isS3 := (dest == "s3" || dest == "both") && s3Enabled
+	isLocal := dest == "local" || dest == "both" || !s3Enabled
 
 	if isS3 && state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
 		ui.PrintStep(5, "Uploading backups to remote S3 Cloud Storage...")
@@ -1694,7 +1695,7 @@ func Backup(domain string) error {
 		}
 		ui.PrintSuccess("S3 Cloud Backups Uploaded Successfully")
 
-		// Prune S3 backups according to retention settings (S3BackupVersions, default 5, allowed 1 to 5)
+		// Prune S3 backups according to retention settings (S3BackupVersions, default 5, allowed 1 to 7)
 		maxVersions := targetSite.S3BackupVersions
 		if maxVersions <= 0 {
 			maxVersions = 5
@@ -1702,8 +1703,8 @@ func Backup(domain string) error {
 		if maxVersions < 1 {
 			maxVersions = 1
 		}
-		if maxVersions > 5 {
-			maxVersions = 5
+		if maxVersions > 7 {
+			maxVersions = 7
 		}
 
 		s3Keys, err := server.ListS3Backups(domain, state)
