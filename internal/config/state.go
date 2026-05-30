@@ -30,6 +30,8 @@ type GlobalConfig struct {
 	S3Bucket             string   `json:"s3_bucket,omitempty"`
 	S3AccessKey          string   `json:"s3_access_key,omitempty"`
 	S3SecretKey          string   `json:"s3_secret_key,omitempty"`
+	TelegramBotToken     string   `json:"telegram_bot_token,omitempty"`
+	TelegramChatID       string   `json:"telegram_chat_id,omitempty"`
 }
 
 

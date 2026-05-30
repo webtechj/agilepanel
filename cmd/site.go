@@ -19,6 +19,12 @@ var (
 	cleanRedis   bool
 	cleanOpcache bool
 	cleanCaddy   bool
+	importFiles  string
+	importDB     string
+	wpAdminUser  string
+	wpAdminPass  string
+	wpAdminEmail string
+	wpAdminName  string
 )
 
 var siteCmd = &cobra.Command{
@@ -94,7 +100,7 @@ var siteCreateCmd = &cobra.Command{
 			}
 		}
 
-		return site.Create(domain, actualPHP, actualType, dbOpt)
+		return site.Create(domain, actualPHP, actualType, dbOpt, importFiles, importDB, wpAdminUser, wpAdminPass, wpAdminEmail, wpAdminName)
 	},
 }
 
@@ -300,11 +306,28 @@ var siteS3DownloadCmd = &cobra.Command{
 	},
 }
 
+var siteS3DeleteCmd = &cobra.Command{
+	Use:   "s3-delete [domain] [timestamp]",
+	Short: "Delete S3 backup version for a website by timestamp",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		timestamp := args[1]
+		return site.DeleteS3BackupCLI(domain, timestamp)
+	},
+}
+
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
 	siteCreateCmd.Flags().StringVar(&siteType, "type", "wp", "Type of site to create: wp, woocommerce, laravel, php, html")
 	siteCreateCmd.Flags().StringVar(&createDBFlag, "db", "default", "Create MariaDB database for site: true, false, default")
+	siteCreateCmd.Flags().StringVar(&importFiles, "import-files", "", "Path to imported website files ZIP")
+	siteCreateCmd.Flags().StringVar(&importDB, "import-db", "", "Path to imported database SQL/ZIP file")
+	siteCreateCmd.Flags().StringVar(&wpAdminUser, "wp-user", "", "WordPress admin username")
+	siteCreateCmd.Flags().StringVar(&wpAdminPass, "wp-pass", "", "WordPress admin password")
+	siteCreateCmd.Flags().StringVar(&wpAdminEmail, "wp-email", "", "WordPress admin email")
+	siteCreateCmd.Flags().StringVar(&wpAdminName, "wp-name", "", "WordPress admin display name")
  
 	siteDeleteCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
 	siteLockCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
@@ -331,6 +354,7 @@ func init() {
 	siteCmd.AddCommand(siteBackupCmd)
 	siteCmd.AddCommand(siteS3ListCmd)
 	siteCmd.AddCommand(siteS3DownloadCmd)
+	siteCmd.AddCommand(siteS3DeleteCmd)
  
 	rootCmd.AddCommand(siteCmd)
 }
