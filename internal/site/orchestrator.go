@@ -1588,9 +1588,10 @@ func Backup(domain string) error {
 	_ = os.MkdirAll(backupDir, 0755)
 
 	hasDB := targetSite.DatabaseName != "" && targetSite.Type != "html"
+	timestamp := time.Now().Format("20060102-150405")
 	dbSqlPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
-	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db.zip", domain))
-	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files.zip", domain))
+	dbZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-db-%s.zip", domain, timestamp))
+	filesZipPath := filepath.Join(backupDir, fmt.Sprintf("%s-files-%s.zip", domain, timestamp))
 
 	homeDir := server.GetSiteRootDir(targetSite.PublicDir)
 
@@ -1664,19 +1665,21 @@ func Backup(domain string) error {
 		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
 	}
 
-	// 5. Perform S3 upload if destination is "s3" or "both" (and S3 credentials are configured, and site has S3 access enabled)
+	// 5. Perform S3 upload if destination is "s3" (and S3 credentials are configured, and site has S3 access enabled)
 	dest := targetSite.BackupDestination
 	if dest == "" {
 		dest = "local" // Default to local
 	}
+	if dest == "both" {
+		dest = "local" // Treat legacy 'both' as local — storage is now exclusive
+	}
 
 	s3Enabled := targetSite.S3Enabled
-	isS3 := (dest == "s3" || dest == "both") && s3Enabled
-	isLocal := dest == "local" || dest == "both" || !s3Enabled
+	isS3 := dest == "s3" && s3Enabled
+	isLocal := !isS3 // strictly one or the other
 
 	if isS3 && state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
 		ui.PrintStep(5, "Uploading backups to remote S3 Cloud Storage...")
-		timestamp := time.Now().Format("20060102-150405")
 
 		filesS3Key := fmt.Sprintf("backups/%s/%s-files-%s.zip", domain, domain, timestamp)
 		fmt.Printf("S3: Uploading files ZIP version as: %s\n", filesS3Key)
@@ -1745,16 +1748,19 @@ func Backup(domain string) error {
 			}
 		}
 
-		// If S3 Storage Only is selected, purge the local ZIP archives to reclaim disk space
-		if dest == "s3" {
-			ui.PrintInfo("Backup destination is S3 Cloud Storage only. Removing local backup ZIPs...")
-			_ = os.Remove(filesZipPath)
-			if hasDB {
-				_ = os.Remove(dbZipPath)
-			}
+		// S3 mode: always remove the local ZIPs since storage is exclusive
+		ui.PrintInfo("Backup destination is S3 Cloud Storage only. Removing local backup ZIPs...")
+		_ = os.Remove(filesZipPath)
+		if hasDB {
+			_ = os.Remove(dbZipPath)
 		}
 	} else if isS3 {
 		ui.PrintWarning("Backup destination is configured for S3 Cloud, but global S3 credentials are not set.")
+	}
+
+	// 6. Prune local backup versions to max 2 (keep newest 2 by timestamp in filename)
+	if isLocal {
+		pruneLocalBackups(backupDir, domain, 2)
 	}
 
 	ui.PrintSuccess("Backup Operations Completed")
@@ -1773,6 +1779,59 @@ func Backup(domain string) error {
 	ui.Divider()
 	fmt.Println()
 	return nil
+}
+
+// pruneLocalBackups deletes the oldest timestamped local backup ZIPs, keeping maxKeep versions.
+func pruneLocalBackups(backupDir, domain string, maxKeep int) {
+	entries, err := os.ReadDir(backupDir)
+	if err != nil {
+		return
+	}
+
+	// Collect timestamped files-*.zip entries for this domain
+	type backupEntry struct {
+		name string
+		ts   string
+	}
+	var filesBackups []backupEntry
+	var dbBackups []backupEntry
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		filesPrefix := fmt.Sprintf("%s-files-", domain)
+		dbPrefix := fmt.Sprintf("%s-db-", domain)
+		if strings.HasPrefix(name, filesPrefix) && strings.HasSuffix(name, ".zip") {
+			ts := strings.TrimSuffix(strings.TrimPrefix(name, filesPrefix), ".zip")
+			filesBackups = append(filesBackups, backupEntry{name: name, ts: ts})
+		} else if strings.HasPrefix(name, dbPrefix) && strings.HasSuffix(name, ".zip") {
+			ts := strings.TrimSuffix(strings.TrimPrefix(name, dbPrefix), ".zip")
+			dbBackups = append(dbBackups, backupEntry{name: name, ts: ts})
+		}
+	}
+
+	// Sort descending (newest first) by timestamp string (YYYYMMDD-HHMMSS sorts lexicographically)
+	sortBackups := func(list []backupEntry) {
+		for i := 0; i < len(list)-1; i++ {
+			for j := i + 1; j < len(list); j++ {
+				if list[j].ts > list[i].ts {
+					list[i], list[j] = list[j], list[i]
+				}
+			}
+		}
+	}
+	sortBackups(filesBackups)
+	sortBackups(dbBackups)
+
+	// Delete files beyond maxKeep
+	for i := maxKeep; i < len(filesBackups); i++ {
+		_ = os.Remove(filepath.Join(backupDir, filesBackups[i].name))
+	}
+	for i := maxKeep; i < len(dbBackups); i++ {
+		_ = os.Remove(filepath.Join(backupDir, dbBackups[i].name))
+	}
 }
 
 // ListS3BackupsCLI prints S3 backups for a domain as a JSON list or text output
