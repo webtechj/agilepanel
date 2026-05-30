@@ -274,19 +274,47 @@ var siteEditCmd = &cobra.Command{
 	},
 }
 
+var s3JsonFlag bool
+
+var siteS3ListCmd = &cobra.Command{
+	Use:   "s3-list [domain]",
+	Short: "List S3 backup timestamps for a website",
+	Args:  cobra.RangeArgs(0, 1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		return site.ListS3BackupsCLI(domain, s3JsonFlag)
+	},
+}
+
+var siteS3DownloadCmd = &cobra.Command{
+	Use:   "s3-download [domain] [timestamp]",
+	Short: "Download S3 backups for a website by timestamp",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		timestamp := args[1]
+		return site.DownloadS3BackupCLI(domain, timestamp)
+	},
+}
+
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
 	siteCreateCmd.Flags().StringVar(&siteType, "type", "wp", "Type of site to create: wp, woocommerce, laravel, php, html")
 	siteCreateCmd.Flags().StringVar(&createDBFlag, "db", "default", "Create MariaDB database for site: true, false, default")
-
+ 
 	siteDeleteCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
 	siteLockCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
-
+ 
 	siteCacheCleanCmd.Flags().BoolVar(&cleanWP, "wp", false, "Clean WordPress transients and internal cache")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanRedis, "redis", false, "Clean Redis Object Cache")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanOpcache, "opcache", false, "Clean PHP OPcache (reloads PHP-FPM)")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanCaddy, "caddy", false, "Clean Caddy edge cache")
+ 
+	siteS3ListCmd.Flags().BoolVar(&s3JsonFlag, "json", false, "Output results in raw JSON format")
 
 	siteCmd.AddCommand(siteCreateCmd)
 	siteCmd.AddCommand(siteDeleteCmd)
@@ -301,6 +329,8 @@ func init() {
 	siteCmd.AddCommand(siteFixPermissionsCmd)
 	siteCmd.AddCommand(siteBackupDBCmd)
 	siteCmd.AddCommand(siteBackupCmd)
-
+	siteCmd.AddCommand(siteS3ListCmd)
+	siteCmd.AddCommand(siteS3DownloadCmd)
+ 
 	rootCmd.AddCommand(siteCmd)
 }
