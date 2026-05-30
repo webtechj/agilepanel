@@ -299,6 +299,22 @@ var serverSecureCmd = &cobra.Command{
 	},
 }
 
+var serverUnlockGuiCmd = &cobra.Command{
+	Use:   "unlock-gui",
+	Short: "Disable secondary GUI panel session security locks (in case of lockout)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := server.UnlockGuiPanel()
+		if err != nil {
+			return err
+		}
+		ui.PrintSuccess("GUI Panel Security Lock Disabled")
+		ui.PrintInfo("The secondary session lock layer has been disabled. You can now log into your dashboard using Basic Authentication.")
+		ui.Divider()
+		fmt.Println()
+		return nil
+	},
+}
+
 func init() {
 	serverTuneCmd.Flags().StringVar(&adminNameFlag, "admin-name", "", "Admin name for the server")
 	serverTuneCmd.Flags().StringVar(&adminEmailFlag, "admin-email", "", "Admin email for SSL installation")
@@ -309,5 +325,6 @@ func init() {
 	serverCmd.AddCommand(serverTuneCmd)
 	serverCmd.AddCommand(serverSecureCmd)
 	serverCmd.AddCommand(serverLogMetricsCmd)
+	serverCmd.AddCommand(serverUnlockGuiCmd)
 	rootCmd.AddCommand(serverCmd)
 }
