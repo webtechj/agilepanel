@@ -268,3 +268,41 @@ func DownloadFromS3(s3Key string, localPath string, state *config.State) error {
 	_, err = io.Copy(outFile, resp.Body)
 	return err
 }
+
+// DeleteFromS3 deletes an object from S3 storage.
+func DeleteFromS3(s3Key string, state *config.State) error {
+	endpoint := state.Global.S3Endpoint
+	bucket := state.Global.S3Bucket
+	region := state.Global.S3Region
+	accessKey := state.Global.S3AccessKey
+	secretKey := state.Global.S3SecretKey
+
+	if accessKey == "" || secretKey == "" || bucket == "" {
+		return fmt.Errorf("S3 credentials not configured")
+	}
+
+	if region == "" {
+		region = "us-east-1"
+	}
+
+	urlStr := getS3URL(endpoint, bucket, s3Key)
+	req, err := buildS3Request("DELETE", urlStr, s3Key, region, bucket, accessKey, secretKey, nil, 0, "")
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("S3 delete failed with status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	return nil
+}
+

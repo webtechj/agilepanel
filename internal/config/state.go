@@ -34,20 +34,22 @@ type GlobalConfig struct {
 
 
 type SiteConfig struct {
-	Domain       string `json:"domain"`
-	PHPVersion   string `json:"php_version"`
-	PublicDir    string `json:"public_dir"`
-	DatabaseName string `json:"database_name"`
-	DatabaseUser string `json:"db_user"`
-	DatabasePass string `json:"db_pass,omitempty"`
-	SystemUser   string `json:"system_user"`
-	IsLocked             bool      `json:"is_locked"`
-	WPAdminUser          string    `json:"wp_admin_user,omitempty"`
-	WPAdminEmail         string    `json:"wp_admin_email,omitempty"`
-	Type                 string    `json:"type,omitempty"`
-	StagingUnlocked      bool      `json:"staging_unlocked,omitempty"`
-	BackupInterval       string    `json:"backup_interval,omitempty"`
-	LastBackupTime       time.Time `json:"last_backup_time,omitempty"`
+	Domain            string    `json:"domain"`
+	PHPVersion        string    `json:"php_version"`
+	PublicDir         string    `json:"public_dir"`
+	DatabaseName      string    `json:"database_name"`
+	DatabaseUser      string    `json:"db_user"`
+	DatabasePass      string    `json:"db_pass,omitempty"`
+	SystemUser        string    `json:"system_user"`
+	IsLocked          bool      `json:"is_locked"`
+	WPAdminUser       string    `json:"wp_admin_user,omitempty"`
+	WPAdminEmail      string    `json:"wp_admin_email,omitempty"`
+	Type              string    `json:"type,omitempty"`
+	StagingUnlocked   bool      `json:"staging_unlocked,omitempty"`
+	BackupInterval    string    `json:"backup_interval,omitempty"`
+	LastBackupTime    time.Time `json:"last_backup_time,omitempty"`
+	BackupDestination string    `json:"backup_destination,omitempty"`
+	S3BackupVersions  int       `json:"s3_backup_versions,omitempty"`
 }
 
 type State struct {

@@ -1664,8 +1664,16 @@ func Backup(domain string) error {
 		_ = exec.Command("chmod", "-R", "0755", backupDir).Run()
 	}
 
-	// 5. If S3 cloud configurations are available, upload timestamped versions to S3
-	if state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
+	// 5. Perform S3 upload if destination is "s3" or "both" (and S3 credentials are configured)
+	dest := targetSite.BackupDestination
+	if dest == "" {
+		dest = "local" // Default to local
+	}
+
+	isS3 := dest == "s3" || dest == "both"
+	isLocal := dest == "local" || dest == "both"
+
+	if isS3 && state.Global.S3Bucket != "" && state.Global.S3AccessKey != "" && state.Global.S3SecretKey != "" {
 		ui.PrintStep(5, "Uploading backups to remote S3 Cloud Storage...")
 		timestamp := time.Now().Format("20060102-150405")
 
@@ -1685,17 +1693,82 @@ func Backup(domain string) error {
 			}
 		}
 		ui.PrintSuccess("S3 Cloud Backups Uploaded Successfully")
+
+		// Prune S3 backups according to retention settings (S3BackupVersions, default 5, allowed 1 to 5)
+		maxVersions := targetSite.S3BackupVersions
+		if maxVersions <= 0 {
+			maxVersions = 5
+		}
+		if maxVersions < 1 {
+			maxVersions = 1
+		}
+		if maxVersions > 5 {
+			maxVersions = 5
+		}
+
+		s3Keys, err := server.ListS3Backups(domain, state)
+		if err == nil {
+			// Group S3 keys by timestamp
+			tsMap := make(map[string][]string)
+			for _, k := range s3Keys {
+				idxFiles := strings.Index(k, "-files-")
+				idxDB := strings.Index(k, "-db-")
+				var ts string
+				if idxFiles != -1 {
+					ts = k[idxFiles+len("-files-"):]
+				} else if idxDB != -1 {
+					ts = k[idxDB+len("-db-"):]
+				}
+				ts = strings.TrimSuffix(ts, ".zip")
+				if len(ts) == 15 && strings.Contains(ts, "-") {
+					tsMap[ts] = append(tsMap[ts], k)
+				}
+			}
+
+			// Sort timestamps descending (newest first)
+			var sortedTs []string
+			for ts := range tsMap {
+				sortedTs = append(sortedTs, ts)
+			}
+			sort.Sort(sort.Reverse(sort.StringSlice(sortedTs)))
+
+			if len(sortedTs) > maxVersions {
+				ui.PrintInfo(fmt.Sprintf("S3 backups count (%d) exceeds limit (%d). Pruning oldest backups...", len(sortedTs), maxVersions))
+				for i := maxVersions; i < len(sortedTs); i++ {
+					oldTs := sortedTs[i]
+					for _, oldKey := range tsMap[oldTs] {
+						fmt.Printf("S3: Deleting old backup file: %s\n", oldKey)
+						_ = server.DeleteFromS3(oldKey, state)
+					}
+				}
+			}
+		}
+
+		// If S3 Storage Only is selected, purge the local ZIP archives to reclaim disk space
+		if dest == "s3" {
+			ui.PrintInfo("Backup destination is S3 Cloud Storage only. Removing local backup ZIPs...")
+			_ = os.Remove(filesZipPath)
+			if hasDB {
+				_ = os.Remove(dbZipPath)
+			}
+		}
+	} else if isS3 {
+		ui.PrintWarning("Backup destination is configured for S3 Cloud, but global S3 credentials are not set.")
 	}
 
 	ui.PrintSuccess("Backup Operations Completed")
 	ui.PrintInfo("AgilePanel has successfully generated separate ZIP backups (and uploaded versions to S3 if configured):")
-	if hasDB {
-		ui.Row("Database ZIP", dbZipPath)
+	if isLocal {
+		if hasDB {
+			ui.Row("Database ZIP", dbZipPath)
+		} else {
+			ui.Row("Database ZIP", "(None - Static HTML site)")
+		}
+		ui.Row("Web Files ZIP", filesZipPath)
+		ui.PrintInfo("These archives are owned by the site user and are ready for download via SFTP/FTP using system user credentials.")
 	} else {
-		ui.Row("Database ZIP", "(None - Static HTML site)")
+		ui.PrintInfo("Backups successfully uploaded offsite to S3 Cloud. No local copies were kept as per storage destination settings.")
 	}
-	ui.Row("Web Files ZIP", filesZipPath)
-	ui.PrintInfo("These archives are owned by the site user and are ready for download via SFTP/FTP using system user credentials.")
 	ui.Divider()
 	fmt.Println()
 	return nil
