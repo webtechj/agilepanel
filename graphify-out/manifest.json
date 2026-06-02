@@ -200,8 +200,13 @@
     "semantic_hash": ""
   },
   "D:\\repos\\agilepanel\\agilepanel_logo.png": {
-    "mtime": 1780027173.04196,
-    "ast_hash": "32cf19a9f9752a667824e31a3277c752",
+    "mtime": 1780193626.2887669,
+    "ast_hash": "5a98ef695a6aed75dbbfb0ce4ae7e23e",
+    "semantic_hash": ""
+  },
+  "D:\\repos\\agilepanel\\cmd\\info.go": {
+    "mtime": 1780377146.5857255,
+    "ast_hash": "f076c40ee008591c02d7da87f8538938",
     "semantic_hash": ""
   }
 }

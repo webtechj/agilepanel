@@ -4,6 +4,33 @@
   "graph": {},
   "nodes": [
     {
+      "label": "info.go",
+      "file_type": "code",
+      "source_file": "cmd/info.go",
+      "source_location": "L1",
+      "id": "cmd_info",
+      "community": 6,
+      "norm_label": "info.go"
+    },
+    {
+      "label": "stackService",
+      "file_type": "code",
+      "source_file": "cmd/info.go",
+      "source_location": "L71",
+      "id": "cmd_stackservice",
+      "community": 6,
+      "norm_label": "stackservice"
+    },
+    {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "cmd/info.go",
+      "source_location": "L170",
+      "id": "cmd_info_init",
+      "community": 6,
+      "norm_label": "init()"
+    },
+    {
       "label": "install.go",
       "file_type": "code",
       "source_file": "D:/repos/VPSops/cmd/install.go",
@@ -251,7 +278,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_config_state_go",
-      "community": 6,
+      "community": 0,
       "norm_label": "state.go"
     },
     {
@@ -260,7 +287,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L17",
       "id": "config_globalconfig",
-      "community": 6,
+      "community": 0,
       "norm_label": "globalconfig"
     },
     {
@@ -269,7 +296,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L38",
       "id": "config_siteconfig",
-      "community": 6,
+      "community": 0,
       "norm_label": "siteconfig"
     },
     {
@@ -278,7 +305,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L52",
       "id": "d_repos_vpsops_internal_config_state_go_time",
-      "community": 6,
+      "community": 0,
       "norm_label": "time"
     },
     {
@@ -287,7 +314,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L58",
       "id": "config_state",
-      "community": 6,
+      "community": 0,
       "norm_label": "state"
     },
     {
@@ -305,7 +332,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L72",
       "id": "config_state_generateuuid",
-      "community": 6,
+      "community": 0,
       "norm_label": "generateuuid()"
     },
     {
@@ -314,7 +341,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L88",
       "id": "config_state_defaultstate",
-      "community": 6,
+      "community": 0,
       "norm_label": "defaultstate()"
     },
     {
@@ -323,7 +350,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L109",
       "id": "config_state_withlockedstate",
-      "community": 6,
+      "community": 0,
       "norm_label": "withlockedstate()"
     },
     {
@@ -341,7 +368,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L224",
       "id": "config_state_writestate",
-      "community": 6,
+      "community": 0,
       "norm_label": "writestate()"
     },
     {
@@ -350,7 +377,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_config_state_test_go",
-      "community": 6,
+      "community": 0,
       "norm_label": "state_test.go"
     },
     {
@@ -359,7 +386,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L10",
       "id": "config_state_test_testdefaultstate",
-      "community": 6,
+      "community": 0,
       "norm_label": "testdefaultstate()"
     },
     {
@@ -368,7 +395,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L10",
       "id": "d_repos_vpsops_internal_config_state_test_go_t",
-      "community": 6,
+      "community": 0,
       "norm_label": "t"
     },
     {
@@ -377,7 +404,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L23",
       "id": "config_state_test_testreadstatecreatesdefault",
-      "community": 6,
+      "community": 0,
       "norm_label": "testreadstatecreatesdefault()"
     },
     {
@@ -386,7 +413,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L44",
       "id": "config_state_test_testwithlockedstate",
-      "community": 6,
+      "community": 0,
       "norm_label": "testwithlockedstate()"
     },
     {
@@ -395,7 +422,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L79",
       "id": "config_state_test_testconcurrentstatelocking",
-      "community": 6,
+      "community": 0,
       "norm_label": "testconcurrentstatelocking()"
     },
     {
@@ -404,7 +431,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L123",
       "id": "config_state_test_testadminfields",
-      "community": 6,
+      "community": 0,
       "norm_label": "testadminfields()"
     },
     {
@@ -494,7 +521,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_server_caddy_go",
-      "community": 0,
+      "community": 5,
       "norm_label": "caddy.go"
     },
     {
@@ -503,7 +530,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L192",
       "id": "server_caddy_generatecaddyfile",
-      "community": 0,
+      "community": 5,
       "norm_label": "generatecaddyfile()"
     },
     {
@@ -512,7 +539,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L192",
       "id": "d_repos_vpsops_internal_server_caddy_go_state",
-      "community": 0,
+      "community": 5,
       "norm_label": "state"
     },
     {
@@ -521,7 +548,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L219",
       "id": "server_caddy_writecaddyfile",
-      "community": 0,
+      "community": 5,
       "norm_label": "writecaddyfile()"
     },
     {
@@ -530,7 +557,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L242",
       "id": "server_caddy_reloadcaddy",
-      "community": 0,
+      "community": 5,
       "norm_label": "reloadcaddy()"
     },
     {
@@ -539,7 +566,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy_test.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_server_caddy_test_go",
-      "community": 25,
+      "community": 5,
       "norm_label": "caddy_test.go"
     },
     {
@@ -548,7 +575,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy_test.go",
       "source_location": "L10",
       "id": "server_caddy_test_testgeneratecaddyfile",
-      "community": 25,
+      "community": 5,
       "norm_label": "testgeneratecaddyfile()"
     },
     {
@@ -557,7 +584,7 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy_test.go",
       "source_location": "L10",
       "id": "d_repos_vpsops_internal_server_caddy_test_go_t",
-      "community": 25,
+      "community": 5,
       "norm_label": "t"
     },
     {
@@ -827,7 +854,7 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L122",
       "id": "server_php_reloadphp",
-      "community": 0,
+      "community": 10,
       "norm_label": "reloadphp()"
     },
     {
@@ -863,7 +890,7 @@
       "source_file": "D:/repos/VPSops/internal/server/repair.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_server_repair_go",
-      "community": 0,
+      "community": 5,
       "norm_label": "repair.go"
     },
     {
@@ -872,7 +899,7 @@
       "source_file": "D:/repos/VPSops/internal/server/repair.go",
       "source_location": "L15",
       "id": "server_repair_repairinstallation",
-      "community": 0,
+      "community": 5,
       "norm_label": "repairinstallation()"
     },
     {
@@ -1619,7 +1646,7 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1305",
       "id": "site_orchestrator_edit",
-      "community": 0,
+      "community": 10,
       "norm_label": "edit()"
     },
     {
@@ -2819,7 +2846,7 @@
       "file_type": "code",
       "source_file": "internal/config/state.go",
       "source_location": "L52",
-      "community": 6,
+      "community": 0,
       "norm_label": "time",
       "id": "internal_config_state_go_time"
     },
@@ -2828,7 +2855,7 @@
       "file_type": "code",
       "source_file": "internal/config/state_test.go",
       "source_location": "L1",
-      "community": 6,
+      "community": 0,
       "norm_label": "state_test.go",
       "id": "config_state_test"
     },
@@ -2837,7 +2864,7 @@
       "file_type": "code",
       "source_file": "internal/config/state_test.go",
       "source_location": "L10",
-      "community": 6,
+      "community": 0,
       "norm_label": "t",
       "id": "internal_config_state_test_go_t"
     },
@@ -2882,7 +2909,7 @@
       "file_type": "code",
       "source_file": "internal/server/caddy.go",
       "source_location": "L1",
-      "community": 0,
+      "community": 5,
       "norm_label": "caddy.go",
       "id": "server_caddy"
     },
@@ -2891,7 +2918,7 @@
       "file_type": "code",
       "source_file": "internal/server/caddy.go",
       "source_location": "L192",
-      "community": 0,
+      "community": 5,
       "norm_label": "state",
       "id": "internal_server_caddy_go_state"
     },
@@ -2900,7 +2927,7 @@
       "file_type": "code",
       "source_file": "internal/server/caddy_test.go",
       "source_location": "L1",
-      "community": 25,
+      "community": 5,
       "norm_label": "caddy_test.go",
       "id": "server_caddy_test"
     },
@@ -2909,7 +2936,7 @@
       "file_type": "code",
       "source_file": "internal/server/caddy_test.go",
       "source_location": "L10",
-      "community": 25,
+      "community": 5,
       "norm_label": "t",
       "id": "internal_server_caddy_test_go_t"
     },
@@ -3008,7 +3035,7 @@
       "file_type": "code",
       "source_file": "internal/server/repair.go",
       "source_location": "L1",
-      "community": 0,
+      "community": 5,
       "norm_label": "repair.go",
       "id": "server_repair"
     },
@@ -3394,12 +3421,32 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "cmd/info.go",
+      "source_location": "L170",
+      "weight": 1.0,
+      "source": "cmd_info",
+      "target": "cmd_info_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "cmd/info.go",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "cmd_info",
+      "target": "cmd_stackservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "D:/repos/VPSops/cmd/install.go",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_install_go",
-      "target": "cmd_install_init",
-      "confidence_score": 1.0
+      "target": "cmd_install_init"
     },
     {
       "relation": "contains",
@@ -3417,9 +3464,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_getdomainarg",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_getdomainarg"
     },
     {
       "relation": "contains",
@@ -3427,9 +3474,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_getservicearg",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_getservicearg"
     },
     {
       "relation": "contains",
@@ -3437,9 +3484,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_promptconfirm",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_promptconfirm"
     },
     {
       "relation": "contains",
@@ -3447,9 +3494,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_promptdoubleconfirm",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_promptdoubleconfirm"
     },
     {
       "relation": "contains",
@@ -3457,9 +3504,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_promptpassword",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_promptpassword"
     },
     {
       "relation": "contains",
@@ -3467,9 +3514,9 @@
       "source_file": "D:/repos/VPSops/cmd/prompts.go",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_prompts_go",
-      "target": "cmd_prompts_promptstring",
-      "confidence_score": 1.0
+      "target": "cmd_prompts_promptstring"
     },
     {
       "relation": "contains",
@@ -3592,9 +3639,9 @@
       "source_file": "D:/repos/VPSops/cmd/repair.go",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_repair_go",
-      "target": "cmd_repair_init",
-      "confidence_score": 1.0
+      "target": "cmd_repair_init"
     },
     {
       "relation": "contains",
@@ -3612,9 +3659,9 @@
       "source_file": "D:/repos/VPSops/cmd/root.go",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_root_go",
-      "target": "cmd_root_execute",
-      "confidence_score": 1.0
+      "target": "cmd_root_execute"
     },
     {
       "relation": "contains",
@@ -3654,9 +3701,9 @@
       "source_file": "D:/repos/VPSops/cmd/server.go",
       "source_location": "L334",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_server_go",
-      "target": "cmd_server_init",
-      "confidence_score": 1.0
+      "target": "cmd_server_init"
     },
     {
       "relation": "contains",
@@ -3664,9 +3711,9 @@
       "source_file": "D:/repos/VPSops/cmd/server.go",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_server_go",
-      "target": "cmd_server_renderprogressbar",
-      "confidence_score": 1.0
+      "target": "cmd_server_renderprogressbar"
     },
     {
       "relation": "contains",
@@ -3716,9 +3763,9 @@
       "source_file": "D:/repos/VPSops/cmd/site.go",
       "source_location": "L320",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_site_go",
-      "target": "cmd_site_init",
-      "confidence_score": 1.0
+      "target": "cmd_site_init"
     },
     {
       "relation": "contains",
@@ -3736,9 +3783,9 @@
       "source_file": "D:/repos/VPSops/cmd/sync.go",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_sync_go",
-      "target": "cmd_sync_init",
-      "confidence_score": 1.0
+      "target": "cmd_sync_init"
     },
     {
       "relation": "contains",
@@ -3756,9 +3803,9 @@
       "source_file": "D:/repos/VPSops/cmd/tool.go",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_tool_go",
-      "target": "cmd_tool_init",
-      "confidence_score": 1.0
+      "target": "cmd_tool_init"
     },
     {
       "relation": "contains",
@@ -3776,9 +3823,9 @@
       "source_file": "D:/repos/VPSops/cmd/update.go",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_cmd_update_go",
-      "target": "cmd_update_init",
-      "confidence_score": 1.0
+      "target": "cmd_update_init"
     },
     {
       "relation": "contains",
@@ -3796,9 +3843,9 @@
       "source_file": "D:/repos/VPSops/install.sh",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_install_sh",
-      "target": "d_repos_vpsops_install_sh__entry",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_install_sh__entry"
     },
     {
       "relation": "contains",
@@ -3816,9 +3863,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_globalconfig",
-      "confidence_score": 1.0
+      "target": "config_globalconfig"
     },
     {
       "relation": "contains",
@@ -3826,9 +3873,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_siteconfig",
-      "confidence_score": 1.0
+      "target": "config_siteconfig"
     },
     {
       "relation": "contains",
@@ -3836,9 +3883,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state",
-      "confidence_score": 1.0
+      "target": "config_state"
     },
     {
       "relation": "contains",
@@ -3846,9 +3893,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_defaultstate",
-      "confidence_score": 1.0
+      "target": "config_state_defaultstate"
     },
     {
       "relation": "contains",
@@ -3856,9 +3903,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_generateuuid",
-      "confidence_score": 1.0
+      "target": "config_state_generateuuid"
     },
     {
       "relation": "contains",
@@ -3866,9 +3913,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_getstatepath",
-      "confidence_score": 1.0
+      "target": "config_state_getstatepath"
     },
     {
       "relation": "contains",
@@ -3876,9 +3923,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L177",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_readstate",
-      "confidence_score": 1.0
+      "target": "config_state_readstate"
     },
     {
       "relation": "contains",
@@ -3886,9 +3933,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L109",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_withlockedstate",
-      "confidence_score": 1.0
+      "target": "config_state_withlockedstate"
     },
     {
       "relation": "contains",
@@ -3896,9 +3943,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L224",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_go",
-      "target": "config_state_writestate",
-      "confidence_score": 1.0
+      "target": "config_state_writestate"
     },
     {
       "relation": "references",
@@ -3918,9 +3965,9 @@
       "source_location": "L52",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "config_siteconfig",
-      "target": "d_repos_vpsops_internal_config_state_go_time",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_go_time"
     },
     {
       "relation": "references",
@@ -4739,9 +4786,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_test_go",
-      "target": "config_state_test_testadminfields",
-      "confidence_score": 1.0
+      "target": "config_state_test_testadminfields"
     },
     {
       "relation": "contains",
@@ -4749,9 +4796,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_test_go",
-      "target": "config_state_test_testconcurrentstatelocking",
-      "confidence_score": 1.0
+      "target": "config_state_test_testconcurrentstatelocking"
     },
     {
       "relation": "contains",
@@ -4759,9 +4806,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_test_go",
-      "target": "config_state_test_testdefaultstate",
-      "confidence_score": 1.0
+      "target": "config_state_test_testdefaultstate"
     },
     {
       "relation": "contains",
@@ -4769,9 +4816,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_test_go",
-      "target": "config_state_test_testreadstatecreatesdefault",
-      "confidence_score": 1.0
+      "target": "config_state_test_testreadstatecreatesdefault"
     },
     {
       "relation": "contains",
@@ -4779,9 +4826,9 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_state_test_go",
-      "target": "config_state_test_testwithlockedstate",
-      "confidence_score": 1.0
+      "target": "config_state_test_testwithlockedstate"
     },
     {
       "relation": "contains",
@@ -4800,9 +4847,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_state_test_testdefaultstate",
-      "target": "d_repos_vpsops_internal_config_state_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_test_go_t"
     },
     {
       "relation": "references",
@@ -4822,9 +4869,9 @@
       "source_location": "L123",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_state_test_testadminfields",
-      "target": "d_repos_vpsops_internal_config_state_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_test_go_t"
     },
     {
       "relation": "references",
@@ -4833,9 +4880,9 @@
       "source_location": "L79",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_state_test_testconcurrentstatelocking",
-      "target": "d_repos_vpsops_internal_config_state_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_test_go_t"
     },
     {
       "relation": "references",
@@ -4844,9 +4891,9 @@
       "source_location": "L23",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_state_test_testreadstatecreatesdefault",
-      "target": "d_repos_vpsops_internal_config_state_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_test_go_t"
     },
     {
       "relation": "references",
@@ -4855,9 +4902,9 @@
       "source_location": "L44",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_state_test_testwithlockedstate",
-      "target": "d_repos_vpsops_internal_config_state_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_state_test_go_t"
     },
     {
       "relation": "contains",
@@ -4949,9 +4996,9 @@
       "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_telemetry_go",
-      "target": "config_telemetry_pingasync",
-      "confidence_score": 1.0
+      "target": "config_telemetry_pingasync"
     },
     {
       "relation": "contains",
@@ -4959,9 +5006,9 @@
       "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_telemetry_go",
-      "target": "config_telemetry_sendtelemetryping",
-      "confidence_score": 1.0
+      "target": "config_telemetry_sendtelemetryping"
     },
     {
       "relation": "contains",
@@ -4969,9 +5016,9 @@
       "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_telemetry_go",
-      "target": "config_telemetrypayload",
-      "confidence_score": 1.0
+      "target": "config_telemetrypayload"
     },
     {
       "relation": "contains",
@@ -5011,9 +5058,9 @@
       "source_location": "L24",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_telemetry_sendtelemetryping",
-      "target": "d_repos_vpsops_internal_config_telemetry_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_telemetry_go_state"
     },
     {
       "relation": "references",
@@ -5055,9 +5102,9 @@
       "source_location": "L70",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_telemetry_pingasync",
-      "target": "d_repos_vpsops_internal_config_telemetry_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_telemetry_go_state"
     },
     {
       "relation": "contains",
@@ -5130,9 +5177,9 @@
       "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_telemetry_test_go",
-      "target": "config_telemetry_test_testsendtelemetryping",
-      "confidence_score": 1.0
+      "target": "config_telemetry_test_testsendtelemetryping"
     },
     {
       "relation": "contains",
@@ -5140,9 +5187,9 @@
       "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_config_telemetry_test_go",
-      "target": "config_telemetry_test_testsendtelemetrypingoptout",
-      "confidence_score": 1.0
+      "target": "config_telemetry_test_testsendtelemetrypingoptout"
     },
     {
       "relation": "contains",
@@ -5161,9 +5208,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_telemetry_test_testsendtelemetryping",
-      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t"
     },
     {
       "relation": "references",
@@ -5183,9 +5230,9 @@
       "source_location": "L72",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "config_telemetry_test_testsendtelemetrypingoptout",
-      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t"
     },
     {
       "relation": "contains",
@@ -5214,9 +5261,9 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_caddy_go",
-      "target": "server_caddy_generatecaddyfile",
-      "confidence_score": 1.0
+      "target": "server_caddy_generatecaddyfile"
     },
     {
       "relation": "contains",
@@ -5224,9 +5271,9 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L242",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_caddy_go",
-      "target": "server_caddy_reloadcaddy",
-      "confidence_score": 1.0
+      "target": "server_caddy_reloadcaddy"
     },
     {
       "relation": "contains",
@@ -5234,9 +5281,9 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy.go",
       "source_location": "L219",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_caddy_go",
-      "target": "server_caddy_writecaddyfile",
-      "confidence_score": 1.0
+      "target": "server_caddy_writecaddyfile"
     },
     {
       "relation": "contains",
@@ -5255,9 +5302,9 @@
       "source_location": "L192",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_caddy_generatecaddyfile",
-      "target": "d_repos_vpsops_internal_server_caddy_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_caddy_go_state"
     },
     {
       "relation": "references",
@@ -5310,9 +5357,9 @@
       "source_location": "L242",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_caddy_reloadcaddy",
-      "target": "d_repos_vpsops_internal_server_caddy_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_caddy_go_state"
     },
     {
       "relation": "references",
@@ -5321,9 +5368,9 @@
       "source_location": "L219",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_caddy_writecaddyfile",
-      "target": "d_repos_vpsops_internal_server_caddy_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_caddy_go_state"
     },
     {
       "relation": "contains",
@@ -5505,9 +5552,9 @@
       "source_file": "D:/repos/VPSops/internal/server/caddy_test.go",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_caddy_test_go",
-      "target": "server_caddy_test_testgeneratecaddyfile",
-      "confidence_score": 1.0
+      "target": "server_caddy_test_testgeneratecaddyfile"
     },
     {
       "relation": "contains",
@@ -5526,9 +5573,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_caddy_test_testgeneratecaddyfile",
-      "target": "d_repos_vpsops_internal_server_caddy_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_caddy_test_go_t"
     },
     {
       "relation": "references",
@@ -5547,9 +5594,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database.go",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_go",
-      "target": "server_database_createdatabase",
-      "confidence_score": 1.0
+      "target": "server_database_createdatabase"
     },
     {
       "relation": "contains",
@@ -5557,9 +5604,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database.go",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_go",
-      "target": "server_database_deletedatabase",
-      "confidence_score": 1.0
+      "target": "server_database_deletedatabase"
     },
     {
       "relation": "contains",
@@ -5567,9 +5614,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database.go",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_go",
-      "target": "server_database_generatesecurepassword",
-      "confidence_score": 1.0
+      "target": "server_database_generatesecurepassword"
     },
     {
       "relation": "contains",
@@ -5577,9 +5624,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database.go",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_go",
-      "target": "server_database_generatesecureprefix",
-      "confidence_score": 1.0
+      "target": "server_database_generatesecureprefix"
     },
     {
       "relation": "contains",
@@ -5770,9 +5817,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database_test.go",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_test_go",
-      "target": "server_database_test_testcreateanddeletedatabase",
-      "confidence_score": 1.0
+      "target": "server_database_test_testcreateanddeletedatabase"
     },
     {
       "relation": "contains",
@@ -5780,9 +5827,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database_test.go",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_test_go",
-      "target": "server_database_test_testgeneratesecurepassword",
-      "confidence_score": 1.0
+      "target": "server_database_test_testgeneratesecurepassword"
     },
     {
       "relation": "contains",
@@ -5790,9 +5837,9 @@
       "source_file": "D:/repos/VPSops/internal/server/database_test.go",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_database_test_go",
-      "target": "server_database_test_testgeneratesecureprefix",
-      "confidence_score": 1.0
+      "target": "server_database_test_testgeneratesecureprefix"
     },
     {
       "relation": "contains",
@@ -5811,9 +5858,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_database_test_testgeneratesecurepassword",
-      "target": "d_repos_vpsops_internal_server_database_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_database_test_go_t"
     },
     {
       "relation": "references",
@@ -5833,9 +5880,9 @@
       "source_location": "L48",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_database_test_testcreateanddeletedatabase",
-      "target": "d_repos_vpsops_internal_server_database_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_database_test_go_t"
     },
     {
       "relation": "references",
@@ -5844,9 +5891,9 @@
       "source_location": "L27",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_database_test_testgeneratesecureprefix",
-      "target": "d_repos_vpsops_internal_server_database_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_database_test_go_t"
     },
     {
       "relation": "contains",
@@ -5896,9 +5943,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics.go",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_historicalstats",
-      "confidence_score": 1.0
+      "target": "server_historicalstats"
     },
     {
       "relation": "contains",
@@ -5906,9 +5953,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics.go",
       "source_location": "L154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_metrics_gethistoricalmetrics",
-      "confidence_score": 1.0
+      "target": "server_metrics_gethistoricalmetrics"
     },
     {
       "relation": "contains",
@@ -5916,9 +5963,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics.go",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_metrics_getmetricspath",
-      "confidence_score": 1.0
+      "target": "server_metrics_getmetricspath"
     },
     {
       "relation": "contains",
@@ -5926,9 +5973,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics.go",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_metrics_logmetrics",
-      "confidence_score": 1.0
+      "target": "server_metrics_logmetrics"
     },
     {
       "relation": "contains",
@@ -5936,9 +5983,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics.go",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_metricsample",
-      "confidence_score": 1.0
+      "target": "server_metricsample"
     },
     {
       "relation": "contains",
@@ -5957,9 +6004,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "server_metricsample",
-      "target": "d_repos_vpsops_internal_server_metrics_go_time",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_metrics_go_time"
     },
     {
       "relation": "references",
@@ -6183,9 +6230,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics_test.go",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_test_go",
-      "target": "server_metrics_test_testgethistoricalmetrics",
-      "confidence_score": 1.0
+      "target": "server_metrics_test_testgethistoricalmetrics"
     },
     {
       "relation": "contains",
@@ -6193,9 +6240,9 @@
       "source_file": "D:/repos/VPSops/internal/server/metrics_test.go",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_metrics_test_go",
-      "target": "server_metrics_test_testlogmetricsandretention",
-      "confidence_score": 1.0
+      "target": "server_metrics_test_testlogmetricsandretention"
     },
     {
       "relation": "contains",
@@ -6214,9 +6261,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_metrics_test_testlogmetricsandretention",
-      "target": "d_repos_vpsops_internal_server_metrics_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_metrics_test_go_t"
     },
     {
       "relation": "references",
@@ -6236,9 +6283,9 @@
       "source_location": "L96",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_metrics_test_testgethistoricalmetrics",
-      "target": "d_repos_vpsops_internal_server_metrics_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_metrics_test_go_t"
     },
     {
       "relation": "contains",
@@ -6267,9 +6314,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L110",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_go",
-      "target": "server_php_deletephppool",
-      "confidence_score": 1.0
+      "target": "server_php_deletephppool"
     },
     {
       "relation": "contains",
@@ -6277,9 +6324,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_go",
-      "target": "server_php_generatephppool",
-      "confidence_score": 1.0
+      "target": "server_php_generatephppool"
     },
     {
       "relation": "contains",
@@ -6287,9 +6334,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_go",
-      "target": "server_php_getphppoolpath",
-      "confidence_score": 1.0
+      "target": "server_php_getphppoolpath"
     },
     {
       "relation": "contains",
@@ -6297,9 +6344,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L122",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_go",
-      "target": "server_php_reloadphp",
-      "confidence_score": 1.0
+      "target": "server_php_reloadphp"
     },
     {
       "relation": "contains",
@@ -6307,9 +6354,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_go",
-      "target": "server_php_writephppool",
-      "confidence_score": 1.0
+      "target": "server_php_writephppool"
     },
     {
       "relation": "contains",
@@ -6576,9 +6623,9 @@
       "source_file": "D:/repos/VPSops/internal/server/php_test.go",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_php_test_go",
-      "target": "server_php_test_testgeneratephppool",
-      "confidence_score": 1.0
+      "target": "server_php_test_testgeneratephppool"
     },
     {
       "relation": "contains",
@@ -6597,9 +6644,9 @@
       "source_location": "L10",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_php_test_testgeneratephppool",
-      "target": "d_repos_vpsops_internal_server_php_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_php_test_go_t"
     },
     {
       "relation": "references",
@@ -6618,9 +6665,9 @@
       "source_file": "D:/repos/VPSops/internal/server/repair.go",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_repair_go",
-      "target": "server_repair_repairinstallation",
-      "confidence_score": 1.0
+      "target": "server_repair_repairinstallation"
     },
     {
       "relation": "contains",
@@ -6682,9 +6729,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_listbucketresult",
-      "confidence_score": 1.0
+      "target": "server_listbucketresult"
     },
     {
       "relation": "contains",
@@ -6692,9 +6739,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_builds3request",
-      "confidence_score": 1.0
+      "target": "server_s3_builds3request"
     },
     {
       "relation": "contains",
@@ -6702,9 +6749,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L280",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_deletefroms3",
-      "confidence_score": 1.0
+      "target": "server_s3_deletefroms3"
     },
     {
       "relation": "contains",
@@ -6712,9 +6759,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L235",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_downloadfroms3",
-      "confidence_score": 1.0
+      "target": "server_s3_downloadfroms3"
     },
     {
       "relation": "contains",
@@ -6722,9 +6769,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_gets3url",
-      "confidence_score": 1.0
+      "target": "server_s3_gets3url"
     },
     {
       "relation": "contains",
@@ -6732,9 +6779,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_getsignaturekey",
-      "confidence_score": 1.0
+      "target": "server_s3_getsignaturekey"
     },
     {
       "relation": "contains",
@@ -6742,9 +6789,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_hashsha256",
-      "confidence_score": 1.0
+      "target": "server_s3_hashsha256"
     },
     {
       "relation": "contains",
@@ -6752,9 +6799,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L179",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_lists3backups",
-      "confidence_score": 1.0
+      "target": "server_s3_lists3backups"
     },
     {
       "relation": "contains",
@@ -6762,9 +6809,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_signhmac",
-      "confidence_score": 1.0
+      "target": "server_s3_signhmac"
     },
     {
       "relation": "contains",
@@ -6772,9 +6819,9 @@
       "source_file": "D:/repos/VPSops/internal/server/s3.go",
       "source_location": "L131",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_s3_go",
-      "target": "server_s3_uploadtos3",
-      "confidence_score": 1.0
+      "target": "server_s3_uploadtos3"
     },
     {
       "relation": "references",
@@ -6942,9 +6989,9 @@
       "source_location": "L73",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "server_s3_builds3request",
-      "target": "d_repos_vpsops_internal_server_s3_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_s3_go_request"
     },
     {
       "relation": "references",
@@ -7029,9 +7076,9 @@
       "source_location": "L131",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_s3_uploadtos3",
-      "target": "d_repos_vpsops_internal_server_s3_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_s3_go_state"
     },
     {
       "relation": "references",
@@ -7062,9 +7109,9 @@
       "source_location": "L280",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_s3_deletefroms3",
-      "target": "d_repos_vpsops_internal_server_s3_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_s3_go_state"
     },
     {
       "relation": "references",
@@ -7073,9 +7120,9 @@
       "source_location": "L235",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_s3_downloadfroms3",
-      "target": "d_repos_vpsops_internal_server_s3_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_s3_go_state"
     },
     {
       "relation": "references",
@@ -7084,9 +7131,9 @@
       "source_location": "L179",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_s3_lists3backups",
-      "target": "d_repos_vpsops_internal_server_s3_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_s3_go_state"
     },
     {
       "relation": "contains",
@@ -7223,9 +7270,9 @@
       "source_file": "D:/repos/VPSops/internal/server/security.go",
       "source_location": "L142",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_security_go",
-      "target": "server_security_cleanserver",
-      "confidence_score": 1.0
+      "target": "server_security_cleanserver"
     },
     {
       "relation": "contains",
@@ -7233,9 +7280,9 @@
       "source_file": "D:/repos/VPSops/internal/server/security.go",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_security_go",
-      "target": "server_security_secureserver",
-      "confidence_score": 1.0
+      "target": "server_security_secureserver"
     },
     {
       "relation": "contains",
@@ -7243,9 +7290,9 @@
       "source_file": "D:/repos/VPSops/internal/server/security.go",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_security_go",
-      "target": "server_security_unlockguipanel",
-      "confidence_score": 1.0
+      "target": "server_security_unlockguipanel"
     },
     {
       "relation": "contains",
@@ -7283,9 +7330,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L229",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_cpustats",
-      "confidence_score": 1.0
+      "target": "server_cpustats"
     },
     {
       "relation": "contains",
@@ -7293,9 +7340,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_processstatus",
-      "confidence_score": 1.0
+      "target": "server_processstatus"
     },
     {
       "relation": "contains",
@@ -7303,9 +7350,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_serverstatus",
-      "confidence_score": 1.0
+      "target": "server_serverstatus"
     },
     {
       "relation": "contains",
@@ -7313,9 +7360,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L258",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_getcpupercentage",
-      "confidence_score": 1.0
+      "target": "server_status_getcpupercentage"
     },
     {
       "relation": "contains",
@@ -7323,9 +7370,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_getstatus",
-      "confidence_score": 1.0
+      "target": "server_status_getstatus"
     },
     {
       "relation": "contains",
@@ -7333,9 +7380,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L289",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_gettcpconnectionscount",
-      "confidence_score": 1.0
+      "target": "server_status_gettcpconnectionscount"
     },
     {
       "relation": "contains",
@@ -7343,9 +7390,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L311",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_gettopprocesses",
-      "confidence_score": 1.0
+      "target": "server_status_gettopprocesses"
     },
     {
       "relation": "contains",
@@ -7353,9 +7400,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L233",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_readcpustats",
-      "confidence_score": 1.0
+      "target": "server_status_readcpustats"
     },
     {
       "relation": "contains",
@@ -7363,9 +7410,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_readdiskusage",
-      "confidence_score": 1.0
+      "target": "server_status_readdiskusage"
     },
     {
       "relation": "contains",
@@ -7373,9 +7420,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L183",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_readlinuxmemory",
-      "confidence_score": 1.0
+      "target": "server_status_readlinuxmemory"
     },
     {
       "relation": "contains",
@@ -7383,9 +7430,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L148",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_readlinuxmemoryandswap",
-      "confidence_score": 1.0
+      "target": "server_status_readlinuxmemoryandswap"
     },
     {
       "relation": "contains",
@@ -7393,9 +7440,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L211",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_readloadavg",
-      "confidence_score": 1.0
+      "target": "server_status_readloadavg"
     },
     {
       "relation": "contains",
@@ -7403,9 +7450,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status.go",
       "source_location": "L363",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_go",
-      "target": "server_status_restartservice",
-      "confidence_score": 1.0
+      "target": "server_status_restartservice"
     },
     {
       "relation": "references",
@@ -7708,9 +7755,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status_test.go",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_test_go",
-      "target": "server_status_test_testgetstatus",
-      "confidence_score": 1.0
+      "target": "server_status_test_testgetstatus"
     },
     {
       "relation": "contains",
@@ -7718,9 +7765,9 @@
       "source_file": "D:/repos/VPSops/internal/server/status_test.go",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_status_test_go",
-      "target": "server_status_test_testrestartservicemock",
-      "confidence_score": 1.0
+      "target": "server_status_test_testrestartservicemock"
     },
     {
       "relation": "contains",
@@ -7739,9 +7786,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_status_test_testgetstatus",
-      "target": "d_repos_vpsops_internal_server_status_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_status_test_go_t"
     },
     {
       "relation": "references",
@@ -7761,9 +7808,9 @@
       "source_location": "L26",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_status_test_testrestartservicemock",
-      "target": "d_repos_vpsops_internal_server_status_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_status_test_go_t"
     },
     {
       "relation": "contains",
@@ -7792,9 +7839,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_createsystemuser",
-      "confidence_score": 1.0
+      "target": "server_system_createsystemuser"
     },
     {
       "relation": "contains",
@@ -7802,9 +7849,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L131",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_deletesitedirectory",
-      "confidence_score": 1.0
+      "target": "server_system_deletesitedirectory"
     },
     {
       "relation": "contains",
@@ -7812,9 +7859,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_deletesystemuser",
-      "confidence_score": 1.0
+      "target": "server_system_deletesystemuser"
     },
     {
       "relation": "contains",
@@ -7822,9 +7869,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L183",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_fixpermissions",
-      "confidence_score": 1.0
+      "target": "server_system_fixpermissions"
     },
     {
       "relation": "contains",
@@ -7832,9 +7879,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_getsiterootdir",
-      "confidence_score": 1.0
+      "target": "server_system_getsiterootdir"
     },
     {
       "relation": "contains",
@@ -7842,9 +7889,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_lockdirectory",
-      "confidence_score": 1.0
+      "target": "server_system_lockdirectory"
     },
     {
       "relation": "contains",
@@ -7852,9 +7899,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_provisionsitedirectory",
-      "confidence_score": 1.0
+      "target": "server_system_provisionsitedirectory"
     },
     {
       "relation": "contains",
@@ -7862,9 +7909,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L220",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_resolvepublicip",
-      "confidence_score": 1.0
+      "target": "server_system_resolvepublicip"
     },
     {
       "relation": "contains",
@@ -7872,9 +7919,9 @@
       "source_file": "D:/repos/VPSops/internal/server/system.go",
       "source_location": "L163",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_system_go",
-      "target": "server_system_unlockdirectory",
-      "confidence_score": 1.0
+      "target": "server_system_unlockdirectory"
     },
     {
       "relation": "contains",
@@ -8236,9 +8283,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tools.go",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_fixphpmyadminconfig",
-      "confidence_score": 1.0
+      "target": "server_tools_fixphpmyadminconfig"
     },
     {
       "relation": "contains",
@@ -8246,9 +8293,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tools.go",
       "source_location": "L182",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_installgui",
-      "confidence_score": 1.0
+      "target": "server_tools_installgui"
     },
     {
       "relation": "contains",
@@ -8256,9 +8303,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tools.go",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_installphpmyadmin",
-      "confidence_score": 1.0
+      "target": "server_tools_installphpmyadmin"
     },
     {
       "relation": "contains",
@@ -8296,9 +8343,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L806",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_installmetricscron",
-      "confidence_score": 1.0
+      "target": "server_tuning_installmetricscron"
     },
     {
       "relation": "contains",
@@ -8306,9 +8353,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L363",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_replaceline",
-      "confidence_score": 1.0
+      "target": "server_tuning_replaceline"
     },
     {
       "relation": "contains",
@@ -8316,9 +8363,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L316",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_setorappendredisconfig",
-      "confidence_score": 1.0
+      "target": "server_tuning_setorappendredisconfig"
     },
     {
       "relation": "contains",
@@ -8326,9 +8373,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L780",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_setupdefaultwebserver",
-      "confidence_score": 1.0
+      "target": "server_tuning_setupdefaultwebserver"
     },
     {
       "relation": "contains",
@@ -8336,9 +8383,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L159",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tunedatabase",
-      "confidence_score": 1.0
+      "target": "server_tuning_tunedatabase"
     },
     {
       "relation": "contains",
@@ -8346,9 +8393,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L246",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tuneredis",
-      "confidence_score": 1.0
+      "target": "server_tuning_tuneredis"
     },
     {
       "relation": "contains",
@@ -8356,9 +8403,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tuneserver",
-      "confidence_score": 1.0
+      "target": "server_tuning_tuneserver"
     },
     {
       "relation": "contains",
@@ -8366,9 +8413,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tuneswap",
-      "confidence_score": 1.0
+      "target": "server_tuning_tuneswap"
     },
     {
       "relation": "contains",
@@ -8376,9 +8423,9 @@
       "source_file": "D:/repos/VPSops/internal/server/tuning.go",
       "source_location": "L757",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_writedefaultwelcomepage",
-      "confidence_score": 1.0
+      "target": "server_tuning_writedefaultwelcomepage"
     },
     {
       "relation": "contains",
@@ -8608,9 +8655,9 @@
       "source_file": "D:/repos/VPSops/internal/server/wordpress.go",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_wordpress_go",
-      "target": "server_wordpress_installwordpress",
-      "confidence_score": 1.0
+      "target": "server_wordpress_installwordpress"
     },
     {
       "relation": "contains",
@@ -8618,9 +8665,9 @@
       "source_file": "D:/repos/VPSops/internal/server/wordpress.go",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_wordpress_go",
-      "target": "server_wordpress_runasuser",
-      "confidence_score": 1.0
+      "target": "server_wordpress_runasuser"
     },
     {
       "relation": "contains",
@@ -8758,9 +8805,9 @@
       "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_server_wordpress_test_go",
-      "target": "server_wordpress_test_testinstallwordpressmock",
-      "confidence_score": 1.0
+      "target": "server_wordpress_test_testinstallwordpressmock"
     },
     {
       "relation": "contains",
@@ -8779,9 +8826,9 @@
       "source_location": "L7",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "server_wordpress_test_testinstallwordpressmock",
-      "target": "d_repos_vpsops_internal_server_wordpress_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_server_wordpress_test_go_t"
     },
     {
       "relation": "references",
@@ -8800,9 +8847,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1673",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_backup",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_backup"
     },
     {
       "relation": "contains",
@@ -8810,9 +8857,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1085",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_backupdb",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_backupdb"
     },
     {
       "relation": "contains",
@@ -8820,9 +8867,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L692",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_cacheclean",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_cacheclean"
     },
     {
       "relation": "contains",
@@ -8830,9 +8877,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_create",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_create"
     },
     {
       "relation": "contains",
@@ -8840,9 +8887,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L534",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_delete",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_delete"
     },
     {
       "relation": "contains",
@@ -8850,9 +8897,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L2097",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_deletes3backupcli",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_deletes3backupcli"
     },
     {
       "relation": "contains",
@@ -8860,9 +8907,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L2038",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_downloads3backupcli",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_downloads3backupcli"
     },
     {
       "relation": "contains",
@@ -8870,9 +8917,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1305",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_edit",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_edit"
     },
     {
       "relation": "contains",
@@ -8880,9 +8927,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1051",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_fixpermissions",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_fixpermissions"
     },
     {
       "relation": "contains",
@@ -8890,9 +8937,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1376",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_getsslinfo",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_getsslinfo"
     },
     {
       "relation": "contains",
@@ -8900,9 +8947,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1212",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_info",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_info"
     },
     {
       "relation": "contains",
@@ -8910,9 +8957,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_list",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_list"
     },
     {
       "relation": "contains",
@@ -8920,9 +8967,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1961",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_lists3backupscli",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_lists3backupscli"
     },
     {
       "relation": "contains",
@@ -8930,9 +8977,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L616",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_lock",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_lock"
     },
     {
       "relation": "contains",
@@ -8940,9 +8987,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L2163",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_notifybackup",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_notifybackup"
     },
     {
       "relation": "contains",
@@ -8950,9 +8997,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_promptline",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_promptline"
     },
     {
       "relation": "contains",
@@ -8960,9 +9007,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1908",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_prunelocalbackups",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_prunelocalbackups"
     },
     {
       "relation": "contains",
@@ -8970,9 +9017,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L764",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_reinstall",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_reinstall"
     },
     {
       "relation": "contains",
@@ -8980,9 +9027,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_sanitizeuser",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_sanitizeuser"
     },
     {
       "relation": "contains",
@@ -8990,9 +9037,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1467",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_selfupdate",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_selfupdate"
     },
     {
       "relation": "contains",
@@ -9000,9 +9047,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L2138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_sendtelegramnotification",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_sendtelegramnotification"
     },
     {
       "relation": "contains",
@@ -9010,9 +9057,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1002",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_sslrenew",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_sslrenew"
     },
     {
       "relation": "contains",
@@ -9020,9 +9067,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1499",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_sync",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_sync"
     },
     {
       "relation": "contains",
@@ -9030,9 +9077,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L654",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_unlock",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_unlock"
     },
     {
       "relation": "contains",
@@ -9040,9 +9087,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_validatedomain",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_validatedomain"
     },
     {
       "relation": "contains",
@@ -9050,9 +9097,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
       "source_location": "L1366",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_sslinfo",
-      "confidence_score": 1.0
+      "target": "site_sslinfo"
     },
     {
       "relation": "contains",
@@ -10002,9 +10049,9 @@
       "source_location": "L1371",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "site_sslinfo",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_time",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_go_time"
     },
     {
       "relation": "references",
@@ -10433,9 +10480,9 @@
       "source_location": "L2138",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_sendtelegramnotification",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_go_state"
     },
     {
       "relation": "references",
@@ -10455,9 +10502,9 @@
       "source_location": "L2163",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_notifybackup",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_state",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_go_state"
     },
     {
       "relation": "contains",
@@ -10486,9 +10533,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_test_testlaravelandhtmlsiteorchestration"
     },
     {
       "relation": "contains",
@@ -10496,9 +10543,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testsanitizeuser",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_test_testsanitizeuser"
     },
     {
       "relation": "contains",
@@ -10506,9 +10553,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testsiteorchestration",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_test_testsiteorchestration"
     },
     {
       "relation": "contains",
@@ -10516,9 +10563,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
       "source_location": "L198",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testsyncimport",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_test_testsyncimport"
     },
     {
       "relation": "contains",
@@ -10526,9 +10573,9 @@
       "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testvalidatedomain",
-      "confidence_score": 1.0
+      "target": "site_orchestrator_test_testvalidatedomain"
     },
     {
       "relation": "contains",
@@ -10547,9 +10594,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_test_testvalidatedomain",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10569,9 +10616,9 @@
       "source_location": "L275",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10580,9 +10627,9 @@
       "source_location": "L41",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_test_testsanitizeuser",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10591,9 +10638,9 @@
       "source_location": "L59",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10602,9 +10649,9 @@
       "source_location": "L198",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "site_orchestrator_test_testsyncimport",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "contains",
@@ -10696,9 +10743,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L185",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_tablecolumn",
-      "confidence_score": 1.0
+      "target": "ui_tablecolumn"
     },
     {
       "relation": "contains",
@@ -10706,9 +10753,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_accent",
-      "confidence_score": 1.0
+      "target": "ui_ui_accent"
     },
     {
       "relation": "contains",
@@ -10716,9 +10763,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_banner",
-      "confidence_score": 1.0
+      "target": "ui_ui_banner"
     },
     {
       "relation": "contains",
@@ -10726,9 +10773,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_danger",
-      "confidence_score": 1.0
+      "target": "ui_ui_danger"
     },
     {
       "relation": "contains",
@@ -10736,9 +10783,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L162",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_divider",
-      "confidence_score": 1.0
+      "target": "ui_ui_divider"
     },
     {
       "relation": "contains",
@@ -10746,9 +10793,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_header",
-      "confidence_score": 1.0
+      "target": "ui_ui_header"
     },
     {
       "relation": "contains",
@@ -10756,9 +10803,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_keystr",
-      "confidence_score": 1.0
+      "target": "ui_ui_keystr"
     },
     {
       "relation": "contains",
@@ -10766,9 +10813,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_label",
-      "confidence_score": 1.0
+      "target": "ui_ui_label"
     },
     {
       "relation": "contains",
@@ -10776,9 +10823,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_muted",
-      "confidence_score": 1.0
+      "target": "ui_ui_muted"
     },
     {
       "relation": "contains",
@@ -10786,9 +10833,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L108",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_padright",
-      "confidence_score": 1.0
+      "target": "ui_ui_padright"
     },
     {
       "relation": "contains",
@@ -10796,9 +10843,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L303",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_printinfo",
-      "confidence_score": 1.0
+      "target": "ui_ui_printinfo"
     },
     {
       "relation": "contains",
@@ -10806,9 +10853,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L298",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_printstep",
-      "confidence_score": 1.0
+      "target": "ui_ui_printstep"
     },
     {
       "relation": "contains",
@@ -10816,9 +10863,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L276",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_printsuccess",
-      "confidence_score": 1.0
+      "target": "ui_ui_printsuccess"
     },
     {
       "relation": "contains",
@@ -10826,9 +10873,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_printtable",
-      "confidence_score": 1.0
+      "target": "ui_ui_printtable"
     },
     {
       "relation": "contains",
@@ -10836,9 +10883,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L293",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_printwarning",
-      "confidence_score": 1.0
+      "target": "ui_ui_printwarning"
     },
     {
       "relation": "contains",
@@ -10846,9 +10893,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_repeat",
-      "confidence_score": 1.0
+      "target": "ui_ui_repeat"
     },
     {
       "relation": "contains",
@@ -10856,9 +10903,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_row",
-      "confidence_score": 1.0
+      "target": "ui_ui_row"
     },
     {
       "relation": "contains",
@@ -10866,9 +10913,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L177",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_rowbadge",
-      "confidence_score": 1.0
+      "target": "ui_ui_rowbadge"
     },
     {
       "relation": "contains",
@@ -10876,9 +10923,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L147",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_sectionheader",
-      "confidence_score": 1.0
+      "target": "ui_ui_sectionheader"
     },
     {
       "relation": "contains",
@@ -10886,9 +10933,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L267",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_statusactive",
-      "confidence_score": 1.0
+      "target": "ui_ui_statusactive"
     },
     {
       "relation": "contains",
@@ -10896,9 +10943,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L271",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_statusfail",
-      "confidence_score": 1.0
+      "target": "ui_ui_statusfail"
     },
     {
       "relation": "contains",
@@ -10906,9 +10953,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L269",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_statusinactive",
-      "confidence_score": 1.0
+      "target": "ui_ui_statusinactive"
     },
     {
       "relation": "contains",
@@ -10916,9 +10963,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L268",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_statuslocked",
-      "confidence_score": 1.0
+      "target": "ui_ui_statuslocked"
     },
     {
       "relation": "contains",
@@ -10926,9 +10973,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L270",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_statusok",
-      "confidence_score": 1.0
+      "target": "ui_ui_statusok"
     },
     {
       "relation": "contains",
@@ -10936,9 +10983,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L87",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_stripansi",
-      "confidence_score": 1.0
+      "target": "ui_ui_stripansi"
     },
     {
       "relation": "contains",
@@ -10946,9 +10993,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_success",
-      "confidence_score": 1.0
+      "target": "ui_ui_success"
     },
     {
       "relation": "contains",
@@ -10956,9 +11003,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_value",
-      "confidence_score": 1.0
+      "target": "ui_ui_value"
     },
     {
       "relation": "contains",
@@ -10966,9 +11013,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_vislen",
-      "confidence_score": 1.0
+      "target": "ui_ui_vislen"
     },
     {
       "relation": "contains",
@@ -10976,9 +11023,9 @@
       "source_file": "D:/repos/VPSops/internal/ui/ui.go",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_internal_ui_ui_go",
-      "target": "ui_ui_warning",
-      "confidence_score": 1.0
+      "target": "ui_ui_warning"
     },
     {
       "relation": "contains",
@@ -11496,9 +11543,9 @@
       "source_file": "D:/repos/VPSops/main.go",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_main_go",
-      "target": "vpsops_main_main",
-      "confidence_score": 1.0
+      "target": "vpsops_main_main"
     },
     {
       "relation": "contains",
@@ -11506,9 +11553,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L168",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_badgemetrics",
-      "confidence_score": 1.0
+      "target": "telemetry_badgemetrics"
     },
     {
       "relation": "contains",
@@ -11516,9 +11563,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_getclientip",
-      "confidence_score": 1.0
+      "target": "telemetry_main_getclientip"
     },
     {
       "relation": "contains",
@@ -11526,9 +11573,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_getmetrics",
-      "confidence_score": 1.0
+      "target": "telemetry_main_getmetrics"
     },
     {
       "relation": "contains",
@@ -11536,9 +11583,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_handlehome",
-      "confidence_score": 1.0
+      "target": "telemetry_main_handlehome"
     },
     {
       "relation": "contains",
@@ -11546,9 +11593,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L213",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_handlejsonbadge",
-      "confidence_score": 1.0
+      "target": "telemetry_main_handlejsonbadge"
     },
     {
       "relation": "contains",
@@ -11556,9 +11603,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_handleping",
-      "confidence_score": 1.0
+      "target": "telemetry_main_handleping"
     },
     {
       "relation": "contains",
@@ -11566,9 +11613,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_handlesvgbadge",
-      "confidence_score": 1.0
+      "target": "telemetry_main_handlesvgbadge"
     },
     {
       "relation": "contains",
@@ -11576,9 +11623,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_haship",
-      "confidence_score": 1.0
+      "target": "telemetry_main_haship"
     },
     {
       "relation": "contains",
@@ -11586,9 +11633,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_main_main",
-      "confidence_score": 1.0
+      "target": "telemetry_main_main"
     },
     {
       "relation": "contains",
@@ -11596,9 +11643,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_pingpayload",
-      "confidence_score": 1.0
+      "target": "telemetry_pingpayload"
     },
     {
       "relation": "contains",
@@ -11606,9 +11653,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main.go",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_go",
-      "target": "telemetry_serverrecord",
-      "confidence_score": 1.0
+      "target": "telemetry_serverrecord"
     },
     {
       "relation": "contains",
@@ -11637,9 +11684,9 @@
       "source_location": "L36",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "telemetry_serverrecord",
-      "target": "d_repos_vpsops_telemetry_main_go_time",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_time"
     },
     {
       "relation": "references",
@@ -11679,9 +11726,9 @@
       "source_location": "L72",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_handlehome",
-      "target": "d_repos_vpsops_telemetry_main_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_request"
     },
     {
       "relation": "references",
@@ -11756,9 +11803,9 @@
       "source_location": "L81",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_getclientip",
-      "target": "d_repos_vpsops_telemetry_main_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_request"
     },
     {
       "relation": "references",
@@ -11767,9 +11814,9 @@
       "source_location": "L213",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_handlejsonbadge",
-      "target": "d_repos_vpsops_telemetry_main_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_request"
     },
     {
       "relation": "references",
@@ -11778,9 +11825,9 @@
       "source_location": "L103",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_handleping",
-      "target": "d_repos_vpsops_telemetry_main_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_request"
     },
     {
       "relation": "references",
@@ -11789,9 +11836,9 @@
       "source_location": "L253",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_handlesvgbadge",
-      "target": "d_repos_vpsops_telemetry_main_go_request",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_go_request"
     },
     {
       "relation": "contains",
@@ -12012,9 +12059,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main_test.go",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testbadges",
-      "confidence_score": 1.0
+      "target": "telemetry_main_test_testbadges"
     },
     {
       "relation": "contains",
@@ -12022,9 +12069,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main_test.go",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandlehome",
-      "confidence_score": 1.0
+      "target": "telemetry_main_test_testhandlehome"
     },
     {
       "relation": "contains",
@@ -12032,9 +12079,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main_test.go",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandleping",
-      "confidence_score": 1.0
+      "target": "telemetry_main_test_testhandleping"
     },
     {
       "relation": "contains",
@@ -12042,9 +12089,9 @@
       "source_file": "D:/repos/VPSops/telemetry/main_test.go",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandlepinginvalid",
-      "confidence_score": 1.0
+      "target": "telemetry_main_test_testhandlepinginvalid"
     },
     {
       "relation": "contains",
@@ -12063,9 +12110,9 @@
       "source_location": "L16",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_test_testhandlehome",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_test_go_t"
     },
     {
       "relation": "references",
@@ -12085,9 +12132,9 @@
       "source_location": "L116",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_test_testbadges",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_test_go_t"
     },
     {
       "relation": "references",
@@ -12096,9 +12143,9 @@
       "source_location": "L33",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_test_testhandleping",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_test_go_t"
     },
     {
       "relation": "references",
@@ -12107,9 +12154,9 @@
       "source_location": "L89",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "telemetry_main_test_testhandlepinginvalid",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t",
-      "confidence_score": 1.0
+      "target": "d_repos_vpsops_telemetry_main_test_go_t"
     },
     {
       "relation": "contains",
@@ -12180,9 +12227,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands",
-      "target": "commands_agilepanel_ap_command_reference",
-      "confidence_score": 1.0
+      "target": "commands_agilepanel_ap_command_reference"
     },
     {
       "relation": "contains",
@@ -12190,9 +12237,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_agilepanel_ap_command_reference",
-      "target": "commands_diagnostics_updates",
-      "confidence_score": 1.0
+      "target": "commands_diagnostics_updates"
     },
     {
       "relation": "contains",
@@ -12200,9 +12247,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L117",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_agilepanel_ap_command_reference",
-      "target": "commands_extensions_addons_ap_install",
-      "confidence_score": 1.0
+      "target": "commands_extensions_addons_ap_install"
     },
     {
       "relation": "contains",
@@ -12210,9 +12257,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_agilepanel_ap_command_reference",
-      "target": "commands_server_administration_ap_server",
-      "confidence_score": 1.0
+      "target": "commands_server_administration_ap_server"
     },
     {
       "relation": "contains",
@@ -12220,9 +12267,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_agilepanel_ap_command_reference",
-      "target": "commands_server_tools_ap_tool",
-      "confidence_score": 1.0
+      "target": "commands_server_tools_ap_tool"
     },
     {
       "relation": "contains",
@@ -12230,9 +12277,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_agilepanel_ap_command_reference",
-      "target": "commands_site_management_ap_site",
-      "confidence_score": 1.0
+      "target": "commands_site_management_ap_site"
     },
     {
       "relation": "contains",
@@ -12240,9 +12287,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_backup_db_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_backup_db_domain"
     },
     {
       "relation": "contains",
@@ -12250,9 +12297,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_backup_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_backup_domain"
     },
     {
       "relation": "contains",
@@ -12260,9 +12307,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_cache_clean_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_cache_clean_domain"
     },
     {
       "relation": "contains",
@@ -12270,9 +12317,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_create_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_create_domain"
     },
     {
       "relation": "contains",
@@ -12280,9 +12327,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_delete_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_delete_domain"
     },
     {
       "relation": "contains",
@@ -12290,9 +12337,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_edit_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_edit_domain"
     },
     {
       "relation": "contains",
@@ -12300,9 +12347,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_fix_permissions_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_fix_permissions_domain"
     },
     {
       "relation": "contains",
@@ -12310,9 +12357,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_info_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_info_domain"
     },
     {
       "relation": "contains",
@@ -12320,9 +12367,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_list",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_list"
     },
     {
       "relation": "contains",
@@ -12330,9 +12377,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_lock_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_lock_domain"
     },
     {
       "relation": "contains",
@@ -12340,9 +12387,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_reinstall_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_reinstall_domain"
     },
     {
       "relation": "contains",
@@ -12350,9 +12397,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_ssl_renew_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_ssl_renew_domain"
     },
     {
       "relation": "contains",
@@ -12360,9 +12407,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_site_management_ap_site",
-      "target": "commands_ap_site_unlock_domain",
-      "confidence_score": 1.0
+      "target": "commands_ap_site_unlock_domain"
     },
     {
       "relation": "contains",
@@ -12370,9 +12417,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_administration_ap_server",
-      "target": "commands_ap_server_auth_username_password",
-      "confidence_score": 1.0
+      "target": "commands_ap_server_auth_username_password"
     },
     {
       "relation": "contains",
@@ -12380,9 +12427,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_administration_ap_server",
-      "target": "commands_ap_server_restart_service",
-      "confidence_score": 1.0
+      "target": "commands_ap_server_restart_service"
     },
     {
       "relation": "contains",
@@ -12390,9 +12437,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_administration_ap_server",
-      "target": "commands_ap_server_secure",
-      "confidence_score": 1.0
+      "target": "commands_ap_server_secure"
     },
     {
       "relation": "contains",
@@ -12400,9 +12447,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_administration_ap_server",
-      "target": "commands_ap_server_status",
-      "confidence_score": 1.0
+      "target": "commands_ap_server_status"
     },
     {
       "relation": "contains",
@@ -12410,9 +12457,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_administration_ap_server",
-      "target": "commands_ap_server_tune",
-      "confidence_score": 1.0
+      "target": "commands_ap_server_tune"
     },
     {
       "relation": "contains",
@@ -12420,9 +12467,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_tools_ap_tool",
-      "target": "commands_ap_tool_fix_phpmyadmin",
-      "confidence_score": 1.0
+      "target": "commands_ap_tool_fix_phpmyadmin"
     },
     {
       "relation": "contains",
@@ -12430,9 +12477,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_server_tools_ap_tool",
-      "target": "commands_ap_tool_install_tool",
-      "confidence_score": 1.0
+      "target": "commands_ap_tool_install_tool"
     },
     {
       "relation": "contains",
@@ -12440,9 +12487,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_extensions_addons_ap_install",
-      "target": "commands_ap_install_gui",
-      "confidence_score": 1.0
+      "target": "commands_ap_install_gui"
     },
     {
       "relation": "contains",
@@ -12450,9 +12497,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L130",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_diagnostics_updates",
-      "target": "commands_ap_repair",
-      "confidence_score": 1.0
+      "target": "commands_ap_repair"
     },
     {
       "relation": "contains",
@@ -12460,9 +12507,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_diagnostics_updates",
-      "target": "commands_ap_sync",
-      "confidence_score": 1.0
+      "target": "commands_ap_sync"
     },
     {
       "relation": "contains",
@@ -12470,9 +12517,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_diagnostics_updates",
-      "target": "commands_ap_update",
-      "confidence_score": 1.0
+      "target": "commands_ap_update"
     },
     {
       "relation": "contains",
@@ -12480,9 +12527,9 @@
       "source_file": "COMMANDS.md",
       "source_location": "L142",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "commands_diagnostics_updates",
-      "target": "commands_ap_upgrade",
-      "confidence_score": 1.0
+      "target": "commands_ap_upgrade"
     },
     {
       "relation": "contains",
@@ -12490,9 +12537,9 @@
       "source_file": "README.md",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_cli_reference_command_set",
-      "confidence_score": 1.0
+      "target": "readme_cli_reference_command_set"
     },
     {
       "relation": "contains",
@@ -12500,9 +12547,9 @@
       "source_file": "README.md",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_installation",
-      "confidence_score": 1.0
+      "target": "readme_installation"
     },
     {
       "relation": "contains",
@@ -12510,9 +12557,9 @@
       "source_file": "README.md",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_key_features",
-      "confidence_score": 1.0
+      "target": "readme_key_features"
     },
     {
       "relation": "contains",
@@ -12520,9 +12567,9 @@
       "source_file": "README.md",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_license",
-      "confidence_score": 1.0
+      "target": "readme_license"
     },
     {
       "relation": "contains",
@@ -12530,9 +12577,9 @@
       "source_file": "README.md",
       "source_location": "L148",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_privacy_telemetry",
-      "confidence_score": 1.0
+      "target": "readme_privacy_telemetry"
     },
     {
       "relation": "contains",
@@ -12540,9 +12587,9 @@
       "source_file": "README.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_what_is_agilepanel",
-      "confidence_score": 1.0
+      "target": "readme_what_is_agilepanel"
     },
     {
       "relation": "contains",
@@ -12550,9 +12597,9 @@
       "source_file": "README.md",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_key_features",
-      "target": "readme_developer_centric_operations",
-      "confidence_score": 1.0
+      "target": "readme_developer_centric_operations"
     },
     {
       "relation": "contains",
@@ -12560,9 +12607,9 @@
       "source_file": "README.md",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_key_features",
-      "target": "readme_high_performance_optimizations",
-      "confidence_score": 1.0
+      "target": "readme_high_performance_optimizations"
     },
     {
       "relation": "contains",
@@ -12570,9 +12617,9 @@
       "source_file": "README.md",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_key_features",
-      "target": "readme_security_first_architecture",
-      "confidence_score": 1.0
+      "target": "readme_security_first_architecture"
     },
     {
       "relation": "contains",
@@ -12580,9 +12627,9 @@
       "source_file": "README.md",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_installation",
-      "target": "readme_installation_from_specific_release_e_g_v0_8",
-      "confidence_score": 1.0
+      "target": "readme_installation_from_specific_release_e_g_v0_8"
     },
     {
       "relation": "contains",
@@ -12590,9 +12637,9 @@
       "source_file": "README.md",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_installation",
-      "target": "readme_standard_installation_latest_version",
-      "confidence_score": 1.0
+      "target": "readme_standard_installation_latest_version"
     },
     {
       "relation": "contains",
@@ -12600,9 +12647,9 @@
       "source_file": "README.md",
       "source_location": "L122",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_cli_reference_command_set",
-      "target": "readme_maintenance_tools",
-      "confidence_score": 1.0
+      "target": "readme_maintenance_tools"
     },
     {
       "relation": "contains",
@@ -12610,9 +12657,9 @@
       "source_file": "README.md",
       "source_location": "L101",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_cli_reference_command_set",
-      "target": "readme_server_administration",
-      "confidence_score": 1.0
+      "target": "readme_server_administration"
     },
     {
       "relation": "contains",
@@ -12620,9 +12667,9 @@
       "source_file": "README.md",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_cli_reference_command_set",
-      "target": "readme_site_management",
-      "confidence_score": 1.0
+      "target": "readme_site_management"
     },
     {
       "relation": "contains",
@@ -12630,9 +12677,9 @@
       "source_file": "README.md",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_privacy_telemetry",
-      "target": "readme_opting_out",
-      "confidence_score": 1.0
+      "target": "readme_opting_out"
     },
     {
       "relation": "contains",
@@ -12640,9 +12687,9 @@
       "source_file": "README.md",
       "source_location": "L152",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_privacy_telemetry",
-      "target": "readme_what_is_collected",
-      "confidence_score": 1.0
+      "target": "readme_what_is_collected"
     },
     {
       "relation": "contains",
@@ -12756,5 +12803,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "98e24d9547808b9e2fb12e2fbbd916399fbaf330"
+  "built_at_commit": "78b7214b325ca400cee79d91f5a5a2869020350b"
 }

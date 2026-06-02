@@ -1,16 +1,16 @@
 # Graph Report - agilepanel  (2026-06-02)
 
 ## Corpus Check
-- 40 files · ~51,413 words
+- 41 files · ~62,725 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 370 nodes · 890 edges · 26 communities (19 shown, 7 thin omitted)
-- Extraction: 70% EXTRACTED · 30% INFERRED · 0% AMBIGUOUS · INFERRED: 263 edges (avg confidence: 0.8)
+- 373 nodes · 892 edges · 25 communities (17 shown, 8 thin omitted)
+- Extraction: 71% EXTRACTED · 29% INFERRED · 0% AMBIGUOUS · INFERRED: 263 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `98e24d95`
+- Built from commit: `78b7214b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -40,7 +40,6 @@
 - [[_COMMUNITY_Update Command|Update Command]]
 - [[_COMMUNITY_Shell Installer Script|Shell Installer Script]]
 - [[_COMMUNITY_Merge Script (Scratch)|Merge Script (Scratch)]]
-- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Create()` - 36 edges
@@ -69,11 +68,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 7 thin omitted)
+## Communities (25 total, 8 thin omitted)
 
 ### Community 0 - "Site Orchestration Core"
-Cohesion: 0.15
-Nodes (41): GetStatePath(), ReadState(), State, State, Time, State, State, Time (+33 more)
+Cohesion: 0.13
+Nodes (49): GlobalConfig, SiteConfig, State, DefaultState(), GenerateUUID(), GetStatePath(), ReadState(), TestAdminFields() (+41 more)
 
 ### Community 1 - "Metrics & System Monitoring"
 Cohesion: 0.12
@@ -92,12 +91,8 @@ Cohesion: 0.20
 Nodes (22): Request, Time, T, ResponseWriter, BadgeMetrics, getClientIP(), getMetrics(), Request (+14 more)
 
 ### Community 5 - "Caddy Web Server Config"
-Cohesion: 0.47
-Nodes (9): installMetricsCron(), replaceLine(), setOrAppendRedisConfig(), SetupDefaultWebserver(), TuneDatabase(), TuneRedis(), TuneServer(), TuneSwap() (+1 more)
-
-### Community 6 - "Config State Management"
-Cohesion: 0.25
-Nodes (16): GlobalConfig, SiteConfig, State, DefaultState(), GenerateUUID(), TestAdminFields(), TestConcurrentStateLocking(), TestDefaultState() (+8 more)
+Cohesion: 0.16
+Nodes (18): State, T, State, T, GenerateCaddyfile(), ReloadCaddy(), TestGenerateCaddyfile(), WriteCaddyfile() (+10 more)
 
 ### Community 7 - "S3 Backup Storage"
 Cohesion: 0.29
@@ -112,8 +107,8 @@ Cohesion: 0.27
 Nodes (9): PingAsync(), SendTelemetryPing(), TestSendTelemetryPing(), TestSendTelemetryPingOptOut(), TelemetryPayload, State, T, State (+1 more)
 
 ### Community 10 - "PHP-FPM Pool Management"
-Cohesion: 0.27
-Nodes (8): T, T, DeletePHPPool(), GeneratePHPPool(), GetPHPPoolPath(), TestGeneratePHPPool(), WritePHPPool(), SiteConfig
+Cohesion: 0.24
+Nodes (10): T, T, DeletePHPPool(), GeneratePHPPool(), GetPHPPoolPath(), ReloadPHP(), TestGeneratePHPPool(), WritePHPPool() (+2 more)
 
 ### Community 11 - "CLI Prompt Helpers"
 Cohesion: 0.61
@@ -143,24 +138,20 @@ Nodes (31): AgilePanel (ap) Command Reference, `ap install gui`, `ap repair`, `a
 Cohesion: 0.12
 Nodes (16): 🛠️ CLI Reference & Command Set, 🛠️ Developer-Centric Operations, 🚀 High-Performance Optimizations, 📥 Installation, Installation from Specific Release (e.g. v0.8), 🌟 Key Features, 📄 License, 🔧 Maintenance & Tools (+8 more)
 
-### Community 25 - "Community 25"
-Cohesion: 0.40
-Nodes (3): T, T, TestGenerateCaddyfile()
-
 ## Knowledge Gaps
-- **61 isolated node(s):** `Time`, `T`, `Time`, `Duration`, `T` (+56 more)
+- **62 isolated node(s):** `stackService`, `Time`, `T`, `Time`, `Duration` (+57 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Create()` connect `Database Management` to `Site Orchestration Core`, `Server CLI & UI Rendering`, `Config State Management`, `S3 Backup Storage`, `Telemetry Ping Client`, `PHP-FPM Pool Management`, `Site Orchestration Tests`?**
-  _High betweenness centrality (0.112) - this node is a cross-community bridge._
-- **Why does `ReadState()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `Config State Management`, `Site Orchestration Tests`?**
-  _High betweenness centrality (0.085) - this node is a cross-community bridge._
-- **Why does `GetStatePath()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `Config State Management`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+- **Why does `Create()` connect `Database Management` to `Site Orchestration Core`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `S3 Backup Storage`, `Telemetry Ping Client`, `PHP-FPM Pool Management`, `Site Orchestration Tests`?**
+  _High betweenness centrality (0.110) - this node is a cross-community bridge._
+- **Why does `ReadState()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `PHP-FPM Pool Management`, `Site Orchestration Tests`?**
+  _High betweenness centrality (0.083) - this node is a cross-community bridge._
+- **Why does `GetStatePath()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `PHP-FPM Pool Management`?**
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **Are the 30 inferred relationships involving `Create()` (e.g. with `DownloadFromS3()` and `GetStatePath()`) actually correct?**
   _`Create()` has 30 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 26 inferred relationships involving `ReadState()` (e.g. with `TestAdminFields()` and `TestConcurrentStateLocking()`) actually correct?**
