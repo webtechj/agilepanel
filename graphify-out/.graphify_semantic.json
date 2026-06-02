@@ -1,0 +1,560 @@
+{
+  "nodes": [
+    {
+      "id": "readme_agilepanel",
+      "label": "AgilePanel",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "readme_features",
+      "label": "AgilePanel Key Features",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "readme_security",
+      "label": "Security-First Architecture",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "readme_performance",
+      "label": "High-Performance Optimizations",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "readme_devops",
+      "label": "Developer-Centric Operations",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "commands_reference",
+      "label": "AgilePanel Command Reference",
+      "file_type": "document",
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "commands_site",
+      "label": "Site Management Command Set",
+      "file_type": "document",
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "commands_server",
+      "label": "Server Administration Command Set",
+      "file_type": "document",
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "commands_tool",
+      "label": "Server Tools Command Set",
+      "file_type": "document",
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "commands_diagnostics",
+      "label": "Diagnostics & Updates",
+      "file_type": "document",
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "webtechj",
+      "contributor": null
+    },
+    {
+      "id": "image_logo",
+      "label": "AgilePanel Logo",
+      "file_type": "image",
+      "source_file": "agilepanel_logo.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "readme_agilepanel",
+      "target": "image_logo",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_agilepanel",
+      "target": "readme_features",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_features",
+      "target": "readme_security",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_features",
+      "target": "readme_performance",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_features",
+      "target": "readme_devops",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_agilepanel",
+      "target": "commands_reference",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_reference",
+      "target": "commands_site",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_reference",
+      "target": "commands_server",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_reference",
+      "target": "commands_tool",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_reference",
+      "target": "commands_diagnostics",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_devops",
+      "target": "cmd_repair_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_diagnostics",
+      "target": "cmd_repair_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "cmd_server_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_site",
+      "target": "cmd_site_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_devops",
+      "target": "cmd_sync_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_diagnostics",
+      "target": "cmd_sync_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_tool",
+      "target": "cmd_tool_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_diagnostics",
+      "target": "cmd_update_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_caddy_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_caddy_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_database_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_database_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_performance",
+      "target": "internal_server_metrics_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_metrics_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_performance",
+      "target": "internal_server_metrics_test_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_metrics_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_php_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_php_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_devops",
+      "target": "internal_server_repair_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_repair_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_s3_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_security",
+      "target": "internal_server_security_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_security_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_status_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_status_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_system_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_tools_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_performance",
+      "target": "internal_server_tuning_go",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_tuning_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_wordpress_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_server",
+      "target": "internal_server_wordpress_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_site",
+      "target": "internal_site_orchestrator_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "commands_site",
+      "target": "internal_site_orchestrator_test_go",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "COMMANDS.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 1200,
+  "output_tokens": 450
+}

@@ -1,0 +1,490 @@
+{
+  "communities": {
+    "0": [
+      "config_state_getstatepath",
+      "internal_site_orchestrator_go_state",
+      "server_caddy_reloadcaddy",
+      "server_php_reloadphp",
+      "server_repair",
+      "server_repair_repairinstallation",
+      "server_wordpress",
+      "server_wordpress_installwordpress",
+      "server_wordpress_runasuser",
+      "site_orchestrator",
+      "site_orchestrator_backup",
+      "site_orchestrator_backupdb",
+      "site_orchestrator_cacheclean",
+      "site_orchestrator_delete",
+      "site_orchestrator_deletes3backupcli",
+      "site_orchestrator_downloads3backupcli",
+      "site_orchestrator_edit",
+      "site_orchestrator_fixpermissions",
+      "site_orchestrator_list",
+      "site_orchestrator_lists3backupscli",
+      "site_orchestrator_lock",
+      "site_orchestrator_notifybackup",
+      "site_orchestrator_prunelocalbackups",
+      "site_orchestrator_sanitizeuser",
+      "site_orchestrator_selfupdate",
+      "site_orchestrator_sendtelegramnotification",
+      "site_orchestrator_sslrenew",
+      "site_orchestrator_sync",
+      "site_orchestrator_test_testsiteorchestration",
+      "site_orchestrator_unlock",
+      "site_orchestrator_validatedomain",
+      "ui_ui_divider",
+      "ui_ui_printinfo",
+      "ui_ui_printstep",
+      "ui_ui_printsuccess",
+      "ui_ui_printwarning"
+    ],
+    "1": [
+      "duration",
+      "internal_server_metrics_go_time",
+      "internal_server_metrics_test_go_t",
+      "internal_server_status_test_go_t",
+      "processstatus",
+      "server_cpustats",
+      "server_historicalstats",
+      "server_metrics",
+      "server_metrics_gethistoricalmetrics",
+      "server_metrics_getmetricspath",
+      "server_metrics_logmetrics",
+      "server_metrics_test",
+      "server_metrics_test_testgethistoricalmetrics",
+      "server_metrics_test_testlogmetricsandretention",
+      "server_metricsample",
+      "server_processstatus",
+      "server_serverstatus",
+      "server_status",
+      "server_status_getcpupercentage",
+      "server_status_getstatus",
+      "server_status_gettcpconnectionscount",
+      "server_status_gettopprocesses",
+      "server_status_readcpustats",
+      "server_status_readdiskusage",
+      "server_status_readlinuxmemory",
+      "server_status_readlinuxmemoryandswap",
+      "server_status_readloadavg",
+      "server_status_restartservice",
+      "server_status_test",
+      "server_status_test_testgetstatus",
+      "server_status_test_testrestartservicemock"
+    ],
+    "2": [
+      "internal_server_database_test_go_t",
+      "internal_site_orchestrator_go_time",
+      "server_database",
+      "server_database_createdatabase",
+      "server_database_deletedatabase",
+      "server_database_generatesecurepassword",
+      "server_database_generatesecureprefix",
+      "server_database_test",
+      "server_database_test_testcreateanddeletedatabase",
+      "server_database_test_testgeneratesecurepassword",
+      "server_database_test_testgeneratesecureprefix",
+      "server_system",
+      "server_system_createsystemuser",
+      "server_system_deletesitedirectory",
+      "server_system_deletesystemuser",
+      "server_system_fixpermissions",
+      "server_system_getsiterootdir",
+      "server_system_lockdirectory",
+      "server_system_provisionsitedirectory",
+      "server_system_resolvepublicip",
+      "server_system_unlockdirectory",
+      "site_orchestrator_create",
+      "site_orchestrator_getsslinfo",
+      "site_orchestrator_info",
+      "site_orchestrator_promptline",
+      "site_orchestrator_reinstall",
+      "site_sslinfo",
+      "ui_ui_row",
+      "ui_ui_sectionheader"
+    ],
+    "3": [
+      "cmd_server",
+      "cmd_server_init",
+      "cmd_server_renderprogressbar",
+      "ui_tablecolumn",
+      "ui_ui",
+      "ui_ui_accent",
+      "ui_ui_banner",
+      "ui_ui_danger",
+      "ui_ui_header",
+      "ui_ui_keystr",
+      "ui_ui_label",
+      "ui_ui_muted",
+      "ui_ui_padright",
+      "ui_ui_printtable",
+      "ui_ui_repeat",
+      "ui_ui_rowbadge",
+      "ui_ui_statusactive",
+      "ui_ui_statusfail",
+      "ui_ui_statusinactive",
+      "ui_ui_statuslocked",
+      "ui_ui_statusok",
+      "ui_ui_stripansi",
+      "ui_ui_success",
+      "ui_ui_value",
+      "ui_ui_vislen",
+      "ui_ui_warning"
+    ],
+    "4": [
+      "responsewriter",
+      "telemetry_badgemetrics",
+      "telemetry_main",
+      "telemetry_main_getclientip",
+      "telemetry_main_getmetrics",
+      "telemetry_main_go_request",
+      "telemetry_main_go_time",
+      "telemetry_main_handlehome",
+      "telemetry_main_handlejsonbadge",
+      "telemetry_main_handleping",
+      "telemetry_main_handlesvgbadge",
+      "telemetry_main_haship",
+      "telemetry_main_main",
+      "telemetry_main_test",
+      "telemetry_main_test_go_t",
+      "telemetry_main_test_testbadges",
+      "telemetry_main_test_testhandlehome",
+      "telemetry_main_test_testhandleping",
+      "telemetry_main_test_testhandlepinginvalid",
+      "telemetry_pingpayload",
+      "telemetry_serverrecord"
+    ],
+    "5": [
+      "internal_server_caddy_go_state",
+      "internal_server_caddy_test_go_t",
+      "server_caddy",
+      "server_caddy_generatecaddyfile",
+      "server_caddy_test",
+      "server_caddy_test_testgeneratecaddyfile",
+      "server_caddy_writecaddyfile",
+      "server_tuning",
+      "server_tuning_installmetricscron",
+      "server_tuning_replaceline",
+      "server_tuning_setorappendredisconfig",
+      "server_tuning_setupdefaultwebserver",
+      "server_tuning_tunedatabase",
+      "server_tuning_tuneredis",
+      "server_tuning_tuneserver",
+      "server_tuning_tuneswap",
+      "server_tuning_writedefaultwelcomepage"
+    ],
+    "6": [
+      "config_globalconfig",
+      "config_siteconfig",
+      "config_state",
+      "config_state_defaultstate",
+      "config_state_generateuuid",
+      "config_state_readstate",
+      "config_state_test",
+      "config_state_test_testadminfields",
+      "config_state_test_testconcurrentstatelocking",
+      "config_state_test_testdefaultstate",
+      "config_state_test_testreadstatecreatesdefault",
+      "config_state_test_testwithlockedstate",
+      "config_state_withlockedstate",
+      "config_state_writestate",
+      "internal_config_state_go_time",
+      "internal_config_state_test_go_t"
+    ],
+    "7": [
+      "internal_server_s3_go_request",
+      "internal_server_s3_go_state",
+      "name",
+      "readseeker",
+      "server_listbucketresult",
+      "server_s3",
+      "server_s3_builds3request",
+      "server_s3_deletefroms3",
+      "server_s3_downloadfroms3",
+      "server_s3_gets3url",
+      "server_s3_getsignaturekey",
+      "server_s3_hashsha256",
+      "server_s3_lists3backups",
+      "server_s3_signhmac",
+      "server_s3_uploadtos3"
+    ],
+    "8": [
+      "commands_diagnostics",
+      "commands_reference",
+      "commands_server",
+      "commands_site",
+      "commands_tool",
+      "image_logo",
+      "readme_agilepanel",
+      "readme_devops",
+      "readme_features",
+      "readme_performance",
+      "readme_security"
+    ],
+    "9": [
+      "config_telemetry",
+      "config_telemetry_pingasync",
+      "config_telemetry_sendtelemetryping",
+      "config_telemetry_test",
+      "config_telemetry_test_testsendtelemetryping",
+      "config_telemetry_test_testsendtelemetrypingoptout",
+      "config_telemetrypayload",
+      "internal_config_telemetry_go_state",
+      "internal_config_telemetry_test_go_t"
+    ],
+    "10": [
+      "internal_server_php_test_go_t",
+      "server_php",
+      "server_php_deletephppool",
+      "server_php_generatephppool",
+      "server_php_getphppoolpath",
+      "server_php_test",
+      "server_php_test_testgeneratephppool",
+      "server_php_writephppool",
+      "siteconfig"
+    ],
+    "11": [
+      "cmd_prompts",
+      "cmd_prompts_getdomainarg",
+      "cmd_prompts_getservicearg",
+      "cmd_prompts_promptconfirm",
+      "cmd_prompts_promptdoubleconfirm",
+      "cmd_prompts_promptpassword",
+      "cmd_prompts_promptstring"
+    ],
+    "12": [
+      "internal_site_orchestrator_test_go_t",
+      "site_orchestrator_test",
+      "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
+      "site_orchestrator_test_testsanitizeuser",
+      "site_orchestrator_test_testsyncimport",
+      "site_orchestrator_test_testvalidatedomain"
+    ],
+    "13": [
+      "cmd_root",
+      "cmd_root_execute",
+      "main",
+      "main_main"
+    ],
+    "14": [
+      "server_security",
+      "server_security_cleanserver",
+      "server_security_secureserver",
+      "server_security_unlockguipanel"
+    ],
+    "15": [
+      "server_tools",
+      "server_tools_fixphpmyadminconfig",
+      "server_tools_installgui",
+      "server_tools_installphpmyadmin"
+    ],
+    "16": [
+      "internal_server_wordpress_test_go_t",
+      "server_wordpress_test",
+      "server_wordpress_test_testinstallwordpressmock"
+    ],
+    "17": [
+      "cmd_install",
+      "cmd_install_init"
+    ],
+    "18": [
+      "cmd_repair",
+      "cmd_repair_init"
+    ],
+    "19": [
+      "cmd_site",
+      "cmd_site_init"
+    ],
+    "20": [
+      "cmd_sync",
+      "cmd_sync_init"
+    ],
+    "21": [
+      "cmd_tool",
+      "cmd_tool_init"
+    ],
+    "22": [
+      "cmd_update",
+      "cmd_update_init"
+    ],
+    "23": [
+      "d_repos_vpsops_install_sh__entry",
+      "install"
+    ],
+    "24": [
+      "run_step3_merge"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1873015873015873,
+    "1": 0.12043010752688173,
+    "2": 0.13054187192118227,
+    "3": 0.11076923076923077,
+    "4": 0.18571428571428572,
+    "5": 0.19117647058823528,
+    "6": 0.26666666666666666,
+    "7": 0.2761904761904762,
+    "8": 0.18181818181818182,
+    "9": 0.3333333333333333,
+    "10": 0.3333333333333333,
+    "11": 0.5238095238095238,
+    "12": 0.5333333333333333,
+    "13": 0.5,
+    "14": 0.5,
+    "15": 0.5,
+    "16": 0.6666666666666666,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0
+  },
+  "gods": [
+    {
+      "id": "site_orchestrator_create",
+      "label": "Create()",
+      "degree": 35
+    },
+    {
+      "id": "config_state_readstate",
+      "label": "ReadState()",
+      "degree": 29
+    },
+    {
+      "id": "config_state_getstatepath",
+      "label": "GetStatePath()",
+      "degree": 24
+    },
+    {
+      "id": "site_orchestrator_reinstall",
+      "label": "Reinstall()",
+      "degree": 20
+    },
+    {
+      "id": "ui_ui_printinfo",
+      "label": "PrintInfo()",
+      "degree": 19
+    },
+    {
+      "id": "site_orchestrator_sync",
+      "label": "Sync()",
+      "degree": 18
+    },
+    {
+      "id": "ui_ui_printsuccess",
+      "label": "PrintSuccess()",
+      "degree": 18
+    },
+    {
+      "id": "site_orchestrator_delete",
+      "label": "Delete()",
+      "degree": 17
+    },
+    {
+      "id": "site_orchestrator_backup",
+      "label": "Backup()",
+      "degree": 17
+    },
+    {
+      "id": "ui_ui_divider",
+      "label": "Divider()",
+      "degree": 17
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AgilePanel",
+      "target": "AgilePanel Logo",
+      "source_files": [
+        "README.md",
+        "agilepanel_logo.png"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "crosses file types (doc ↔ image); connects across different repos/directories"
+    },
+    {
+      "source": "main()",
+      "target": "Execute()",
+      "source_files": [
+        "main.go",
+        "cmd/root.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "renderProgressBar()",
+      "target": "Muted()",
+      "source_files": [
+        "cmd/server.go",
+        "internal/ui/ui.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "renderProgressBar()",
+      "target": "repeat()",
+      "source_files": [
+        "cmd/server.go",
+        "internal/ui/ui.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "List()",
+      "target": "Accent()",
+      "source_files": [
+        "internal/site/orchestrator.go",
+        "internal/ui/ui.go"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities; peripheral node `Accent()` unexpectedly reaches hub `List()`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Create()` connect `Community 2` to `Community 0`, `Community 3`, `Community 5`, `Community 6`, `Community 7`, `Community 9`, `Community 10`, `Community 12`?",
+      "why": "High betweenness centrality (0.148) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ReadState()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 12`?",
+      "why": "High betweenness centrality (0.115) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `GetStatePath()` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`, `Community 6`?",
+      "why": "High betweenness centrality (0.107) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 30 inferred relationships involving `Create()` (e.g. with `DownloadFromS3()` and `GetStatePath()`) actually correct?",
+      "why": "`Create()` has 30 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 26 inferred relationships involving `ReadState()` (e.g. with `TestAdminFields()` and `TestConcurrentStateLocking()`) actually correct?",
+      "why": "`ReadState()` has 26 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 23 inferred relationships involving `GetStatePath()` (e.g. with `getMetricsPath()` and `RepairInstallation()`) actually correct?",
+      "why": "`GetStatePath()` has 23 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 18 inferred relationships involving `Reinstall()` (e.g. with `GetStatePath()` and `WithLockedState()`) actually correct?",
+      "why": "`Reinstall()` has 18 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}
