@@ -34,10 +34,16 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 
 ## 🌟 Key Features
 
-### 🔒 Security-First Architecture
-*   **System User Isolation**: Automatically provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
+### 🔒 Security-First Architecture & Hardening
+*   **Path Traversal Prevention**: Strict whitelist validation resolving paths inside a safe jail (`/var/www/`), shielding folders from directory traversal exploits.
+*   **Command Sanitization**: Active character whitelisting on shell execute arguments and whitelisting of safe text editors to block remote execution.
+*   **Secure Session Management**: Relying strictly on cryptographically secure `crypto/rand` random generators, HttpOnly and Strict SameSite cookie tags, and a short 1-hour session timeout.
+*   **IP-Based Rate Limiting**: Token-bucket rate limiter middleware on sensitive endpoints prevents API brute-forcing and denial of service.
+*   **Secure File Manager**: Automated MIME type checks block direct execution of files with malicious extensions (e.g. php/phtml) and run real-time checks using virus/shell signature patterns (including `clamscan` validation).
+*   **Administrative Audit Logging**: All security actions and administrative changes are recorded with origin IPs in `agilepanel_audit.log`.
+*   **System User Isolation**: Provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
 *   **Hardened PHP Configurations**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
-*   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes to block generic SQL injection and automated path guessing.
+*   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes.
 *   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/`, and shield sensitive scripts (`xmlrpc.php`, `install.php`).
 
 ### 🚀 High-Performance Optimizations
@@ -64,10 +70,10 @@ Run the automated one-liner installer:
 curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/main/install.sh | sudo bash
 ```
 
-### Installation from Specific Release (e.g. v0.8)
+### Installation from Specific Release (e.g. v1.0.1)
 You can choose to install specific tagged releases:
 ```bash
-curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/v0.8/install.sh | AP_VERSION=v0.8 sudo -E bash
+curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/v1.0.1/install.sh | AP_VERSION=v1.0.1 sudo -E bash
 ```
 
 *The installer will prompt you for the server administrator's Name and Email. This email will be registered with Let's Encrypt / ZeroSSL for SSL certificate renewals.*
@@ -76,72 +82,59 @@ curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/v0.8/install.sh 
 
 ## 🛠️ CLI Reference & Command Set
 
-AgilePanel is managed entirely via the `ap` command. It is designed to be friendly for newbies and powerful for CLI experts.
+AgilePanel is managed entirely via the `ap` command. Below is the complete list of all supported commands:
 
-### 🌐 Site Management
+### 🌐 Site Management (`ap site [subcommand]`)
 
 | Command | Description |
 | :--- | :--- |
-| `ap site create [domain] --wp` | Creates a new PHP/WordPress site with automated system users, databases, and SSL. |
-| `ap site delete [domain]` | Completely decommissions a website, drops its database, and cleans directory files. |
-| `ap site list` | Renders a clean, responsive, stacked list of all hosted sites and their active status. |
+| `ap site create [domain] [flags]` | Creates a new PHP/WordPress/Laravel/HTML site with automated system users, database, and SSL. |
+| `ap site delete [domain] [-y]` | Decommissions a website, drops its database, and cleans directory files. |
+| `ap site list` | Renders a list of all hosted sites and their active status. |
 | `ap site info [domain]` | Queries directories, database credentials, active FPM versions, and SSL certificates. |
+| `ap site edit [domain]` | Opens the site's PHP-FPM configuration pool in your system's text editor. |
 | `ap site lock [domain]` | Sets site files to immutable/read-only to protect against write exploits. |
 | `ap site unlock [domain]` | Restores standard write access to install plugins or run core upgrades. |
 | `ap site cache-clean [domain]` | Flushes WordPress transients, Redis caches, PHP OPcache, and Caddy edge caches. |
-| `ap site backup [domain]` | Generates separate manual ZIP backups of both web files and database schemas. |
-| `ap site backup-db [domain]` | Creates a raw SQL database backup inside the site's secure `/backup` folder. |
-| `ap site edit [domain]` | Opens the site's PHP-FPM configuration pool in your system's text editor. |
 | `ap site reinstall [domain]` | Freshly reinstalls WordPress core files and database schemas under existing configs. |
 | `ap site ssl-renew [domain]` | Clears the local Caddy certificates cache and forces Caddy to request a fresh SSL. |
 | `ap site fix-permissions [domain]` | Recursively restores correct file (0644) and folder (0755) permissions. |
+| `ap site backup [domain]` | Generates separate manual ZIP backups of both web files and database schemas. |
+| `ap site backup-db [domain]` | Creates a raw SQL database backup inside the site's secure `/backup` folder. |
+| `ap site s3-list [domain] [--json]` | Lists recent S3 Cloud backup versions and timestamps for the site. |
+| `ap site s3-download [domain] [ts]` | Downloads a specific S3 backup archive to local storage by timestamp. |
+| `ap site s3-delete [domain] [ts]` | Deletes a specific S3 backup archive from cloud storage by timestamp. |
 
----
+### 🖥️ Server Administration (`ap server [subcommand]`)
 
-### 🖥️ Server Administration
+| Command | Description |
+| :--- | :--- |
+| `ap server status` | Check system CPU load, memory usage, sockets, active processes, and services. |
+| `ap server auth [user] [pass]` | Configure basic auth credentials used to secure phpMyAdmin and backend tools. |
+| `ap server tune` | Audit hardware resources and re-tune database buffers, Redis sockets, and Swap file. |
+| `ap server secure` | Hardens SSH configurations, sets firewall UFW boundaries, and password aging policies. |
+| `ap server restart [service\|all]` | Restart web server stack components (`caddy\|mariadb\|redis\|php-fpm\|all`). |
+| `ap server unlock-gui` | Disables secondary GUI panel session PIN security locks in case of login lockout. |
+| `ap server clean` | Clears log files, expired backups, and unused cache files to free up disk space. |
 
-*   **Monitor Status**: Check system CPU load, memory usage, site count, and active services:
-    ```bash
-    ap server status
-    ```
-*   **Configure Administrator Auth**: Configure basic auth credentials used to secure phpMyAdmin and backend tools:
-    ```bash
-    ap server auth [username] [password]
-    ```
-*   **Hardware Optimization**: Audit resources to re-tune buffers, Redis sockets, and Swap memory:
-    ```bash
-    ap server tune
-    ```
-*   **Service Restarts**: Restart web server stack components:
-    ```bash
-    ap server restart [caddy|mariadb|redis|php8.3-fpm|all]
-    ```
+### 🔧 Maintenance & Tools (`ap tool [subcommand]` / root commands)
 
----
+| Command | Description |
+| :--- | :--- |
+| `ap tool install phpmyadmin` | Install phpMyAdmin globally on port `8888` secured behind Basic Auth. |
+| `ap tool fix-phpmyadmin` | Regenerates phpMyAdmin config.inc.php with a fresh Blowfish secret. |
+| `ap repair` | Rebuilds and repairs all configuration files and PHP pools instantly. |
+| `ap sync` | Scans the web directories and synchronizes orphan websites into state records. |
+| `ap update` | Self-updates the `ap` executable to the latest build version. |
+| `ap upgrade` | Upgrades all core OS packages and re-aligns system modules. |
 
-### 🔧 Maintenance & Tools
+### 👑 Web GUI Dashboard Companion (`ap gui [subcommand]`)
 
-*   **Install phpMyAdmin**: Install phpMyAdmin on-demand:
-    ```bash
-    ap tool install phpmyadmin
-    ```
-    *Access securely at `http://[your-server-ip]:8888` using the credentials configured in `ap server auth`.*
-*   **Repair Configurations**: Verify and rebuild your server configs and PHP pools instantly:
-    ```bash
-    ap repair
-    ```
-*   **System Update**: Refresh apt repositories and self-update the `ap` executable to the latest build:
-    ```bash
-    ap update
-    ```
-*   **System Upgrade**: Upgrade all OS packages and run `ap repair` to ensure compatibility:
-    ```bash
-    ap upgrade
-    ```
-*   **Configuration Sync**: Synchronize configuration files and auto-import untracked site folders:
-    ```bash
-    ap sync
-    ```
+| Command | Description |
+| :--- | :--- |
+| `ap gui enable` | Starts and enables the `agilepanel-gui` daemon service and opens port `8889`. |
+| `ap gui disable` | Stops and disables the `agilepanel-gui` daemon service and blocks port `8889` access. |
+| `ap gui update` | Downloads the latest compiled `agilepanel-gui` binary release and restarts the daemon. |
 
 ---
 
@@ -152,7 +145,7 @@ AgilePanel collects anonymous usage telemetry to track active installations and 
 ### What is collected?
 - A randomly generated unique server ID (`uuid` stored in `/etc/agilepanel/state.json`)
 - System OS and Architecture (e.g. `linux`, `amd64`)
-- Current AgilePanel version (e.g. `0.8.0`)
+- Current AgilePanel version (e.g. `1.0.1`)
 - The number of WordPress sites hosted on the server
 
 > [!NOTE]
@@ -169,4 +162,3 @@ export AGILEPANEL_TELEMETRY_URL="none"
 ## 📄 License
 
 AgilePanel is open-source software licensed under the [MIT License](LICENSE).
-

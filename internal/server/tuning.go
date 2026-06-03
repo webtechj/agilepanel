@@ -701,7 +701,7 @@ const welcomeHTML = `<!DOCTYPE html>
         <header>
             <div class="logo-container floating">
                 <span class="logo-icon">▲ AgilePanel</span>
-                <span class="logo-badge">v1.0.0</span>
+                <span class="logo-badge">v1.0.1</span>
             </div>
             <h1>Web Stack Successfully Initialized</h1>
             <p class="subtitle">Your High-Performance VPS is fully optimized and ready to serve next-generation web experiences.</p>
