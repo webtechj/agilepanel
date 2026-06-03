@@ -46,6 +46,7 @@ type ServerStatus struct {
 	PeakCPU24h        float64
 	PeakMemory24h     float64
 	PeakSwap24h       float64
+	AverageLoad24h    float64
 	TopProcesses24h   []ProcessStatus
 }
 
@@ -139,6 +140,7 @@ func GetStatus() (*ServerStatus, error) {
 		status.PeakCPU24h = hStats.PeakCPU
 		status.PeakMemory24h = hStats.PeakMemory
 		status.PeakSwap24h = hStats.PeakSwap
+		status.AverageLoad24h = hStats.AverageLoad
 		status.TopProcesses24h = hStats.TopProcesses
 	}
 

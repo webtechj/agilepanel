@@ -249,4 +249,159 @@ WantedBy=multi-user.target
 	return nil
 }
 
+// DisableGui stops and disables the agilepanel-gui systemd service and blocks port 8889.
+func DisableGui() error {
+	if runtime.GOOS != "linux" {
+		fmt.Println("Tools (Mock): Disabling AgilePanel Web GUI addon...")
+		return nil
+	}
+
+	fmt.Println("Tools: Stopping agilepanel-gui daemon...")
+	_ = exec.Command("systemctl", "stop", "agilepanel-gui").Run()
+
+	fmt.Println("Tools: Disabling agilepanel-gui service...")
+	_ = exec.Command("systemctl", "disable", "agilepanel-gui").Run()
+
+	// Block/remove firewall rules for port 8889
+	if _, err := exec.LookPath("ufw"); err == nil {
+		fmt.Println("Tools: Removing port 8889 from UFW...")
+		_ = exec.Command("ufw", "deny", "8889/tcp").Run()
+		_ = exec.Command("ufw", "delete", "allow", "8889/tcp").Run()
+	} else if _, err := exec.LookPath("firewall-cmd"); err == nil {
+		fmt.Println("Tools: Removing port 8889 from firewalld...")
+		_ = exec.Command("firewall-cmd", "--permanent", "--remove-port=8889/tcp").Run()
+		_ = exec.Command("firewall-cmd", "--reload").Run()
+	}
+
+	fmt.Println("Tools: AgilePanel Web GUI successfully disabled.")
+	return nil
+}
+
+// EnableGui starts and enables the agilepanel-gui systemd service and opens port 8889.
+func EnableGui() error {
+	destPath := "/usr/local/bin/agilepanel-gui"
+
+	if runtime.GOOS != "linux" {
+		fmt.Println("Tools (Mock): Enabling AgilePanel Web GUI addon...")
+		return nil
+	}
+
+	// Check if already installed / binary exists
+	if _, err := os.Stat(destPath); os.IsNotExist(err) {
+		return fmt.Errorf("AgilePanel Web GUI is not installed. Run 'ap install gui' first")
+	}
+
+	// Ensure systemd service is configured
+	servicePath := "/etc/systemd/system/agilepanel-gui.service"
+	if _, err := os.Stat(servicePath); os.IsNotExist(err) {
+		fmt.Println("Tools: Re-configuring systemd service 'agilepanel-gui.service'...")
+		serviceContent := `[Unit]
+Description=AgilePanel Web GUI Daemon
+After=network.target caddy.service mariadb.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/agilepanel-gui
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+`
+		if err := os.WriteFile(servicePath, []byte(serviceContent), 0644); err != nil {
+			return fmt.Errorf("failed to write systemd service file: %w", err)
+		}
+		_ = exec.Command("systemctl", "daemon-reload").Run()
+	}
+
+	fmt.Println("Tools: Enabling agilepanel-gui service...")
+	_ = exec.Command("systemctl", "enable", "agilepanel-gui").Run()
+
+	fmt.Println("Tools: Starting agilepanel-gui service...")
+	if err := exec.Command("systemctl", "restart", "agilepanel-gui").Run(); err != nil {
+		return fmt.Errorf("failed to start agilepanel-gui service: %w", err)
+	}
+
+	// Configure firewall rules for port 8889
+	if _, err := exec.LookPath("ufw"); err == nil {
+		fmt.Println("Tools: Opening port 8889 in UFW...")
+		_ = exec.Command("ufw", "allow", "8889/tcp").Run()
+	} else if _, err := exec.LookPath("firewall-cmd"); err == nil {
+		fmt.Println("Tools: Opening port 8889 in firewalld...")
+		_ = exec.Command("firewall-cmd", "--permanent", "--add-port=8889/tcp").Run()
+		_ = exec.Command("firewall-cmd", "--reload").Run()
+	}
+
+	fmt.Println("Tools: AgilePanel Web GUI successfully enabled.")
+	return nil
+}
+
+// UpdateGui downloads the latest AgilePanel Web GUI binary from GitHub, replaces the existing one, and restarts the service.
+func UpdateGui() error {
+	destPath := "/usr/local/bin/agilepanel-gui"
+
+	if runtime.GOOS != "linux" {
+		fmt.Printf("Tools (Mock): Updating AgilePanel Web GUI to latest version...\n")
+		return nil
+	}
+
+	// Check if already installed / binary exists
+	if _, err := os.Stat(destPath); os.IsNotExist(err) {
+		return fmt.Errorf("AgilePanel Web GUI is not installed. Run 'ap install gui' first")
+	}
+
+	// Stop service if running and remove old binary to prevent "Text file busy"
+	fmt.Println("Tools: Stopping existing agilepanel-gui daemon...")
+	_ = exec.Command("systemctl", "stop", "agilepanel-gui").Run()
+
+	_ = os.Remove(destPath)
+
+	fmt.Println("Tools: Downloading latest AgilePanel GUI companion binary from GitHub...")
+	downloadCmd := exec.Command("curl", "-L", "-o", destPath, "https://raw.githubusercontent.com/webtechj/agilepanel-gui/main/agilepanel-gui-linux-amd64")
+	if err := downloadCmd.Run(); err != nil {
+		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
+	}
+
+	fmt.Println("Tools: Setting executable permissions on GUI binary...")
+	if err := exec.Command("chmod", "+x", destPath).Run(); err != nil {
+		return fmt.Errorf("failed to set execution permission on GUI binary: %w", err)
+	}
+
+	// Re-create service file if it doesn't exist (safety fallback)
+	servicePath := "/etc/systemd/system/agilepanel-gui.service"
+	if _, err := os.Stat(servicePath); os.IsNotExist(err) {
+		serviceContent := `[Unit]
+Description=AgilePanel Web GUI Daemon
+After=network.target caddy.service mariadb.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/agilepanel-gui
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+`
+		if err := os.WriteFile(servicePath, []byte(serviceContent), 0644); err != nil {
+			return fmt.Errorf("failed to write systemd service file: %w", err)
+		}
+		_ = exec.Command("systemctl", "daemon-reload").Run()
+		_ = exec.Command("systemctl", "enable", "agilepanel-gui").Run()
+	}
+
+	fmt.Println("Tools: Starting updated agilepanel-gui service...")
+	if err := exec.Command("systemctl", "restart", "agilepanel-gui").Run(); err != nil {
+		return fmt.Errorf("failed to restart agilepanel-gui service: %w", err)
+	}
+
+	fmt.Println("Tools: AgilePanel Web GUI successfully updated.")
+	return nil
+}
+
+
 

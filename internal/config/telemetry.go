@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const Version = "0.8.0"
+const Version = "1.0.0"
 
 // TelemetryPayload represents the anonymous metadata sent to the telemetry server.
 type TelemetryPayload struct {

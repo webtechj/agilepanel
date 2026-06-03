@@ -33,6 +33,7 @@ type HistoricalStats struct {
 	PeakCPU      float64
 	PeakMemory   float64
 	PeakSwap     float64
+	AverageLoad  float64
 	TopProcesses []ProcessStatus
 }
 
@@ -182,6 +183,7 @@ func GetHistoricalMetrics(duration time.Duration) (*HistoricalStats, error) {
 	var peakCPU float64
 	var peakMemory float64
 	var peakSwap float64
+	var sumLoad float64
 
 	// Track processes by name to find peak CPU/memory seen for each command
 	procPeaks := make(map[string]*ProcessStatus)
@@ -190,6 +192,7 @@ func GetHistoricalMetrics(duration time.Duration) (*HistoricalStats, error) {
 		if s.CPUPercentage > peakCPU {
 			peakCPU = s.CPUPercentage
 		}
+		sumLoad += s.Load1m
 		var memPct float64
 		if s.MemoryTotalGB > 0 {
 			memPct = (s.MemoryUsedGB / s.MemoryTotalGB) * 100
@@ -235,11 +238,17 @@ func GetHistoricalMetrics(duration time.Duration) (*HistoricalStats, error) {
 		sortedProcs = sortedProcs[:5]
 	}
 
+	var avgLoad float64
+	if len(filtered) > 0 {
+		avgLoad = sumLoad / float64(len(filtered))
+	}
+
 	return &HistoricalStats{
 		SampleCount:  len(filtered),
 		PeakCPU:      peakCPU,
 		PeakMemory:   peakMemory,
 		PeakSwap:     peakSwap,
+		AverageLoad:  avgLoad,
 		TopProcesses: sortedProcs,
 	}, nil
 }

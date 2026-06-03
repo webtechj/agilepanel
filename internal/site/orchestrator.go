@@ -1326,6 +1326,24 @@ func Edit(domain string) error {
 
 	// Determine editor to use
 	editor := os.Getenv("EDITOR")
+	if editor != "" {
+		if strings.ContainsAny(editor, ";&|<>()$`\r\n") {
+			return fmt.Errorf("invalid editor path: command separators or redirection detected")
+		}
+		baseEditor := filepath.Base(editor)
+		allowedEditors := map[string]bool{
+			"nano":        true,
+			"vim":         true,
+			"vi":          true,
+			"notepad.exe": true,
+			"notepad":     true,
+			"emacs":       true,
+		}
+		if !allowedEditors[strings.ToLower(baseEditor)] {
+			return fmt.Errorf("editor %s is not in the whitelist of safe editors", baseEditor)
+		}
+	}
+
 	if editor == "" {
 		if runtime.GOOS == "windows" {
 			editor = "notepad.exe"

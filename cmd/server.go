@@ -117,6 +117,7 @@ var serverStatusCmd = &cobra.Command{
 			ui.Row("Peak CPU Usage", fmt.Sprintf("%.1f%%", status.PeakCPU24h))
 			ui.Row("Peak RAM Usage", fmt.Sprintf("%.1f%%", status.PeakMemory24h))
 			ui.Row("Peak Swap Usage", fmt.Sprintf("%.1f%%", status.PeakSwap24h))
+			ui.Row("Average Load (24h)", fmt.Sprintf("%.2f", status.AverageLoad24h))
 
 			fmt.Println()
 			ui.PrintInfo("Top 5 Resource Consuming Processes (Peak CPU):")
