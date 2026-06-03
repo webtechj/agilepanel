@@ -34,15 +34,9 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 
 ## 🌟 Key Features
 
-### 🔒 Security-First Architecture & Hardening
-*   **Path Traversal Prevention**: Strict whitelist validation resolving paths inside a safe jail (`/var/www/`), shielding folders from directory traversal exploits.
-*   **Command Sanitization**: Active character whitelisting on shell execute arguments and whitelisting of safe text editors to block remote execution.
-*   **Secure Session Management**: Relying strictly on cryptographically secure `crypto/rand` random generators, HttpOnly and Strict SameSite cookie tags, and a short 1-hour session timeout.
-*   **IP-Based Rate Limiting**: Token-bucket rate limiter middleware on sensitive endpoints prevents API brute-forcing and denial of service.
-*   **Secure File Manager**: Automated MIME type checks block direct execution of files with malicious extensions (e.g. php/phtml) and run real-time checks using virus/shell signature patterns (including `clamscan` validation).
-*   **Administrative Audit Logging**: All security actions and administrative changes are recorded with origin IPs in `agilepanel_audit.log`.
-*   **System User Isolation**: Provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
-*   **Hardened PHP Configurations**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
+### 🔒 Security-First Infrastructure
+*   **System User Isolation**: Automatically provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
+*   **Hardened PHP Defaults**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
 *   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes.
 *   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/`, and shield sensitive scripts (`xmlrpc.php`, `install.php`).
 
@@ -55,7 +49,7 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 ### 🛠️ Developer-Centric Operations
 *   **On-Demand phpMyAdmin**: Install phpMyAdmin with one command. Access is hidden behind a dedicated global port (`IP:8888`) and shielded behind bcrypt-based HTTP Basic Authentication.
 *   **Non-Destructive Repair System**: Run `ap repair` to completely recreate all configuration files, verify swap buffers, re-generate PHP pools, and reload services without touching databases, site files, or data.
-*   **Automatic Directory Synchronization**: The `ap sync` command scans `/var/www/` for pre-existing website folders, reads their database settings directly from `wp-config.php`, and automatically registers them back into the panel's locked `state.json` file.
+*   **Automatic Directory Synchronization**: The `ap sync` command scans `/var/www/` for pre-existing website folders, reads their database settings directly from `wp-config.php`, and registers them back into the panel's locked `state.json` file.
 *   **Zero-Dependency Deployment**: Compiled as a standalone static Go binary with no Python or third-party runtime package dependencies required.
 
 ---
