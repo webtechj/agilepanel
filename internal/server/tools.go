@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // InstallPhpMyAdmin downloads and configures phpMyAdmin in /usr/share/phpmyadmin.
@@ -197,7 +199,15 @@ func InstallGui() error {
 	_ = os.Remove(destPath)
 
 	fmt.Println("Tools: Downloading AgilePanel GUI companion binary...")
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, "https://raw.githubusercontent.com/webtechj/agilepanel-gui/main/agilepanel-gui-linux-amd64")
+	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
+	var guiURL string
+	if branch != "" {
+		guiURL = fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
+		fmt.Printf("Tools: Using branch override '%s'...\n", branch)
+	} else {
+		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
+	}
+	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
 	}
@@ -359,7 +369,15 @@ func UpdateGui() error {
 	_ = os.Remove(destPath)
 
 	fmt.Println("Tools: Downloading latest AgilePanel GUI companion binary from GitHub...")
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, "https://raw.githubusercontent.com/webtechj/agilepanel-gui/main/agilepanel-gui-linux-amd64")
+	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
+	var guiURL string
+	if branch != "" {
+		guiURL = fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
+		fmt.Printf("Tools: Using branch override '%s'...\n", branch)
+	} else {
+		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
+	}
+	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
 	}
@@ -401,6 +419,39 @@ WantedBy=multi-user.target
 
 	fmt.Println("Tools: AgilePanel Web GUI successfully updated.")
 	return nil
+}
+
+// GetGuiInfo returns whether the GUI addon is installed and its version.
+func GetGuiInfo() (bool, string) {
+	guiPath := "/usr/local/bin/agilepanel-gui"
+	if runtime.GOOS == "windows" {
+		// Try to find the executable in the parent directory for development/mocking
+		devPath := filepath.Join("..", "agilepanel-gui", "agilepanel-gui.exe")
+		if _, err := os.Stat(devPath); err == nil {
+			guiPath = devPath
+		} else {
+			guiPath = "./agilepanel-gui.exe"
+		}
+	}
+
+	if _, err := os.Stat(guiPath); err != nil {
+		return false, ""
+	}
+
+	// Try executing with --version flag
+	cmd := exec.Command(guiPath, "--version")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err == nil {
+		version := strings.TrimSpace(out.String())
+		version = strings.TrimPrefix(version, "agilepanel-gui version ")
+		version = strings.TrimPrefix(version, "version ")
+		if version != "" {
+			return true, version
+		}
+	}
+
+	return true, "1.0.1"
 }
 
 

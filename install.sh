@@ -153,8 +153,21 @@ mv wp-cli.phar /usr/local/bin/wp
 # 6. Download the compiled AgilePanel binary from GitHub
 echo "Downloading AgilePanel CLI..."
 GITHUB_REPO="webtechj/agilepanel"
-AP_VERSION="${AP_VERSION:-main}"
-curl -L -o /usr/local/bin/ap "https://raw.githubusercontent.com/${GITHUB_REPO}/${AP_VERSION}/ap-linux-amd64"
+# Default: download from the latest stable GitHub Release.
+# To install from a specific branch (e.g. development), set:
+#   AP_CHANNEL=branch AP_BRANCH=development bash install.sh
+AP_CHANNEL="${AP_CHANNEL:-release}"
+AP_BRANCH="${AP_BRANCH:-development}"
+
+if [ "$AP_CHANNEL" = "branch" ]; then
+    echo "Installing from branch: ${AP_BRANCH}"
+    curl -L -o /usr/local/bin/ap \
+        "https://raw.githubusercontent.com/${GITHUB_REPO}/${AP_BRANCH}/ap-linux-amd64"
+else
+    echo "Installing latest stable release..."
+    curl -L -o /usr/local/bin/ap \
+        "https://github.com/${GITHUB_REPO}/releases/latest/download/ap-linux-amd64"
+fi
 chmod +x /usr/local/bin/ap
 
 # 7. Initialize default AgilePanel State

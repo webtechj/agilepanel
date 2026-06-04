@@ -9,7 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=version&logo=github" alt="Release Version" /></a>
+  <a href="https://github.com/webtechj/agilepanel/releases"><img src="https://img.shields.io/github/v/release/webtechj/agilepanel?color=blue&label=stable&logo=github" alt="Latest Stable Release" /></a>
+  <a href="https://github.com/webtechj/agilepanel/tree/development"><img src="https://img.shields.io/badge/branch-development-orange?logo=github" alt="Development Branch" /></a>
   <img src="https://img.shields.io/badge/Language-Go-00add8?logo=go&logoColor=white" alt="Go Language" />
   <img src="https://img.shields.io/badge/OS-Ubuntu%20%7C%20Debian-E95420?logo=ubuntu&logoColor=white" alt="OS Support" />
   <img src="https://img.shields.io/badge/Web_Server-Caddy-00a2db?logo=caddy&logoColor=white" alt="Caddy Web Server" />
@@ -58,19 +59,39 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 
 Ensure your server is running a clean install of **Ubuntu 22.04+ LTS** or **Debian 11+**.
 
-### Standard Installation (Latest Version)
-Run the automated one-liner installer:
+> [!IMPORTANT]
+> AgilePanel requires **root** (`sudo`) access to configure system services (Caddy, PHP-FPM, MariaDB, Redis).
+
+### Standard Installation (Latest Stable Release)
+
+Run the one-liner on your VPS. It always fetches the **latest stable release** automatically:
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/main/install.sh | sudo bash
 ```
 
-### Installation from Specific Release (e.g. v1.0.1)
-You can choose to install specific tagged releases:
+The installer will prompt you for the server administrator's **Name** and **Email** (used for SSL certificate renewals via Let's Encrypt / ZeroSSL). For non-interactive installs, pass them as environment variables:
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/v1.0.1/install.sh | AP_VERSION=v1.0.1 sudo -E bash
+ADMIN_NAME="Your Name" ADMIN_EMAIL="you@example.com" \
+  curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/main/install.sh | sudo -E bash
 ```
 
-*The installer will prompt you for the server administrator's Name and Email. This email will be registered with Let's Encrypt / ZeroSSL for SSL certificate renewals.*
+### Install Development Branch (Advanced)
+
+> [!WARNING]
+> The `development` branch contains unreleased work and may be unstable. Only use this on test VPS instances.
+
+```bash
+AP_CHANNEL=branch AP_BRANCH=development \
+  curl -sSL https://raw.githubusercontent.com/webtechj/agilepanel/development/install.sh | sudo -E bash
+```
+
+To keep a dev VPS updating from the development branch:
+```bash
+# Add to /etc/environment on the dev VPS
+echo 'AGILEPANEL_UPDATE_BRANCH=development' | sudo tee -a /etc/environment
+```
 
 ---
 

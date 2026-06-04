@@ -64,6 +64,13 @@ var infoCmd = &cobra.Command{
 		ui.Row("Public IP", publicIP)
 		ui.Row("Hosted Sites", fmt.Sprintf("%d active website(s)", siteCount))
 
+		guiInstalled, guiVersion := server.GetGuiInfo()
+		guiStatusStr := "Not Installed"
+		if guiInstalled {
+			guiStatusStr = fmt.Sprintf("Installed (v%s)", guiVersion)
+		}
+		ui.Row("Web GUI Addon", guiStatusStr)
+
 		// Stack & Running Services Section
 		ui.SectionHeader("SYSTEM STACK & RUNNING SERVICES")
 
