@@ -1482,6 +1482,8 @@ func GetSSLInfo(domain string) (*SSLInfo, error) {
 }
 
 // SelfUpdate downloads the latest ap binary from GitHub to replace the running executable.
+// By default it fetches from the latest stable GitHub Release.
+// Set AGILEPANEL_UPDATE_BRANCH (e.g. "development") to override and pull from a raw branch instead.
 func SelfUpdate() error {
 	if runtime.GOOS != "linux" {
 		fmt.Println("Self-Update (Mock): Downloading latest ap-linux-amd64 to /usr/local/bin/ap")
@@ -1490,10 +1492,14 @@ func SelfUpdate() error {
 
 	destPath := "/usr/local/bin/ap"
 	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
-	if branch == "" {
-		branch = "main"
+
+	var url string
+	if branch != "" {
+		url = fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel/%s/ap-linux-amd64", branch)
+		fmt.Printf("Self-Update: Using branch override '%s'...\n", branch)
+	} else {
+		url = "https://github.com/webtechj/agilepanel/releases/latest/download/ap-linux-amd64"
 	}
-	url := fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel/%s/ap-linux-amd64", branch)
 
 	fmt.Printf("Self-Update: Fetching latest binary from %s...\n", url)
 	tmpFile := destPath + ".tmp"

@@ -200,11 +200,14 @@ func InstallGui() error {
 
 	fmt.Println("Tools: Downloading AgilePanel GUI companion binary...")
 	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
-	if branch == "" {
-		branch = "main"
+	var guiURL string
+	if branch != "" {
+		guiURL = fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
+		fmt.Printf("Tools: Using branch override '%s'...\n", branch)
+	} else {
+		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
 	}
-	url := fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, url)
+	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
 	}
@@ -367,11 +370,14 @@ func UpdateGui() error {
 
 	fmt.Println("Tools: Downloading latest AgilePanel GUI companion binary from GitHub...")
 	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
-	if branch == "" {
-		branch = "main"
+	var guiURL string
+	if branch != "" {
+		guiURL = fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
+		fmt.Printf("Tools: Using branch override '%s'...\n", branch)
+	} else {
+		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
 	}
-	url := fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel-gui/%s/agilepanel-gui-linux-amd64", branch)
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, url)
+	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
 	}

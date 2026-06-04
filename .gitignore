@@ -9,3 +9,7 @@ state.json.lock
 # Mock directories
 etc/
 var/
+
+# Development artifacts
+graphify-out/
+metrics_history.json
