@@ -1489,7 +1489,11 @@ func SelfUpdate() error {
 	}
 
 	destPath := "/usr/local/bin/ap"
-	url := "https://raw.githubusercontent.com/webtechj/agilepanel/main/ap-linux-amd64"
+	branch := os.Getenv("AGILEPANEL_UPDATE_BRANCH")
+	if branch == "" {
+		branch = "main"
+	}
+	url := fmt.Sprintf("https://raw.githubusercontent.com/webtechj/agilepanel/%s/ap-linux-amd64", branch)
 
 	fmt.Printf("Self-Update: Fetching latest binary from %s...\n", url)
 	tmpFile := destPath + ".tmp"
