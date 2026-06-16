@@ -4,6 +4,24 @@
   "graph": {},
   "nodes": [
     {
+      "label": "gui.go",
+      "file_type": "code",
+      "source_file": "cmd/gui.go",
+      "source_location": "L1",
+      "id": "cmd_gui",
+      "community": 26,
+      "norm_label": "gui.go"
+    },
+    {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "cmd/gui.go",
+      "source_location": "L74",
+      "id": "cmd_gui_init",
+      "community": 26,
+      "norm_label": "init()"
+    },
+    {
       "label": "info.go",
       "file_type": "code",
       "source_file": "cmd/info.go",
@@ -16,7 +34,7 @@
       "label": "stackService",
       "file_type": "code",
       "source_file": "cmd/info.go",
-      "source_location": "L71",
+      "source_location": "L78",
       "id": "cmd_stackservice",
       "community": 6,
       "norm_label": "stackservice"
@@ -25,7 +43,7 @@
       "label": "init()",
       "file_type": "code",
       "source_file": "cmd/info.go",
-      "source_location": "L170",
+      "source_location": "L177",
       "id": "cmd_info_init",
       "community": 6,
       "norm_label": "init()"
@@ -132,16 +150,16 @@
     {
       "label": "root.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/cmd/root.go",
+      "source_file": "cmd/root.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_cmd_root_go",
+      "id": "cmd_root",
       "community": 13,
       "norm_label": "root.go"
     },
     {
       "label": "Execute()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/cmd/root.go",
+      "source_file": "cmd/root.go",
       "source_location": "L22",
       "id": "cmd_root_execute",
       "community": 13,
@@ -150,16 +168,16 @@
     {
       "label": "server.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/cmd/server.go",
+      "source_file": "cmd/server.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_cmd_server_go",
+      "id": "cmd_server",
       "community": 3,
       "norm_label": "server.go"
     },
     {
       "label": "renderProgressBar()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/cmd/server.go",
+      "source_file": "cmd/server.go",
       "source_location": "L21",
       "id": "cmd_server_renderprogressbar",
       "community": 3,
@@ -168,8 +186,8 @@
     {
       "label": "init()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/cmd/server.go",
-      "source_location": "L334",
+      "source_file": "cmd/server.go",
+      "source_location": "L335",
       "id": "cmd_server_init",
       "community": 3,
       "norm_label": "init()"
@@ -278,7 +296,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_config_state_go",
-      "community": 0,
+      "community": 9,
       "norm_label": "state.go"
     },
     {
@@ -287,7 +305,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L17",
       "id": "config_globalconfig",
-      "community": 0,
+      "community": 9,
       "norm_label": "globalconfig"
     },
     {
@@ -296,7 +314,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L38",
       "id": "config_siteconfig",
-      "community": 0,
+      "community": 9,
       "norm_label": "siteconfig"
     },
     {
@@ -305,7 +323,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L52",
       "id": "d_repos_vpsops_internal_config_state_go_time",
-      "community": 0,
+      "community": 9,
       "norm_label": "time"
     },
     {
@@ -314,7 +332,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L58",
       "id": "config_state",
-      "community": 0,
+      "community": 9,
       "norm_label": "state"
     },
     {
@@ -332,7 +350,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L72",
       "id": "config_state_generateuuid",
-      "community": 0,
+      "community": 9,
       "norm_label": "generateuuid()"
     },
     {
@@ -341,7 +359,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L88",
       "id": "config_state_defaultstate",
-      "community": 0,
+      "community": 9,
       "norm_label": "defaultstate()"
     },
     {
@@ -350,7 +368,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L109",
       "id": "config_state_withlockedstate",
-      "community": 0,
+      "community": 9,
       "norm_label": "withlockedstate()"
     },
     {
@@ -368,7 +386,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state.go",
       "source_location": "L224",
       "id": "config_state_writestate",
-      "community": 0,
+      "community": 9,
       "norm_label": "writestate()"
     },
     {
@@ -377,7 +395,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_config_state_test_go",
-      "community": 0,
+      "community": 9,
       "norm_label": "state_test.go"
     },
     {
@@ -386,7 +404,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L10",
       "id": "config_state_test_testdefaultstate",
-      "community": 0,
+      "community": 9,
       "norm_label": "testdefaultstate()"
     },
     {
@@ -395,7 +413,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L10",
       "id": "d_repos_vpsops_internal_config_state_test_go_t",
-      "community": 0,
+      "community": 9,
       "norm_label": "t"
     },
     {
@@ -404,7 +422,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L23",
       "id": "config_state_test_testreadstatecreatesdefault",
-      "community": 0,
+      "community": 9,
       "norm_label": "testreadstatecreatesdefault()"
     },
     {
@@ -413,7 +431,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L44",
       "id": "config_state_test_testwithlockedstate",
-      "community": 0,
+      "community": 9,
       "norm_label": "testwithlockedstate()"
     },
     {
@@ -422,7 +440,7 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L79",
       "id": "config_state_test_testconcurrentstatelocking",
-      "community": 0,
+      "community": 9,
       "norm_label": "testconcurrentstatelocking()"
     },
     {
@@ -431,88 +449,88 @@
       "source_file": "D:/repos/VPSops/internal/config/state_test.go",
       "source_location": "L123",
       "id": "config_state_test_testadminfields",
-      "community": 0,
+      "community": 9,
       "norm_label": "testadminfields()"
     },
     {
       "label": "telemetry.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_config_telemetry_go",
-      "community": 9,
+      "id": "config_telemetry",
+      "community": 12,
       "norm_label": "telemetry.go"
     },
     {
       "label": "TelemetryPayload",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L15",
       "id": "config_telemetrypayload",
-      "community": 9,
+      "community": 12,
       "norm_label": "telemetrypayload"
     },
     {
       "label": "SendTelemetryPing()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L24",
       "id": "config_telemetry_sendtelemetryping",
-      "community": 9,
+      "community": 12,
       "norm_label": "sendtelemetryping()"
     },
     {
       "label": "State",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L24",
-      "id": "d_repos_vpsops_internal_config_telemetry_go_state",
-      "community": 9,
+      "id": "internal_config_telemetry_go_state",
+      "community": 12,
       "norm_label": "state"
     },
     {
       "label": "PingAsync()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L70",
       "id": "config_telemetry_pingasync",
-      "community": 9,
+      "community": 12,
       "norm_label": "pingasync()"
     },
     {
       "label": "telemetry_test.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
+      "source_file": "internal/config/telemetry_test.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_config_telemetry_test_go",
-      "community": 9,
+      "id": "config_telemetry_test",
+      "community": 12,
       "norm_label": "telemetry_test.go"
     },
     {
       "label": "TestSendTelemetryPing()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
+      "source_file": "internal/config/telemetry_test.go",
       "source_location": "L12",
       "id": "config_telemetry_test_testsendtelemetryping",
-      "community": 9,
+      "community": 12,
       "norm_label": "testsendtelemetryping()"
     },
     {
       "label": "T",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
+      "source_file": "internal/config/telemetry_test.go",
       "source_location": "L12",
-      "id": "d_repos_vpsops_internal_config_telemetry_test_go_t",
-      "community": 9,
+      "id": "internal_config_telemetry_test_go_t",
+      "community": 12,
       "norm_label": "t"
     },
     {
       "label": "TestSendTelemetryPingOptOut()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
+      "source_file": "internal/config/telemetry_test.go",
       "source_location": "L72",
       "id": "config_telemetry_test_testsendtelemetrypingoptout",
-      "community": 9,
+      "community": 12,
       "norm_label": "testsendtelemetrypingoptout()"
     },
     {
@@ -680,16 +698,16 @@
     {
       "label": "metrics.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_server_metrics_go",
+      "id": "server_metrics",
       "community": 1,
       "norm_label": "metrics.go"
     },
     {
       "label": "MetricSample",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L15",
       "id": "server_metricsample",
       "community": 1,
@@ -698,16 +716,16 @@
     {
       "label": "Time",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L16",
-      "id": "d_repos_vpsops_internal_server_metrics_go_time",
+      "id": "internal_server_metrics_go_time",
       "community": 1,
       "norm_label": "time"
     },
     {
       "label": "ProcessStatus",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L28",
       "id": "processstatus",
       "community": 1,
@@ -716,7 +734,7 @@
     {
       "label": "HistoricalStats",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L31",
       "id": "server_historicalstats",
       "community": 1,
@@ -725,8 +743,8 @@
     {
       "label": "getMetricsPath()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L39",
+      "source_file": "internal/server/metrics.go",
+      "source_location": "L40",
       "id": "server_metrics_getmetricspath",
       "community": 1,
       "norm_label": "getmetricspath()"
@@ -734,8 +752,8 @@
     {
       "label": "LogMetrics()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L48",
+      "source_file": "internal/server/metrics.go",
+      "source_location": "L49",
       "id": "server_metrics_logmetrics",
       "community": 1,
       "norm_label": "logmetrics()"
@@ -743,8 +761,8 @@
     {
       "label": "GetHistoricalMetrics()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L154",
+      "source_file": "internal/server/metrics.go",
+      "source_location": "L155",
       "id": "server_metrics_gethistoricalmetrics",
       "community": 1,
       "norm_label": "gethistoricalmetrics()"
@@ -752,8 +770,8 @@
     {
       "label": "Duration",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L154",
+      "source_file": "internal/server/metrics.go",
+      "source_location": "L155",
       "id": "duration",
       "community": 1,
       "norm_label": "duration"
@@ -854,7 +872,7 @@
       "source_file": "D:/repos/VPSops/internal/server/php.go",
       "source_location": "L122",
       "id": "server_php_reloadphp",
-      "community": 10,
+      "community": 0,
       "norm_label": "reloadphp()"
     },
     {
@@ -890,7 +908,7 @@
       "source_file": "D:/repos/VPSops/internal/server/repair.go",
       "source_location": "L1",
       "id": "d_repos_vpsops_internal_server_repair_go",
-      "community": 5,
+      "community": 0,
       "norm_label": "repair.go"
     },
     {
@@ -899,7 +917,7 @@
       "source_file": "D:/repos/VPSops/internal/server/repair.go",
       "source_location": "L15",
       "id": "server_repair_repairinstallation",
-      "community": 5,
+      "community": 0,
       "norm_label": "repairinstallation()"
     },
     {
@@ -1076,16 +1094,16 @@
     {
       "label": "status.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_server_status_go",
+      "id": "server_status",
       "community": 1,
       "norm_label": "status.go"
     },
     {
       "label": "ProcessStatus",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L17",
       "id": "server_processstatus",
       "community": 1,
@@ -1094,7 +1112,7 @@
     {
       "label": "ServerStatus",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L24",
       "id": "server_serverstatus",
       "community": 1,
@@ -1103,8 +1121,8 @@
     {
       "label": "GetStatus()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L53",
+      "source_file": "internal/server/status.go",
+      "source_location": "L54",
       "id": "server_status_getstatus",
       "community": 1,
       "norm_label": "getstatus()"
@@ -1112,8 +1130,8 @@
     {
       "label": "readLinuxMemoryAndSwap()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L148",
+      "source_file": "internal/server/status.go",
+      "source_location": "L150",
       "id": "server_status_readlinuxmemoryandswap",
       "community": 1,
       "norm_label": "readlinuxmemoryandswap()"
@@ -1121,8 +1139,8 @@
     {
       "label": "readLinuxMemory()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L183",
+      "source_file": "internal/server/status.go",
+      "source_location": "L185",
       "id": "server_status_readlinuxmemory",
       "community": 1,
       "norm_label": "readlinuxmemory()"
@@ -1130,8 +1148,8 @@
     {
       "label": "readDiskUsage()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L188",
+      "source_file": "internal/server/status.go",
+      "source_location": "L190",
       "id": "server_status_readdiskusage",
       "community": 1,
       "norm_label": "readdiskusage()"
@@ -1139,8 +1157,8 @@
     {
       "label": "readLoadAvg()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L211",
+      "source_file": "internal/server/status.go",
+      "source_location": "L213",
       "id": "server_status_readloadavg",
       "community": 1,
       "norm_label": "readloadavg()"
@@ -1148,8 +1166,8 @@
     {
       "label": "cpuStats",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L229",
+      "source_file": "internal/server/status.go",
+      "source_location": "L231",
       "id": "server_cpustats",
       "community": 1,
       "norm_label": "cpustats"
@@ -1157,8 +1175,8 @@
     {
       "label": "readCPUStats()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L233",
+      "source_file": "internal/server/status.go",
+      "source_location": "L235",
       "id": "server_status_readcpustats",
       "community": 1,
       "norm_label": "readcpustats()"
@@ -1166,8 +1184,8 @@
     {
       "label": "getCPUPercentage()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L258",
+      "source_file": "internal/server/status.go",
+      "source_location": "L260",
       "id": "server_status_getcpupercentage",
       "community": 1,
       "norm_label": "getcpupercentage()"
@@ -1175,8 +1193,8 @@
     {
       "label": "getTCPConnectionsCount()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L289",
+      "source_file": "internal/server/status.go",
+      "source_location": "L291",
       "id": "server_status_gettcpconnectionscount",
       "community": 1,
       "norm_label": "gettcpconnectionscount()"
@@ -1184,8 +1202,8 @@
     {
       "label": "getTopProcesses()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L311",
+      "source_file": "internal/server/status.go",
+      "source_location": "L313",
       "id": "server_status_gettopprocesses",
       "community": 1,
       "norm_label": "gettopprocesses()"
@@ -1193,10 +1211,10 @@
     {
       "label": "RestartService()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
-      "source_location": "L363",
+      "source_file": "internal/server/status.go",
+      "source_location": "L365",
       "id": "server_status_restartservice",
-      "community": 1,
+      "community": 0,
       "norm_label": "restartservice()"
     },
     {
@@ -1328,17 +1346,17 @@
     {
       "label": "tools.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
+      "source_file": "internal/server/tools.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_server_tools_go",
+      "id": "server_tools",
       "community": 15,
       "norm_label": "tools.go"
     },
     {
       "label": "InstallPhpMyAdmin()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L14",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L16",
       "id": "server_tools_installphpmyadmin",
       "community": 15,
       "norm_label": "installphpmyadmin()"
@@ -1346,8 +1364,8 @@
     {
       "label": "FixPhpMyAdminConfig()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L126",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L128",
       "id": "server_tools_fixphpmyadminconfig",
       "community": 15,
       "norm_label": "fixphpmyadminconfig()"
@@ -1355,25 +1373,61 @@
     {
       "label": "InstallGui()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L182",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L184",
       "id": "server_tools_installgui",
       "community": 15,
       "norm_label": "installgui()"
     },
     {
+      "label": "DisableGui()",
+      "file_type": "code",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L260",
+      "id": "server_tools_disablegui",
+      "community": 15,
+      "norm_label": "disablegui()"
+    },
+    {
+      "label": "EnableGui()",
+      "file_type": "code",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L288",
+      "id": "server_tools_enablegui",
+      "community": 15,
+      "norm_label": "enablegui()"
+    },
+    {
+      "label": "UpdateGui()",
+      "file_type": "code",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L349",
+      "id": "server_tools_updategui",
+      "community": 15,
+      "norm_label": "updategui()"
+    },
+    {
+      "label": "GetGuiInfo()",
+      "file_type": "code",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L419",
+      "id": "server_tools_getguiinfo",
+      "community": 15,
+      "norm_label": "getguiinfo()"
+    },
+    {
       "label": "tuning.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_server_tuning_go",
+      "id": "server_tuning",
       "community": 5,
       "norm_label": "tuning.go"
     },
     {
       "label": "TuneServer()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L18",
       "id": "server_tuning_tuneserver",
       "community": 5,
@@ -1382,7 +1436,7 @@
     {
       "label": "TuneSwap()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L68",
       "id": "server_tuning_tuneswap",
       "community": 5,
@@ -1391,7 +1445,7 @@
     {
       "label": "TuneDatabase()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L159",
       "id": "server_tuning_tunedatabase",
       "community": 5,
@@ -1400,7 +1454,7 @@
     {
       "label": "TuneRedis()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L246",
       "id": "server_tuning_tuneredis",
       "community": 5,
@@ -1409,7 +1463,7 @@
     {
       "label": "setOrAppendRedisConfig()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L316",
       "id": "server_tuning_setorappendredisconfig",
       "community": 5,
@@ -1418,7 +1472,7 @@
     {
       "label": "replaceLine()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L363",
       "id": "server_tuning_replaceline",
       "community": 5,
@@ -1427,7 +1481,7 @@
     {
       "label": "writeDefaultWelcomePage()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L757",
       "id": "server_tuning_writedefaultwelcomepage",
       "community": 5,
@@ -1436,7 +1490,7 @@
     {
       "label": "SetupDefaultWebserver()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L780",
       "id": "server_tuning_setupdefaultwebserver",
       "community": 5,
@@ -1445,7 +1499,7 @@
     {
       "label": "installMetricsCron()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L806",
       "id": "server_tuning_installmetricscron",
       "community": 5,
@@ -1481,16 +1535,16 @@
     {
       "label": "wordpress_test.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
+      "source_file": "internal/server/wordpress_test.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_server_wordpress_test_go",
+      "id": "server_wordpress_test",
       "community": 2,
       "norm_label": "wordpress_test.go"
     },
     {
       "label": "TestInstallWordPressMock()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
+      "source_file": "internal/server/wordpress_test.go",
       "source_location": "L7",
       "id": "server_wordpress_test_testinstallwordpressmock",
       "community": 2,
@@ -1499,25 +1553,25 @@
     {
       "label": "T",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
+      "source_file": "internal/server/wordpress_test.go",
       "source_location": "L7",
-      "id": "d_repos_vpsops_internal_server_wordpress_test_go_t",
+      "id": "internal_server_wordpress_test_go_t",
       "community": 2,
       "norm_label": "t"
     },
     {
       "label": "orchestrator.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_site_orchestrator_go",
+      "id": "site_orchestrator",
       "community": 0,
       "norm_label": "orchestrator.go"
     },
     {
       "label": "ValidateDomain()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L28",
       "id": "site_orchestrator_validatedomain",
       "community": 0,
@@ -1526,7 +1580,7 @@
     {
       "label": "SanitizeUser()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L36",
       "id": "site_orchestrator_sanitizeuser",
       "community": 0,
@@ -1535,16 +1589,16 @@
     {
       "label": "promptLine()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L47",
       "id": "site_orchestrator_promptline",
-      "community": 0,
+      "community": 2,
       "norm_label": "promptline()"
     },
     {
       "label": "Create()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L60",
       "id": "site_orchestrator_create",
       "community": 2,
@@ -1553,7 +1607,7 @@
     {
       "label": "Delete()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L534",
       "id": "site_orchestrator_delete",
       "community": 0,
@@ -1562,7 +1616,7 @@
     {
       "label": "Lock()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L616",
       "id": "site_orchestrator_lock",
       "community": 0,
@@ -1571,7 +1625,7 @@
     {
       "label": "Unlock()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L654",
       "id": "site_orchestrator_unlock",
       "community": 0,
@@ -1580,7 +1634,7 @@
     {
       "label": "CacheClean()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L692",
       "id": "site_orchestrator_cacheclean",
       "community": 0,
@@ -1589,7 +1643,7 @@
     {
       "label": "Reinstall()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L764",
       "id": "site_orchestrator_reinstall",
       "community": 2,
@@ -1598,7 +1652,7 @@
     {
       "label": "SSLRenew()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1002",
       "id": "site_orchestrator_sslrenew",
       "community": 0,
@@ -1607,7 +1661,7 @@
     {
       "label": "FixPermissions()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1051",
       "id": "site_orchestrator_fixpermissions",
       "community": 0,
@@ -1616,7 +1670,7 @@
     {
       "label": "BackupDB()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1085",
       "id": "site_orchestrator_backupdb",
       "community": 0,
@@ -1625,7 +1679,7 @@
     {
       "label": "List()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1154",
       "id": "site_orchestrator_list",
       "community": 0,
@@ -1634,7 +1688,7 @@
     {
       "label": "Info()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1212",
       "id": "site_orchestrator_info",
       "community": 3,
@@ -1643,17 +1697,17 @@
     {
       "label": "Edit()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1305",
       "id": "site_orchestrator_edit",
-      "community": 10,
+      "community": 0,
       "norm_label": "edit()"
     },
     {
       "label": "SSLInfo",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1366",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1384",
       "id": "site_sslinfo",
       "community": 0,
       "norm_label": "sslinfo"
@@ -1661,17 +1715,17 @@
     {
       "label": "Time",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1371",
-      "id": "d_repos_vpsops_internal_site_orchestrator_go_time",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1389",
+      "id": "internal_site_orchestrator_go_time",
       "community": 0,
       "norm_label": "time"
     },
     {
       "label": "GetSSLInfo()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1376",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1394",
       "id": "site_orchestrator_getsslinfo",
       "community": 0,
       "norm_label": "getsslinfo()"
@@ -1679,8 +1733,8 @@
     {
       "label": "SelfUpdate()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1467",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1485",
       "id": "site_orchestrator_selfupdate",
       "community": 0,
       "norm_label": "selfupdate()"
@@ -1688,8 +1742,8 @@
     {
       "label": "Sync()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1499",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1521",
       "id": "site_orchestrator_sync",
       "community": 0,
       "norm_label": "sync()"
@@ -1697,8 +1751,8 @@
     {
       "label": "Backup()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1673",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1695",
       "id": "site_orchestrator_backup",
       "community": 0,
       "norm_label": "backup()"
@@ -1706,8 +1760,8 @@
     {
       "label": "pruneLocalBackups()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1908",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1930",
       "id": "site_orchestrator_prunelocalbackups",
       "community": 0,
       "norm_label": "prunelocalbackups()"
@@ -1715,8 +1769,8 @@
     {
       "label": "ListS3BackupsCLI()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1961",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1983",
       "id": "site_orchestrator_lists3backupscli",
       "community": 0,
       "norm_label": "lists3backupscli()"
@@ -1724,8 +1778,8 @@
     {
       "label": "DownloadS3BackupCLI()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2038",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L2060",
       "id": "site_orchestrator_downloads3backupcli",
       "community": 0,
       "norm_label": "downloads3backupcli()"
@@ -1733,8 +1787,8 @@
     {
       "label": "DeleteS3BackupCLI()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2097",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L2119",
       "id": "site_orchestrator_deletes3backupcli",
       "community": 0,
       "norm_label": "deletes3backupcli()"
@@ -1742,8 +1796,8 @@
     {
       "label": "sendTelegramNotification()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2138",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L2160",
       "id": "site_orchestrator_sendtelegramnotification",
       "community": 0,
       "norm_label": "sendtelegramnotification()"
@@ -1751,17 +1805,17 @@
     {
       "label": "State",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2138",
-      "id": "d_repos_vpsops_internal_site_orchestrator_go_state",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L2160",
+      "id": "internal_site_orchestrator_go_state",
       "community": 0,
       "norm_label": "state"
     },
     {
       "label": "notifyBackup()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2163",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L2185",
       "id": "site_orchestrator_notifybackup",
       "community": 0,
       "norm_label": "notifybackup()"
@@ -1769,43 +1823,43 @@
     {
       "label": "orchestrator_test.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "community": 12,
+      "id": "site_orchestrator_test",
+      "community": 0,
       "norm_label": "orchestrator_test.go"
     },
     {
       "label": "TestValidateDomain()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L12",
       "id": "site_orchestrator_test_testvalidatedomain",
-      "community": 12,
+      "community": 0,
       "norm_label": "testvalidatedomain()"
     },
     {
       "label": "T",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L12",
-      "id": "d_repos_vpsops_internal_site_orchestrator_test_go_t",
-      "community": 12,
+      "id": "internal_site_orchestrator_test_go_t",
+      "community": 0,
       "norm_label": "t"
     },
     {
       "label": "TestSanitizeUser()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L41",
       "id": "site_orchestrator_test_testsanitizeuser",
-      "community": 12,
+      "community": 0,
       "norm_label": "testsanitizeuser()"
     },
     {
       "label": "TestSiteOrchestration()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L59",
       "id": "site_orchestrator_test_testsiteorchestration",
       "community": 0,
@@ -1814,19 +1868,19 @@
     {
       "label": "TestSyncImport()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L198",
       "id": "site_orchestrator_test_testsyncimport",
-      "community": 12,
+      "community": 0,
       "norm_label": "testsyncimport()"
     },
     {
       "label": "TestLaravelAndHTMLSiteOrchestration()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L275",
       "id": "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
-      "community": 12,
+      "community": 0,
       "norm_label": "testlaravelandhtmlsiteorchestration()"
     },
     {
@@ -2118,6 +2172,15 @@
       "norm_label": "main()"
     },
     {
+      "label": "metrics_history.json",
+      "file_type": "code",
+      "source_file": "metrics_history.json",
+      "source_location": "L1",
+      "id": "metrics_history",
+      "community": 25,
+      "norm_label": "metrics_history.json"
+    },
+    {
       "label": "main.go",
       "file_type": "code",
       "source_file": "D:/repos/VPSops/telemetry/main.go",
@@ -2255,16 +2318,16 @@
     {
       "label": "main_test.go",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L1",
-      "id": "d_repos_vpsops_telemetry_main_test_go",
+      "id": "telemetry_main_test",
       "community": 4,
       "norm_label": "main_test.go"
     },
     {
       "label": "TestHandleHome()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L16",
       "id": "telemetry_main_test_testhandlehome",
       "community": 4,
@@ -2273,16 +2336,16 @@
     {
       "label": "T",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L16",
-      "id": "d_repos_vpsops_telemetry_main_test_go_t",
+      "id": "telemetry_main_test_go_t",
       "community": 4,
       "norm_label": "t"
     },
     {
       "label": "TestHandlePing()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L33",
       "id": "telemetry_main_test_testhandleping",
       "community": 4,
@@ -2291,7 +2354,7 @@
     {
       "label": "TestHandlePingInvalid()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L89",
       "id": "telemetry_main_test_testhandlepinginvalid",
       "community": 4,
@@ -2300,7 +2363,7 @@
     {
       "label": "TestBadges()",
       "file_type": "code",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L116",
       "id": "telemetry_main_test_testbadges",
       "community": 4,
@@ -2622,13 +2685,13 @@
       "norm_label": "\ud83c\udf1f key features"
     },
     {
-      "label": "\ud83d\udd12 Security-First Architecture",
+      "label": "\ud83d\udd12 Security-First Infrastructure",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L37",
-      "id": "readme_security_first_architecture",
+      "id": "readme_security_first_infrastructure",
       "community": 24,
-      "norm_label": "\ud83d\udd12 security-first architecture"
+      "norm_label": "\ud83d\udd12 security-first infrastructure"
     },
     {
       "label": "\ud83d\ude80 High-Performance Optimizations",
@@ -2667,13 +2730,13 @@
       "norm_label": "standard installation (latest version)"
     },
     {
-      "label": "Installation from Specific Release (e.g. v0.8)",
+      "label": "Installation from Specific Release (e.g. v1.0.1)",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L67",
-      "id": "readme_installation_from_specific_release_e_g_v0_8",
+      "id": "readme_installation_from_specific_release_e_g_v1_0_1",
       "community": 24,
-      "norm_label": "installation from specific release (e.g. v0.8)"
+      "norm_label": "installation from specific release (e.g. v1.0.1)"
     },
     {
       "label": "\ud83d\udee0\ufe0f CLI Reference & Command Set",
@@ -2685,37 +2748,46 @@
       "norm_label": "\ud83d\udee0\ufe0f cli reference & command set"
     },
     {
-      "label": "\ud83c\udf10 Site Management",
+      "label": "\ud83c\udf10 Site Management (`ap site [subcommand]`)",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L81",
-      "id": "readme_site_management",
+      "id": "readme_site_management_ap_site_subcommand",
       "community": 24,
-      "norm_label": "\ud83c\udf10 site management"
+      "norm_label": "\ud83c\udf10 site management (`ap site [subcommand]`)"
     },
     {
-      "label": "\ud83d\udda5\ufe0f Server Administration",
+      "label": "\ud83d\udda5\ufe0f Server Administration (`ap server [subcommand]`)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L101",
-      "id": "readme_server_administration",
+      "source_location": "L102",
+      "id": "readme_server_administration_ap_server_subcommand",
       "community": 24,
-      "norm_label": "\ud83d\udda5\ufe0f server administration"
+      "norm_label": "\ud83d\udda5\ufe0f server administration (`ap server [subcommand]`)"
     },
     {
-      "label": "\ud83d\udd27 Maintenance & Tools",
+      "label": "\ud83d\udd27 Maintenance & Tools (`ap tool [subcommand]` / root commands)",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L122",
-      "id": "readme_maintenance_tools",
+      "source_location": "L114",
+      "id": "readme_maintenance_tools_ap_tool_subcommand_root_commands",
       "community": 24,
-      "norm_label": "\ud83d\udd27 maintenance & tools"
+      "norm_label": "\ud83d\udd27 maintenance & tools (`ap tool [subcommand]` / root commands)"
+    },
+    {
+      "label": "\ud83d\udc51 Web GUI Dashboard Companion (`ap gui [subcommand]`)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L125",
+      "id": "readme_web_gui_dashboard_companion_ap_gui_subcommand",
+      "community": 24,
+      "norm_label": "\ud83d\udc51 web gui dashboard companion (`ap gui [subcommand]`)"
     },
     {
       "label": "\ud83d\udcca Privacy & Telemetry",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L148",
+      "source_location": "L135",
       "id": "readme_privacy_telemetry",
       "community": 24,
       "norm_label": "\ud83d\udcca privacy & telemetry"
@@ -2724,7 +2796,7 @@
       "label": "What is collected?",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L152",
+      "source_location": "L139",
       "id": "readme_what_is_collected",
       "community": 24,
       "norm_label": "what is collected?"
@@ -2733,7 +2805,7 @@
       "label": "Opting Out",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L161",
+      "source_location": "L148",
       "id": "readme_opting_out",
       "community": 24,
       "norm_label": "opting out"
@@ -2742,10 +2814,64 @@
       "label": "\ud83d\udcc4 License",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L169",
+      "source_location": "L156",
       "id": "readme_license",
       "community": 24,
       "norm_label": "\ud83d\udcc4 license"
+    },
+    {
+      "label": "\ud83d\udd12 Security-First Architecture & Hardening",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L37",
+      "community": 24,
+      "norm_label": "\ud83d\udd12 security-first architecture & hardening",
+      "id": "readme_security_first_architecture_hardening"
+    },
+    {
+      "label": "\ud83d\udd12 Security-First Architecture",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L37",
+      "community": 24,
+      "norm_label": "\ud83d\udd12 security-first architecture",
+      "id": "readme_security_first_architecture"
+    },
+    {
+      "label": "Installation from Specific Release (e.g. v0.8)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L67",
+      "community": 24,
+      "norm_label": "installation from specific release (e.g. v0.8)",
+      "id": "readme_installation_from_specific_release_e_g_v0_8"
+    },
+    {
+      "label": "\ud83c\udf10 Site Management",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L81",
+      "community": 24,
+      "norm_label": "\ud83c\udf10 site management",
+      "id": "readme_site_management"
+    },
+    {
+      "label": "\ud83d\udda5\ufe0f Server Administration",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L101",
+      "community": 24,
+      "norm_label": "\ud83d\udda5\ufe0f server administration",
+      "id": "readme_server_administration"
+    },
+    {
+      "label": "\ud83d\udd27 Maintenance & Tools",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L122",
+      "community": 24,
+      "norm_label": "\ud83d\udd27 maintenance & tools",
+      "id": "readme_maintenance_tools"
     },
     {
       "label": "install.go",
@@ -2773,24 +2899,6 @@
       "community": 18,
       "norm_label": "repair.go",
       "id": "cmd_repair"
-    },
-    {
-      "label": "root.go",
-      "file_type": "code",
-      "source_file": "cmd/root.go",
-      "source_location": "L1",
-      "community": 13,
-      "norm_label": "root.go",
-      "id": "cmd_root"
-    },
-    {
-      "label": "server.go",
-      "file_type": "code",
-      "source_file": "cmd/server.go",
-      "source_location": "L1",
-      "community": 3,
-      "norm_label": "server.go",
-      "id": "cmd_server"
     },
     {
       "label": "site.go",
@@ -2846,7 +2954,7 @@
       "file_type": "code",
       "source_file": "internal/config/state.go",
       "source_location": "L52",
-      "community": 0,
+      "community": 9,
       "norm_label": "time",
       "id": "internal_config_state_go_time"
     },
@@ -2855,7 +2963,7 @@
       "file_type": "code",
       "source_file": "internal/config/state_test.go",
       "source_location": "L1",
-      "community": 0,
+      "community": 9,
       "norm_label": "state_test.go",
       "id": "config_state_test"
     },
@@ -2864,45 +2972,9 @@
       "file_type": "code",
       "source_file": "internal/config/state_test.go",
       "source_location": "L10",
-      "community": 0,
+      "community": 9,
       "norm_label": "t",
       "id": "internal_config_state_test_go_t"
-    },
-    {
-      "label": "telemetry.go",
-      "file_type": "code",
-      "source_file": "internal/config/telemetry.go",
-      "source_location": "L1",
-      "community": 9,
-      "norm_label": "telemetry.go",
-      "id": "config_telemetry"
-    },
-    {
-      "label": "State",
-      "file_type": "code",
-      "source_file": "internal/config/telemetry.go",
-      "source_location": "L24",
-      "community": 9,
-      "norm_label": "state",
-      "id": "internal_config_telemetry_go_state"
-    },
-    {
-      "label": "telemetry_test.go",
-      "file_type": "code",
-      "source_file": "internal/config/telemetry_test.go",
-      "source_location": "L1",
-      "community": 9,
-      "norm_label": "telemetry_test.go",
-      "id": "config_telemetry_test"
-    },
-    {
-      "label": "T",
-      "file_type": "code",
-      "source_file": "internal/config/telemetry_test.go",
-      "source_location": "L12",
-      "community": 9,
-      "norm_label": "t",
-      "id": "internal_config_telemetry_test_go_t"
     },
     {
       "label": "caddy.go",
@@ -2968,24 +3040,6 @@
       "id": "internal_server_database_test_go_t"
     },
     {
-      "label": "metrics.go",
-      "file_type": "code",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L1",
-      "community": 1,
-      "norm_label": "metrics.go",
-      "id": "server_metrics"
-    },
-    {
-      "label": "Time",
-      "file_type": "code",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L16",
-      "community": 1,
-      "norm_label": "time",
-      "id": "internal_server_metrics_go_time"
-    },
-    {
       "label": "metrics_test.go",
       "file_type": "code",
       "source_file": "internal/server/metrics_test.go",
@@ -3035,7 +3089,7 @@
       "file_type": "code",
       "source_file": "internal/server/repair.go",
       "source_location": "L1",
-      "community": 5,
+      "community": 0,
       "norm_label": "repair.go",
       "id": "server_repair"
     },
@@ -3076,15 +3130,6 @@
       "id": "server_security"
     },
     {
-      "label": "status.go",
-      "file_type": "code",
-      "source_file": "internal/server/status.go",
-      "source_location": "L1",
-      "community": 1,
-      "norm_label": "status.go",
-      "id": "server_status"
-    },
-    {
       "label": "status_test.go",
       "file_type": "code",
       "source_file": "internal/server/status_test.go",
@@ -3112,24 +3157,6 @@
       "id": "server_system"
     },
     {
-      "label": "tools.go",
-      "file_type": "code",
-      "source_file": "internal/server/tools.go",
-      "source_location": "L1",
-      "community": 15,
-      "norm_label": "tools.go",
-      "id": "server_tools"
-    },
-    {
-      "label": "tuning.go",
-      "file_type": "code",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L1",
-      "community": 5,
-      "norm_label": "tuning.go",
-      "id": "server_tuning"
-    },
-    {
       "label": "wordpress.go",
       "file_type": "code",
       "source_file": "internal/server/wordpress.go",
@@ -3137,69 +3164,6 @@
       "community": 2,
       "norm_label": "wordpress.go",
       "id": "server_wordpress"
-    },
-    {
-      "label": "wordpress_test.go",
-      "file_type": "code",
-      "source_file": "internal/server/wordpress_test.go",
-      "source_location": "L1",
-      "community": 2,
-      "norm_label": "wordpress_test.go",
-      "id": "server_wordpress_test"
-    },
-    {
-      "label": "T",
-      "file_type": "code",
-      "source_file": "internal/server/wordpress_test.go",
-      "source_location": "L7",
-      "community": 2,
-      "norm_label": "t",
-      "id": "internal_server_wordpress_test_go_t"
-    },
-    {
-      "label": "orchestrator.go",
-      "file_type": "code",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1",
-      "community": 0,
-      "norm_label": "orchestrator.go",
-      "id": "site_orchestrator"
-    },
-    {
-      "label": "Time",
-      "file_type": "code",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1371",
-      "community": 0,
-      "norm_label": "time",
-      "id": "internal_site_orchestrator_go_time"
-    },
-    {
-      "label": "State",
-      "file_type": "code",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L2138",
-      "community": 0,
-      "norm_label": "state",
-      "id": "internal_site_orchestrator_go_state"
-    },
-    {
-      "label": "orchestrator_test.go",
-      "file_type": "code",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L1",
-      "community": 12,
-      "norm_label": "orchestrator_test.go",
-      "id": "site_orchestrator_test"
-    },
-    {
-      "label": "T",
-      "file_type": "code",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L12",
-      "community": 12,
-      "norm_label": "t",
-      "id": "internal_site_orchestrator_test_go_t"
     },
     {
       "label": "ui.go",
@@ -3254,24 +3218,6 @@
       "community": 4,
       "norm_label": "request",
       "id": "telemetry_main_go_request"
-    },
-    {
-      "label": "main_test.go",
-      "file_type": "code",
-      "source_file": "telemetry/main_test.go",
-      "source_location": "L1",
-      "community": 4,
-      "norm_label": "main_test.go",
-      "id": "telemetry_main_test"
-    },
-    {
-      "label": "T",
-      "file_type": "code",
-      "source_file": "telemetry/main_test.go",
-      "source_location": "L16",
-      "community": 4,
-      "norm_label": "t",
-      "id": "telemetry_main_test_go_t"
     },
     {
       "label": "AgilePanel",
@@ -3421,12 +3367,22 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "cmd/gui.go",
+      "source_location": "L55",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "cmd_gui",
+      "target": "cmd_gui_init"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "cmd/info.go",
       "source_location": "L170",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cmd_info",
-      "target": "cmd_info_init",
-      "confidence_score": 1.0
+      "target": "cmd_info_init"
     },
     {
       "relation": "contains",
@@ -3434,9 +3390,9 @@
       "source_file": "cmd/info.go",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cmd_info",
-      "target": "cmd_stackservice",
-      "confidence_score": 1.0
+      "target": "cmd_stackservice"
     },
     {
       "relation": "contains",
@@ -3656,16 +3612,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/cmd/root.go",
-      "source_location": "L22",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_cmd_root_go",
-      "target": "cmd_root_execute"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "cmd/root.go",
       "source_location": "L22",
       "weight": 1.0,
@@ -3698,22 +3644,12 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/cmd/server.go",
+      "source_file": "cmd/server.go",
       "source_location": "L334",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_cmd_server_go",
+      "source": "cmd_server",
       "target": "cmd_server_init"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/cmd/server.go",
-      "source_location": "L21",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_cmd_server_go",
-      "target": "cmd_server_renderprogressbar"
     },
     {
       "relation": "contains",
@@ -3746,16 +3682,6 @@
       "weight": 1.0,
       "source": "cmd_server_renderprogressbar",
       "target": "ui_ui_repeat"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "cmd/server.go",
-      "source_location": "L334",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "cmd_server",
-      "target": "cmd_server_init"
     },
     {
       "relation": "contains",
@@ -4993,32 +4919,22 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L70",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_config_telemetry_go",
+      "source": "config_telemetry",
       "target": "config_telemetry_pingasync"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
+      "source_file": "internal/config/telemetry.go",
       "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_config_telemetry_go",
+      "source": "config_telemetry",
       "target": "config_telemetry_sendtelemetryping"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_config_telemetry_go",
-      "target": "config_telemetrypayload"
     },
     {
       "relation": "contains",
@@ -5029,16 +4945,6 @@
       "confidence_score": 1.0,
       "source": "config_telemetry",
       "target": "config_telemetrypayload"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/config/telemetry.go",
-      "source_location": "L24",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "config_telemetry",
-      "target": "config_telemetry_sendtelemetryping"
     },
     {
       "relation": "calls",
@@ -5050,17 +4956,6 @@
       "confidence_score": 1.0,
       "source": "config_telemetry_pingasync",
       "target": "config_telemetry_sendtelemetryping"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
-      "source_location": "L24",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "config_telemetry_sendtelemetryping",
-      "target": "d_repos_vpsops_internal_config_telemetry_go_state"
     },
     {
       "relation": "references",
@@ -5094,27 +4989,6 @@
       "weight": 1.0,
       "source": "config_telemetry_test_testsendtelemetrypingoptout",
       "target": "config_telemetry_sendtelemetryping"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry.go",
-      "source_location": "L70",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "config_telemetry_pingasync",
-      "target": "d_repos_vpsops_internal_config_telemetry_go_state"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/config/telemetry.go",
-      "source_location": "L70",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "config_telemetry",
-      "target": "config_telemetry_pingasync"
     },
     {
       "relation": "references",
@@ -5174,26 +5048,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_config_telemetry_test_go",
-      "target": "config_telemetry_test_testsendtelemetryping"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
-      "source_location": "L72",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_config_telemetry_test_go",
-      "target": "config_telemetry_test_testsendtelemetrypingoptout"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "internal/config/telemetry_test.go",
       "source_location": "L12",
       "weight": 1.0,
@@ -5202,15 +5056,14 @@
       "target": "config_telemetry_test_testsendtelemetryping"
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
-      "source_location": "L12",
+      "source_file": "internal/config/telemetry_test.go",
+      "source_location": "L72",
       "weight": 1.0,
-      "context": "parameter_type",
       "confidence_score": 1.0,
-      "source": "config_telemetry_test_testsendtelemetryping",
-      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t"
+      "source": "config_telemetry_test",
+      "target": "config_telemetry_test_testsendtelemetrypingoptout"
     },
     {
       "relation": "references",
@@ -5222,27 +5075,6 @@
       "confidence_score": 1.0,
       "source": "config_telemetry_test_testsendtelemetryping",
       "target": "internal_config_telemetry_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/config/telemetry_test.go",
-      "source_location": "L72",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "config_telemetry_test_testsendtelemetrypingoptout",
-      "target": "d_repos_vpsops_internal_config_telemetry_test_go_t"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/config/telemetry_test.go",
-      "source_location": "L72",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "config_telemetry_test",
-      "target": "config_telemetry_test_testsendtelemetrypingoptout"
     },
     {
       "relation": "references",
@@ -5940,52 +5772,42 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L31",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_metrics_go",
+      "source": "server_metrics",
       "target": "server_historicalstats"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L154",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_metrics_go",
+      "source": "server_metrics",
       "target": "server_metrics_gethistoricalmetrics"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L39",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_metrics_go",
+      "source": "server_metrics",
       "target": "server_metrics_getmetricspath"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
+      "source_file": "internal/server/metrics.go",
       "source_location": "L48",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_metrics_go",
+      "source": "server_metrics",
       "target": "server_metrics_logmetrics"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_metrics_go",
-      "target": "server_metricsample"
     },
     {
       "relation": "contains",
@@ -5996,17 +5818,6 @@
       "confidence_score": 1.0,
       "source": "server_metrics",
       "target": "server_metricsample"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/metrics.go",
-      "source_location": "L16",
-      "weight": 1.0,
-      "context": "field",
-      "confidence_score": 1.0,
-      "source": "server_metricsample",
-      "target": "d_repos_vpsops_internal_server_metrics_go_time"
     },
     {
       "relation": "references",
@@ -6042,16 +5853,6 @@
       "target": "processstatus"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_metrics",
-      "target": "server_historicalstats"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/metrics.go",
@@ -6061,16 +5862,6 @@
       "confidence_score": 1.0,
       "source": "server_metrics_gethistoricalmetrics",
       "target": "server_historicalstats"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_metrics",
-      "target": "server_metrics_getmetricspath"
     },
     {
       "relation": "calls",
@@ -6093,16 +5884,6 @@
       "confidence_score": 1.0,
       "source": "server_metrics_logmetrics",
       "target": "server_metrics_getmetricspath"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L48",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_metrics",
-      "target": "server_metrics_logmetrics"
     },
     {
       "relation": "calls",
@@ -6180,16 +5961,6 @@
       "weight": 1.0,
       "source": "server_metrics_test_testlogmetricsandretention",
       "target": "server_metrics_logmetrics"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/metrics.go",
-      "source_location": "L154",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_metrics",
-      "target": "server_metrics_gethistoricalmetrics"
     },
     {
       "relation": "references",
@@ -7327,131 +7098,131 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L229",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_cpustats"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L17",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_processstatus"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_serverstatus"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L258",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_getcpupercentage"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L53",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_getstatus"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L289",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_gettcpconnectionscount"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L311",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_gettopprocesses"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L233",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_readcpustats"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L188",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_readdiskusage"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L183",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_readlinuxmemory"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L148",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_readlinuxmemoryandswap"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L211",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_readloadavg"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/status.go",
+      "source_file": "internal/server/status.go",
       "source_location": "L363",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_status_go",
+      "source": "server_status",
       "target": "server_status_restartservice"
     },
     {
@@ -7466,16 +7237,6 @@
       "target": "server_processstatus"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L17",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_processstatus"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/status.go",
@@ -7487,16 +7248,6 @@
       "target": "server_processstatus"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L24",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_serverstatus"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/status.go",
@@ -7506,16 +7257,6 @@
       "confidence_score": 1.0,
       "source": "server_status_getstatus",
       "target": "server_serverstatus"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L53",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_getstatus"
     },
     {
       "relation": "calls",
@@ -7595,16 +7336,6 @@
       "target": "server_status_getstatus"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L148",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_readlinuxmemoryandswap"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -7614,16 +7345,6 @@
       "confidence_score": 1.0,
       "source": "server_status_readlinuxmemory",
       "target": "server_status_readlinuxmemoryandswap"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L183",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_readlinuxmemory"
     },
     {
       "relation": "calls",
@@ -7637,36 +7358,6 @@
       "target": "server_status_readlinuxmemory"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L188",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_readdiskusage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L211",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_readloadavg"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L229",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_cpustats"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/status.go",
@@ -7678,16 +7369,6 @@
       "target": "server_cpustats"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L233",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_readcpustats"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -7697,46 +7378,6 @@
       "confidence_score": 1.0,
       "source": "server_status_getcpupercentage",
       "target": "server_status_readcpustats"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L258",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_getcpupercentage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L289",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_gettcpconnectionscount"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L311",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_gettopprocesses"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/status.go",
-      "source_location": "L363",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_status",
-      "target": "server_status_restartservice"
     },
     {
       "relation": "calls",
@@ -8280,42 +7921,22 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L126",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L253",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_fixphpmyadminconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L182",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_installgui"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tools.go",
-      "source_location": "L14",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tools_go",
-      "target": "server_tools_installphpmyadmin"
+      "source": "server_tools",
+      "target": "server_tools_disablegui"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/tools.go",
-      "source_location": "L14",
+      "source_location": "L281",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "server_tools",
-      "target": "server_tools_installphpmyadmin"
+      "target": "server_tools_enablegui"
     },
     {
       "relation": "contains",
@@ -8331,6 +7952,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "internal/server/tools.go",
+      "source_location": "L419",
+      "weight": 1.0,
+      "source": "server_tools",
+      "target": "server_tools_getguiinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/server/tools.go",
       "source_location": "L182",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8340,92 +7971,82 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_tools",
+      "target": "server_tools_installphpmyadmin"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/server/tools.go",
+      "source_location": "L281",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_tools",
+      "target": "server_tools_updategui"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L806",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_installmetricscron"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L363",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_replaceline"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L316",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_setorappendredisconfig"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L780",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_setupdefaultwebserver"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L159",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_tunedatabase"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
+      "source_file": "internal/server/tuning.go",
       "source_location": "L246",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
+      "source": "server_tuning",
       "target": "server_tuning_tuneredis"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tuneserver"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
-      "source_location": "L68",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_tuneswap"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/tuning.go",
-      "source_location": "L757",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_tuning_go",
-      "target": "server_tuning_writedefaultwelcomepage"
     },
     {
       "relation": "contains",
@@ -8436,6 +8057,26 @@
       "confidence_score": 1.0,
       "source": "server_tuning",
       "target": "server_tuning_tuneserver"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/server/tuning.go",
+      "source_location": "L68",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_tuning",
+      "target": "server_tuning_tuneswap"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/server/tuning.go",
+      "source_location": "L757",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_tuning",
+      "target": "server_tuning_writedefaultwelcomepage"
     },
     {
       "relation": "calls",
@@ -8537,36 +8178,6 @@
       "target": "ui_ui_printwarning"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L68",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_tuneswap"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L159",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_tunedatabase"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L246",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_tuneredis"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -8589,36 +8200,6 @@
       "target": "server_tuning_setorappendredisconfig"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L316",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_setorappendredisconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L363",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_replaceline"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L757",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_writedefaultwelcomepage"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -8628,26 +8209,6 @@
       "confidence_score": 1.0,
       "source": "server_tuning_setupdefaultwebserver",
       "target": "server_tuning_writedefaultwelcomepage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L780",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_setupdefaultwebserver"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/server/tuning.go",
-      "source_location": "L806",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_tuning",
-      "target": "server_tuning_installmetricscron"
     },
     {
       "relation": "contains",
@@ -8802,33 +8363,12 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_server_wordpress_test_go",
-      "target": "server_wordpress_test_testinstallwordpressmock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "internal/server/wordpress_test.go",
       "source_location": "L7",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "server_wordpress_test",
       "target": "server_wordpress_test_testinstallwordpressmock"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/server/wordpress_test.go",
-      "source_location": "L7",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "server_wordpress_test_testinstallwordpressmock",
-      "target": "d_repos_vpsops_internal_server_wordpress_test_go_t"
     },
     {
       "relation": "references",
@@ -8844,262 +8384,242 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1673",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_backup"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1085",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_backupdb"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L692",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_cacheclean"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L60",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_create"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L534",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_delete"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L2097",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_deletes3backupcli"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L2038",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_downloads3backupcli"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1305",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_edit"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1051",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_fixpermissions"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1376",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_getsslinfo"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1212",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_info"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1154",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_list"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1961",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_lists3backupscli"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L616",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_lock"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L2163",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_notifybackup"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L47",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_promptline"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1908",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_prunelocalbackups"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L764",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_reinstall"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L36",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_sanitizeuser"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1467",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_selfupdate"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L2138",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_sendtelegramnotification"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1002",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_sslrenew"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L1499",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_sync"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
+      "source_file": "internal/site/orchestrator.go",
       "source_location": "L654",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
+      "source": "site_orchestrator",
       "target": "site_orchestrator_unlock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L28",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_orchestrator_validatedomain"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1366",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_go",
-      "target": "site_sslinfo"
     },
     {
       "relation": "contains",
@@ -9110,6 +8630,16 @@
       "confidence_score": 1.0,
       "source": "site_orchestrator",
       "target": "site_orchestrator_validatedomain"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "internal/site/orchestrator.go",
+      "source_location": "L1366",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "site_orchestrator",
+      "target": "site_sslinfo"
     },
     {
       "relation": "calls",
@@ -9145,16 +8675,6 @@
       "target": "site_orchestrator_validatedomain"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_sanitizeuser"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -9188,16 +8708,6 @@
       "target": "site_orchestrator_sanitizeuser"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L47",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_promptline"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -9207,16 +8717,6 @@
       "confidence_score": 1.0,
       "source": "site_orchestrator_create",
       "target": "site_orchestrator_promptline"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L60",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_create"
     },
     {
       "relation": "calls",
@@ -9329,16 +8829,6 @@
       "target": "site_orchestrator_create"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L534",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_delete"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -9381,16 +8871,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
       "target": "site_orchestrator_delete"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L616",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_lock"
     },
     {
       "relation": "calls",
@@ -9437,16 +8917,6 @@
       "target": "site_orchestrator_lock"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L654",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_unlock"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -9491,16 +8961,6 @@
       "target": "ui_ui_printsuccess"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L692",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_cacheclean"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -9543,16 +9003,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
       "target": "site_orchestrator_cacheclean"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L764",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_reinstall"
     },
     {
       "relation": "calls",
@@ -9654,16 +9104,6 @@
       "target": "site_orchestrator_reinstall"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1002",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_sslrenew"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -9708,16 +9148,6 @@
       "target": "site_orchestrator_sslrenew"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1051",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_fixpermissions"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -9749,16 +9179,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_fixpermissions",
       "target": "ui_ui_printsuccess"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1085",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_backupdb"
     },
     {
       "relation": "calls",
@@ -9803,16 +9223,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
       "target": "site_orchestrator_backupdb"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1154",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_list"
     },
     {
       "relation": "calls",
@@ -9890,16 +9300,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
       "target": "site_orchestrator_list"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1212",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_info"
     },
     {
       "relation": "calls",
@@ -10001,16 +9401,6 @@
       "target": "site_orchestrator_info"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1305",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_edit"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -10020,16 +9410,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsiteorchestration",
       "target": "site_orchestrator_edit"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1366",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_sslinfo"
     },
     {
       "relation": "references",
@@ -10045,17 +9425,6 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L1371",
-      "weight": 1.0,
-      "context": "field",
-      "confidence_score": 1.0,
-      "source": "site_sslinfo",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
       "source_file": "internal/site/orchestrator.go",
       "source_location": "L1371",
       "weight": 1.0,
@@ -10063,26 +9432,6 @@
       "confidence_score": 1.0,
       "source": "site_sslinfo",
       "target": "internal_site_orchestrator_go_time"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1376",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_getsslinfo"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1467",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_selfupdate"
     },
     {
       "relation": "calls",
@@ -10094,16 +9443,6 @@
       "confidence_score": 1.0,
       "source": "site_orchestrator_sync",
       "target": "site_orchestrator_selfupdate"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1499",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_sync"
     },
     {
       "relation": "calls",
@@ -10170,16 +9509,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_test_testsyncimport",
       "target": "site_orchestrator_sync"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1673",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_backup"
     },
     {
       "relation": "calls",
@@ -10281,26 +9610,6 @@
       "target": "site_orchestrator_backup"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1908",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_prunelocalbackups"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L1961",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_lists3backupscli"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -10343,16 +9652,6 @@
       "weight": 1.0,
       "source": "site_orchestrator_lists3backupscli",
       "target": "ui_ui_printwarning"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L2038",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_downloads3backupcli"
     },
     {
       "relation": "calls",
@@ -10399,16 +9698,6 @@
       "target": "ui_ui_printsuccess"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L2097",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_deletes3backupcli"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -10453,16 +9742,6 @@
       "target": "ui_ui_printwarning"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L2138",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_sendtelegramnotification"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -10476,17 +9755,6 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2138",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_sendtelegramnotification",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_state"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
       "source_file": "internal/site/orchestrator.go",
       "source_location": "L2138",
       "weight": 1.0,
@@ -10494,27 +9762,6 @@
       "confidence_score": 1.0,
       "source": "site_orchestrator_sendtelegramnotification",
       "target": "internal_site_orchestrator_go_state"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator.go",
-      "source_location": "L2163",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_notifybackup",
-      "target": "d_repos_vpsops_internal_site_orchestrator_go_state"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator.go",
-      "source_location": "L2163",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator",
-      "target": "site_orchestrator_notifybackup"
     },
     {
       "relation": "references",
@@ -10530,52 +9777,42 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L275",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
+      "source": "site_orchestrator_test",
       "target": "site_orchestrator_test_testlaravelandhtmlsiteorchestration"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L41",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
+      "source": "site_orchestrator_test",
       "target": "site_orchestrator_test_testsanitizeuser"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L59",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
+      "source": "site_orchestrator_test",
       "target": "site_orchestrator_test_testsiteorchestration"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L198",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
+      "source": "site_orchestrator_test",
       "target": "site_orchestrator_test_testsyncimport"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_internal_site_orchestrator_test_go",
-      "target": "site_orchestrator_test_testvalidatedomain"
     },
     {
       "relation": "contains",
@@ -10586,17 +9823,6 @@
       "confidence_score": 1.0,
       "source": "site_orchestrator_test",
       "target": "site_orchestrator_test_testvalidatedomain"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
-      "source_location": "L12",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test_testvalidatedomain",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10612,56 +9838,13 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
+      "source_file": "internal/site/orchestrator_test.go",
       "source_location": "L275",
       "weight": 1.0,
       "context": "parameter_type",
       "confidence_score": 1.0,
       "source": "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
-      "source_location": "L41",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test_testsanitizeuser",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
-      "source_location": "L59",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test_testsiteorchestration",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/internal/site/orchestrator_test.go",
-      "source_location": "L198",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test_testsyncimport",
-      "target": "d_repos_vpsops_internal_site_orchestrator_test_go_t"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test",
-      "target": "site_orchestrator_test_testsanitizeuser"
+      "target": "internal_site_orchestrator_test_go_t"
     },
     {
       "relation": "references",
@@ -10675,16 +9858,6 @@
       "target": "internal_site_orchestrator_test_go_t"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L59",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test",
-      "target": "site_orchestrator_test_testsiteorchestration"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/site/orchestrator_test.go",
@@ -10696,16 +9869,6 @@
       "target": "internal_site_orchestrator_test_go_t"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L198",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test",
-      "target": "site_orchestrator_test_testsyncimport"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "internal/site/orchestrator_test.go",
@@ -10714,27 +9877,6 @@
       "context": "parameter_type",
       "confidence_score": 1.0,
       "source": "site_orchestrator_test_testsyncimport",
-      "target": "internal_site_orchestrator_test_go_t"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L275",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test",
-      "target": "site_orchestrator_test_testlaravelandhtmlsiteorchestration"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "internal/site/orchestrator_test.go",
-      "source_location": "L275",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "site_orchestrator_test_testlaravelandhtmlsiteorchestration",
       "target": "internal_site_orchestrator_test_go_t"
     },
     {
@@ -12056,107 +11198,22 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
+      "source_file": "telemetry/main_test.go",
       "source_location": "L116",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_repos_vpsops_telemetry_main_test_go",
+      "source": "telemetry_main_test",
       "target": "telemetry_main_test_testbadges"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L16",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandlehome"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L33",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandleping"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L89",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_repos_vpsops_telemetry_main_test_go",
-      "target": "telemetry_main_test_testhandlepinginvalid"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "telemetry/main_test.go",
       "source_location": "L16",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "telemetry_main_test",
       "target": "telemetry_main_test_testhandlehome"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L16",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandlehome",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "telemetry/main_test.go",
-      "source_location": "L16",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandlehome",
-      "target": "telemetry_main_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L116",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testbadges",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L33",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandleping",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "D:/repos/VPSops/telemetry/main_test.go",
-      "source_location": "L89",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandlepinginvalid",
-      "target": "d_repos_vpsops_telemetry_main_test_go_t"
     },
     {
       "relation": "contains",
@@ -12167,17 +11224,6 @@
       "confidence_score": 1.0,
       "source": "telemetry_main_test",
       "target": "telemetry_main_test_testhandleping"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "telemetry/main_test.go",
-      "source_location": "L33",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandleping",
-      "target": "telemetry_main_test_go_t"
     },
     {
       "relation": "contains",
@@ -12193,22 +11239,12 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "telemetry/main_test.go",
-      "source_location": "L89",
+      "source_location": "L16",
       "weight": 1.0,
       "context": "parameter_type",
       "confidence_score": 1.0,
-      "source": "telemetry_main_test_testhandlepinginvalid",
+      "source": "telemetry_main_test_testhandlehome",
       "target": "telemetry_main_test_go_t"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "telemetry/main_test.go",
-      "source_location": "L116",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "telemetry_main_test",
-      "target": "telemetry_main_test_testbadges"
     },
     {
       "relation": "references",
@@ -12219,6 +11255,28 @@
       "context": "parameter_type",
       "confidence_score": 1.0,
       "source": "telemetry_main_test_testbadges",
+      "target": "telemetry_main_test_go_t"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "telemetry/main_test.go",
+      "source_location": "L33",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "confidence_score": 1.0,
+      "source": "telemetry_main_test_testhandleping",
+      "target": "telemetry_main_test_go_t"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "telemetry/main_test.go",
+      "source_location": "L89",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "confidence_score": 1.0,
+      "source": "telemetry_main_test_testhandlepinginvalid",
       "target": "telemetry_main_test_go_t"
     },
     {
@@ -12625,11 +11683,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_key_features",
+      "target": "readme_security_first_architecture_hardening"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "readme_key_features",
+      "target": "readme_security_first_infrastructure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L67",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "readme_installation",
       "target": "readme_installation_from_specific_release_e_g_v0_8"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_installation",
+      "target": "readme_installation_from_specific_release_e_g_v1_0_1"
     },
     {
       "relation": "contains",
@@ -12655,6 +11743,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L120",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_cli_reference_command_set",
+      "target": "readme_maintenance_tools_ap_tool_subcommand_root_commands"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L101",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -12665,11 +11763,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
+      "source_location": "L108",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_cli_reference_command_set",
+      "target": "readme_server_administration_ap_server_subcommand"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
       "source_location": "L81",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "readme_cli_reference_command_set",
       "target": "readme_site_management"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L87",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_cli_reference_command_set",
+      "target": "readme_site_management_ap_site_subcommand"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L131",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_cli_reference_command_set",
+      "target": "readme_web_gui_dashboard_companion_ap_gui_subcommand"
     },
     {
       "relation": "contains",
@@ -12803,5 +11931,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "78b7214b325ca400cee79d91f5a5a2869020350b"
+  "built_at_commit": "9dda4bd5b6f38272884462dcb8077704be172b58"
 }

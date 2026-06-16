@@ -99,6 +99,12 @@ const caddyfileTemplateStr = `# Global Options Block
         Referrer-Policy "no-referrer-when-downgrade"
     }
 
+    # Static Asset Browser Caching
+    @static {
+        path *.ico *.css *.js *.gif *.webp *.avif *.jpg *.jpeg *.png *.svg *.woff *.woff2
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
     # Block access to hidden files/directories except .well-known
     @hidden-files {
         path */.*
@@ -112,9 +118,9 @@ const caddyfileTemplateStr = `# Global Options Block
     }
     respond @uploads-php "Access Denied" 403
 
-    # Block access to xmlrpc.php and install.php
+    # Block access to xmlrpc.php, install.php, and wp-config.php
     @blocked-php {
-        path /xmlrpc.php /wp-admin/install.php
+        path /xmlrpc.php /wp-admin/install.php /wp-config.php
     }
     respond @blocked-php "Access Denied" 403
 
@@ -156,6 +162,12 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
         Referrer-Policy "no-referrer-when-downgrade"
     }
 
+    # Static Asset Browser Caching
+    @static {
+        path *.ico *.css *.js *.gif *.webp *.avif *.jpg *.jpeg *.png *.svg *.woff *.woff2
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
     # Block access to hidden files/directories except .well-known
     @hidden-files {
         path */.*
@@ -169,9 +181,9 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
     }
     respond @uploads-php "Access Denied" 403
 
-    # Block access to xmlrpc.php and install.php
+    # Block access to xmlrpc.php, install.php, and wp-config.php
     @blocked-php {
-        path /xmlrpc.php /wp-admin/install.php
+        path /xmlrpc.php /wp-admin/install.php /wp-config.php
     }
     respond @blocked-php "Access Denied" 403
 

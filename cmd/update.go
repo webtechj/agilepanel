@@ -66,7 +66,7 @@ var upgradeCmd = &cobra.Command{
 		}
 
 		ui.PrintStep(2, "Running configuration repair and syncing all services...")
-		if err := server.RepairInstallation(); err != nil {
+		if err := server.RepairInstallation(false); err != nil {
 			return err
 		}
 
