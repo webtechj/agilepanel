@@ -160,7 +160,7 @@ AgilePanel collects anonymous usage telemetry to track active installations and 
 ### What is collected?
 - A randomly generated unique server ID (`uuid` stored in `/etc/agilepanel/state.json`)
 - System OS and Architecture (e.g. `linux`, `amd64`)
-- Current AgilePanel version (e.g. `1.0.1`)
+- Current AgilePanel version (e.g. `1.0.2`)
 - The number of WordPress sites hosted on the server
 
 > [!NOTE]

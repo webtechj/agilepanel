@@ -55,8 +55,8 @@ func TestSendTelemetryPing(t *testing.T) {
 	if receivedContentType != "application/json" {
 		t.Errorf("expected Content-Type application/json, got %s", receivedContentType)
 	}
-	if receivedUserAgent != "AgilePanel-CLI/1.0.1" {
-		t.Errorf("expected User-Agent AgilePanel-CLI/1.0.1, got %s", receivedUserAgent)
+	if receivedUserAgent != "AgilePanel-CLI/1.0.2" {
+		t.Errorf("expected User-Agent AgilePanel-CLI/1.0.2, got %s", receivedUserAgent)
 	}
 	if receivedPayload.UUID != "test-uuid-12345" {
 		t.Errorf("expected UUID test-uuid-12345, got %s", receivedPayload.UUID)
@@ -64,8 +64,8 @@ func TestSendTelemetryPing(t *testing.T) {
 	if receivedPayload.SiteCount != 2 {
 		t.Errorf("expected SiteCount 2, got %d", receivedPayload.SiteCount)
 	}
-	if receivedPayload.Version != "1.0.1" {
-		t.Errorf("expected Version 1.0.1, got %s", receivedPayload.Version)
+	if receivedPayload.Version != "1.0.2" {
+		t.Errorf("expected Version 1.0.2, got %s", receivedPayload.Version)
 	}
 }
 

@@ -451,7 +451,7 @@ func GetGuiInfo() (bool, string) {
 		}
 	}
 
-	return true, "1.0.1"
+	return true, "1.0.2"
 }
 
 
