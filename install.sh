@@ -74,9 +74,13 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Ensure GPG and keyrings directories exist with proper permissions
+mkdir -p ~/.gnupg /etc/apt/keyrings
+chmod 700 ~/.gnupg
+
 # 1. Update system package index
 apt-get update || true
-apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo zip unzip
+apt-get install -y curl gpg gnupg2 dirmngr lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo zip unzip ca-certificates
 
 # 2. Add Caddy official repository
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
@@ -85,17 +89,10 @@ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /
 # 3. Add PHP (Ondřej Surý) repository (for Ubuntu/Debian)
 if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
     echo "Configuring PHP repository..."
-    apt-get install -y gnupg2 ca-certificates
     
     # Check if it is Ubuntu
     if [ -f /etc/lsb-release ] || grep -q "Ubuntu" /etc/issue 2>/dev/null; then
         echo "Adding PHP PPA for Ubuntu..."
-        mkdir -p /etc/apt/keyrings
-        # Import GPG key securely using direct HTTPS or keyserver fallback
-        curl -sSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x4F4EA0AAE5267A6C' | gpg --dearmor --yes -o /etc/apt/keyrings/ondrej-php.gpg || \
-        (gpg --no-default-keyring --keyring /tmp/ondrej.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4F4EA0AAE5267A6C && \
-         gpg --no-default-keyring --keyring /tmp/ondrej.gpg --export --yes -o /etc/apt/keyrings/ondrej-php.gpg && \
-         rm -f /tmp/ondrej.gpg)
         
         # Get Ubuntu codename
         if [ -f /etc/lsb-release ]; then
@@ -105,7 +102,14 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
             CODENAME=$(lsb_release -sc)
         fi
         
-        echo "deb [signed-by=/etc/apt/keyrings/ondrej-php.gpg] http://ppa.launchpad.net/ondrej/php/ubuntu ${CODENAME} main" > /etc/apt/sources.list.d/ondrej-php.list
+        # Import GPG key via HTTPS direct stream to avoid dirmngr/keyserver socket dependencies
+        if curl -sSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x4F4EA0AAE5267A6C' | gpg --dearmor --yes -o /etc/apt/keyrings/ondrej-php.gpg 2>/dev/null; then
+            echo "deb [signed-by=/etc/apt/keyrings/ondrej-php.gpg] http://ppa.launchpad.net/ondrej/php/ubuntu ${CODENAME} main" > /etc/apt/sources.list.d/ondrej-php.list
+        else
+            echo "Fallback: Adding Ondrej PHP PPA via add-apt-repository..."
+            apt-get install -y software-properties-common
+            add-apt-repository -y ppa:ondrej/php
+        fi
     else
         # Debian
         echo "Adding PHP package source for Debian..."
