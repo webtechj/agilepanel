@@ -12,7 +12,7 @@ import (
 )
 
 // RepairInstallation restores all configuration files and applies optimisations.
-func RepairInstallation() error {
+func RepairInstallation(allowSSHPasswordRecovery bool) error {
 	// 1. Load panel state database
 	statePath := config.GetStatePath()
 	state, err := config.ReadState(statePath)
@@ -42,7 +42,7 @@ func RepairInstallation() error {
 	}
 
 	// 5. Restore SSH Password Login for recovery
-	if runtime.GOOS == "linux" {
+	if runtime.GOOS == "linux" && allowSSHPasswordRecovery {
 		ui.PrintStep(4, "Restoring SSH configurations to allow password login (recovery mode)...")
 		sshdPath := "/etc/ssh/sshd_config"
 		if data, err := ioutil.ReadFile(sshdPath); err == nil {

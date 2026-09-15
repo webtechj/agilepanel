@@ -1,16 +1,16 @@
-# Graph Report - agilepanel  (2026-06-02)
+# Graph Report - agilepanel  (2026-06-04)
 
 ## Corpus Check
-- 41 files · ~62,725 words
+- 43 files · ~65,430 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 373 nodes · 892 edges · 25 communities (17 shown, 8 thin omitted)
-- Extraction: 71% EXTRACTED · 29% INFERRED · 0% AMBIGUOUS · INFERRED: 263 edges (avg confidence: 0.8)
+- 367 nodes · 812 edges · 27 communities (19 shown, 8 thin omitted)
+- Extraction: 68% EXTRACTED · 32% INFERRED · 0% AMBIGUOUS · INFERRED: 263 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `78b7214b`
+- Built from commit: `9dda4bd5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -30,7 +30,6 @@
 - [[_COMMUNITY_Site Orchestration Tests|Site Orchestration Tests]]
 - [[_COMMUNITY_CLI Entry Point|CLI Entry Point]]
 - [[_COMMUNITY_Server Security Hardening|Server Security Hardening]]
-- [[_COMMUNITY_Tool Installer (phpMyAdminGUI)|Tool Installer (phpMyAdmin/GUI)]]
 - [[_COMMUNITY_WordPress Install Tests|WordPress Install Tests]]
 - [[_COMMUNITY_Install Command|Install Command]]
 - [[_COMMUNITY_Repair Command|Repair Command]]
@@ -42,57 +41,57 @@
 - [[_COMMUNITY_Merge Script (Scratch)|Merge Script (Scratch)]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Create()` - 36 edges
+1. `Create()` - 35 edges
 2. `ReadState()` - 30 edges
 3. `GetStatePath()` - 25 edges
-4. `Reinstall()` - 21 edges
+4. `Reinstall()` - 20 edges
 5. `PrintInfo()` - 20 edges
-6. `Sync()` - 19 edges
-7. `PrintSuccess()` - 19 edges
-8. `Delete()` - 18 edges
-9. `Backup()` - 18 edges
-10. `Divider()` - 18 edges
+6. `PrintSuccess()` - 19 edges
+7. `Sync()` - 18 edges
+8. `Divider()` - 18 edges
+9. `Delete()` - 17 edges
+10. `Backup()` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `AgilePanel` --references--> `AgilePanel Logo`  [EXTRACTED]
-  README.md → agilepanel_logo.png
-- `main()` --calls--> `Execute()`  [INFERRED]
-  main.go → D:/repos/VPSops/cmd/root.go
-- `SendTelemetryPing()` --references--> `State`  [EXTRACTED]
-  D:/repos/VPSops/internal/config/telemetry.go → internal/config/telemetry.go
-- `PingAsync()` --references--> `State`  [EXTRACTED]
-  D:/repos/VPSops/internal/config/telemetry.go → internal/config/telemetry.go
-- `TestSendTelemetryPing()` --references--> `T`  [EXTRACTED]
-  D:/repos/VPSops/internal/config/telemetry_test.go → internal/config/telemetry_test.go
+- `getMetricsPath()` --calls--> `GetStatePath()`  [INFERRED]
+  internal/server/metrics.go → D:/repos/VPSops/internal/config/state.go
+- `GetStatus()` --calls--> `GetStatePath()`  [INFERRED]
+  internal/server/status.go → D:/repos/VPSops/internal/config/state.go
+- `SetupDefaultWebserver()` --calls--> `GetStatePath()`  [INFERRED]
+  internal/server/tuning.go → D:/repos/VPSops/internal/config/state.go
+- `TuneServer()` --calls--> `GetStatePath()`  [INFERRED]
+  internal/server/tuning.go → D:/repos/VPSops/internal/config/state.go
+- `Create()` --calls--> `GetStatePath()`  [INFERRED]
+  internal/site/orchestrator.go → D:/repos/VPSops/internal/config/state.go
 
 ## Import Cycles
 - None detected.
 
-## Communities (25 total, 8 thin omitted)
+## Communities (27 total, 8 thin omitted)
 
 ### Community 0 - "Site Orchestration Core"
-Cohesion: 0.13
-Nodes (49): GlobalConfig, SiteConfig, State, DefaultState(), GenerateUUID(), GetStatePath(), ReadState(), TestAdminFields() (+41 more)
+Cohesion: 0.15
+Nodes (39): GetStatePath(), ReadState(), State, Time, T, ReloadPHP(), RepairInstallation(), RestartService() (+31 more)
 
 ### Community 1 - "Metrics & System Monitoring"
-Cohesion: 0.12
-Nodes (30): Time, T, T, Duration, Time, T, T, ProcessStatus (+22 more)
+Cohesion: 0.11
+Nodes (28): T, T, Duration, Time, T, T, ProcessStatus, cpuStats (+20 more)
 
 ### Community 2 - "Database Management"
 Cohesion: 0.13
-Nodes (25): T, T, T, T, CreateDatabase(), DeleteDatabase(), GenerateSecurePassword(), GenerateSecurePrefix() (+17 more)
+Nodes (25): T, T, T, CreateDatabase(), DeleteDatabase(), GenerateSecurePassword(), GenerateSecurePrefix(), TestCreateAndDeleteDatabase() (+17 more)
 
 ### Community 3 - "Server CLI & UI Rendering"
 Cohesion: 0.16
-Nodes (28): init(), renderProgressBar(), Info(), TableColumn, Accent(), Banner(), Danger(), Header() (+20 more)
+Nodes (27): renderProgressBar(), Info(), TableColumn, Accent(), Banner(), Danger(), Header(), KeyStr() (+19 more)
 
 ### Community 4 - "Telemetry Service"
 Cohesion: 0.20
-Nodes (22): Request, Time, T, ResponseWriter, BadgeMetrics, getClientIP(), getMetrics(), Request (+14 more)
+Nodes (21): Request, Time, ResponseWriter, BadgeMetrics, getClientIP(), getMetrics(), Request, Time (+13 more)
 
 ### Community 5 - "Caddy Web Server Config"
 Cohesion: 0.16
-Nodes (18): State, T, State, T, GenerateCaddyfile(), ReloadCaddy(), TestGenerateCaddyfile(), WriteCaddyfile() (+10 more)
+Nodes (17): State, T, State, T, GenerateCaddyfile(), ReloadCaddy(), TestGenerateCaddyfile(), WriteCaddyfile() (+9 more)
 
 ### Community 7 - "S3 Backup Storage"
 Cohesion: 0.29
@@ -103,43 +102,39 @@ Cohesion: 0.18
 Nodes (11): Diagnostics & Updates, AgilePanel Command Reference, Server Administration Command Set, Site Management Command Set, Server Tools Command Set, AgilePanel Logo, AgilePanel, Developer-Centric Operations (+3 more)
 
 ### Community 9 - "Telemetry Ping Client"
-Cohesion: 0.27
-Nodes (9): PingAsync(), SendTelemetryPing(), TestSendTelemetryPing(), TestSendTelemetryPingOptOut(), TelemetryPayload, State, T, State (+1 more)
+Cohesion: 0.25
+Nodes (16): GlobalConfig, SiteConfig, State, DefaultState(), GenerateUUID(), TestAdminFields(), TestConcurrentStateLocking(), TestDefaultState() (+8 more)
 
 ### Community 10 - "PHP-FPM Pool Management"
-Cohesion: 0.24
-Nodes (10): T, T, DeletePHPPool(), GeneratePHPPool(), GetPHPPoolPath(), ReloadPHP(), TestGeneratePHPPool(), WritePHPPool() (+2 more)
+Cohesion: 0.27
+Nodes (8): T, T, DeletePHPPool(), GeneratePHPPool(), GetPHPPoolPath(), TestGeneratePHPPool(), WritePHPPool(), SiteConfig
 
 ### Community 11 - "CLI Prompt Helpers"
 Cohesion: 0.61
 Nodes (6): getDomainArg(), getServiceArg(), promptConfirm(), promptDoubleConfirm(), promptPassword(), promptString()
 
 ### Community 12 - "Site Orchestration Tests"
-Cohesion: 0.57
-Nodes (6): T, T, TestLaravelAndHTMLSiteOrchestration(), TestSanitizeUser(), TestSyncImport(), TestValidateDomain()
+Cohesion: 0.33
+Nodes (7): PingAsync(), SendTelemetryPing(), TestSendTelemetryPing(), TestSendTelemetryPingOptOut(), TelemetryPayload, State, T
 
 ### Community 13 - "CLI Entry Point"
-Cohesion: 0.29
+Cohesion: 0.33
 Nodes (3): Execute(), main(), main()
 
 ### Community 14 - "Server Security Hardening"
 Cohesion: 0.60
 Nodes (3): CleanServer(), SecureServer(), UnlockGuiPanel()
 
-### Community 15 - "Tool Installer (phpMyAdmin/GUI)"
-Cohesion: 0.60
-Nodes (3): FixPhpMyAdminConfig(), InstallGui(), InstallPhpMyAdmin()
-
 ### Community 16 - "WordPress Install Tests"
 Cohesion: 0.06
 Nodes (31): AgilePanel (ap) Command Reference, `ap install gui`, `ap repair`, `ap server auth [username] [password]`, `ap server restart [service]`, `ap server secure`, `ap server status`, `ap server tune` (+23 more)
 
 ### Community 24 - "Merge Script (Scratch)"
-Cohesion: 0.12
-Nodes (16): 🛠️ CLI Reference & Command Set, 🛠️ Developer-Centric Operations, 🚀 High-Performance Optimizations, 📥 Installation, Installation from Specific Release (e.g. v0.8), 🌟 Key Features, 📄 License, 🔧 Maintenance & Tools (+8 more)
+Cohesion: 0.08
+Nodes (23): 🛠️ CLI Reference & Command Set, 🛠️ Developer-Centric Operations, 🚀 High-Performance Optimizations, 📥 Installation, Installation from Specific Release (e.g. v0.8), Installation from Specific Release (e.g. v1.0.1), 🌟 Key Features, 📄 License (+15 more)
 
 ## Knowledge Gaps
-- **62 isolated node(s):** `stackService`, `Time`, `T`, `Time`, `Duration` (+57 more)
+- **67 isolated node(s):** `stackService`, `Time`, `TelemetryPayload`, `T`, `Time` (+62 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -147,11 +142,11 @@ Nodes (16): 🛠️ CLI Reference & Command Set, 🛠️ Developer-Centric Opera
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Create()` connect `Database Management` to `Site Orchestration Core`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `S3 Backup Storage`, `Telemetry Ping Client`, `PHP-FPM Pool Management`, `Site Orchestration Tests`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
-- **Why does `ReadState()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `PHP-FPM Pool Management`, `Site Orchestration Tests`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Why does `GetStatePath()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `PHP-FPM Pool Management`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
+- **Why does `ReadState()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `Telemetry Ping Client`?**
+  _High betweenness centrality (0.075) - this node is a cross-community bridge._
+- **Why does `GetStatePath()` connect `Site Orchestration Core` to `Metrics & System Monitoring`, `Database Management`, `Server CLI & UI Rendering`, `Caddy Web Server Config`, `Telemetry Ping Client`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
 - **Are the 30 inferred relationships involving `Create()` (e.g. with `DownloadFromS3()` and `GetStatePath()`) actually correct?**
   _`Create()` has 30 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 26 inferred relationships involving `ReadState()` (e.g. with `TestAdminFields()` and `TestConcurrentStateLocking()`) actually correct?**

@@ -42,7 +42,7 @@ func TestHandlePing(t *testing.T) {
 		UUID:      "test-server-uuid-99999",
 		OS:        "linux",
 		Arch:      "amd64",
-		Version:   "1.0.1",
+		Version:   "1.0.2",
 		SiteCount: 3,
 	}
 
@@ -102,7 +102,7 @@ func TestHandlePingInvalid(t *testing.T) {
 	// Test missing UUID
 	payload := PingPayload{
 		OS:      "linux",
-		Version: "1.0.1",
+		Version: "1.0.2",
 	}
 	body, _ := json.Marshal(payload)
 	req2 := httptest.NewRequest("POST", "/api/ping", bytes.NewBuffer(body))
@@ -123,14 +123,14 @@ func TestBadges(t *testing.T) {
 		{
 			UUID:      "server-1",
 			OS:        "linux",
-			Version:   "1.0.1",
+			Version:   "1.0.2",
 			SiteCount: 2,
 			LastSeen:  time.Now(), // Active
 		},
 		{
 			UUID:      "server-2",
 			OS:        "linux",
-			Version:   "1.0.1",
+			Version:   "1.0.2",
 			SiteCount: 5,
 			LastSeen:  time.Now().AddDate(0, 0, -10), // Inactive (> 7 days)
 		},
