@@ -72,11 +72,14 @@ if [ -z "$ADMIN_EMAIL" ]; then
     fi
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
 # 1. Update system package index
-apt-get update && apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo zip unzip
+apt-get update || true
+apt-get install -y curl gpg lsb-release debian-keyring debian-archive-keyring apt-transport-https sudo zip unzip
 
 # 2. Add Caddy official repository
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
 # 3. Add PHP (Ondřej Surý) repository (for Ubuntu/Debian)
@@ -87,11 +90,12 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
     # Check if it is Ubuntu
     if [ -f /etc/lsb-release ] || grep -q "Ubuntu" /etc/issue 2>/dev/null; then
         echo "Adding PHP PPA for Ubuntu..."
-        # Import GPG key securely using keyserver
-        gpg --no-default-keyring --keyring /tmp/ondrej.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4F4EA0AAE5267A6C
         mkdir -p /etc/apt/keyrings
-        gpg --no-default-keyring --keyring /tmp/ondrej.gpg --export --yes -o /etc/apt/keyrings/ondrej-php.gpg
-        rm -f /tmp/ondrej.gpg
+        # Import GPG key securely using direct HTTPS or keyserver fallback
+        curl -sSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x4F4EA0AAE5267A6C' | gpg --dearmor --yes -o /etc/apt/keyrings/ondrej-php.gpg || \
+        (gpg --no-default-keyring --keyring /tmp/ondrej.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4F4EA0AAE5267A6C && \
+         gpg --no-default-keyring --keyring /tmp/ondrej.gpg --export --yes -o /etc/apt/keyrings/ondrej-php.gpg && \
+         rm -f /tmp/ondrej.gpg)
         
         # Get Ubuntu codename
         if [ -f /etc/lsb-release ]; then
@@ -108,7 +112,7 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
         curl -sSL https://packages.sury.org/php/README.txt | bash
     fi
 fi
-apt-get update
+apt-get update || true
 
 # 3.5. Stop, disable and purge conflicting web servers
 echo "Removing and purging conflicting web servers (apache2/nginx) to clear port 80/443..."
