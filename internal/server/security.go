@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,7 +27,7 @@ func UnlockGuiPanel() error {
 	}
 
 	config := guiAuth{Enabled: false}
-	if data, err := ioutil.ReadFile(path); err == nil {
+	if data, err := os.ReadFile(path); err == nil {
 		_ = json.Unmarshal(data, &config)
 	}
 
@@ -38,7 +37,7 @@ func UnlockGuiPanel() error {
 		return fmt.Errorf("failed to marshal gui auth: %w", err)
 	}
 
-	return ioutil.WriteFile(path, newData, 0644)
+	return os.WriteFile(path, newData, 0644)
 }
 
 // SecureServer audits and seals security loopholes on Ubuntu Server.
@@ -59,7 +58,7 @@ func SecureServer() error {
 
 		// Update /etc/login.defs for future users
 		loginDefsPath := "/etc/login.defs"
-		if data, err := ioutil.ReadFile(loginDefsPath); err == nil {
+		if data, err := os.ReadFile(loginDefsPath); err == nil {
 			content := string(data)
 			lines := strings.Split(content, "\n")
 			modified := false
@@ -71,7 +70,7 @@ func SecureServer() error {
 				}
 			}
 			if modified {
-				_ = ioutil.WriteFile(loginDefsPath, []byte(strings.Join(lines, "\n")), 0644)
+				_ = os.WriteFile(loginDefsPath, []byte(strings.Join(lines, "\n")), 0644)
 				fmt.Println("Security: Updated /etc/login.defs PASS_MAX_DAYS to 30.")
 			}
 		}
@@ -85,11 +84,25 @@ func SecureServer() error {
 		if _, err := exec.LookPath("ufw"); err == nil {
 			fmt.Println("Security: Configuring UFW Firewall rules...")
 			
-			// Allow SSH, HTTP, HTTPS and AgilePanel custom ports
+			// Allow SSH (default 22 and any custom port configured in sshd_config)
 			_ = exec.Command("ufw", "allow", "22/tcp").Run()
+			if sshdData, err := os.ReadFile("/etc/ssh/sshd_config"); err == nil {
+				for _, line := range strings.Split(string(sshdData), "\n") {
+					line = strings.TrimSpace(line)
+					if strings.HasPrefix(strings.ToLower(line), "port ") {
+						parts := strings.Fields(line)
+						if len(parts) >= 2 && parts[1] != "" && parts[1] != "22" {
+							_ = exec.Command("ufw", "allow", parts[1]+"/tcp").Run()
+						}
+					}
+				}
+			}
+
+			// Allow HTTP, HTTPS and AgilePanel custom ports (8888 phpMyAdmin, 8889 GUI)
 			_ = exec.Command("ufw", "allow", "80/tcp").Run()
 			_ = exec.Command("ufw", "allow", "443/tcp").Run()
 			_ = exec.Command("ufw", "allow", "8888/tcp").Run()
+			_ = exec.Command("ufw", "allow", "8889/tcp").Run()
 			
 			// Enable UFW
 			cmdEnable := exec.Command("ufw", "--force", "enable")
@@ -102,13 +115,13 @@ func SecureServer() error {
 			fmt.Println("Security Warning: 'ufw' utility is not installed. Recommended: 'apt install ufw'.")
 		}
 	} else {
-		fmt.Println("Security (Mock): Enabled UFW and opened ports 22, 80, 443, 8888.")
+		fmt.Println("Security (Mock): Enabled UFW and opened ports 22, 80, 443, 8888, 8889.")
 	}
 
 	// 3. Harden SSH Configuration (/etc/ssh/sshd_config)
 	if runtime.GOOS == "linux" {
 		sshdPath := "/etc/ssh/sshd_config"
-		if data, err := ioutil.ReadFile(sshdPath); err == nil {
+		if data, err := os.ReadFile(sshdPath); err == nil {
 			content := string(data)
 			modified := false
 
@@ -123,7 +136,7 @@ func SecureServer() error {
 			}
 
 			if modified {
-				if err := ioutil.WriteFile(sshdPath, []byte(content), 0644); err == nil {
+				if err := os.WriteFile(sshdPath, []byte(content), 0644); err == nil {
 					fmt.Println("Security: SSH Configuration hardened (PermitRootLogin set to prohibit-password).")
 					// Reload SSH daemon
 					_ = exec.Command("systemctl", "reload", "ssh").Run()
@@ -138,13 +151,13 @@ func SecureServer() error {
 	return nil
 }
 
-// CleanServer purges system/app logs, old backup zip files, and package caches
+// CleanServer purges rotated logs, old backup zip files, and temporary caches safely.
 func CleanServer() error {
 	fmt.Println("AgilePanel: Starting system disk space cleanup...")
 
-	// 1. Clear system and application logs (Linux)
+	// 1. Clear rotated logs and vacuum journald
 	if runtime.GOOS == "linux" {
-		fmt.Println("Cleanup: Truncating system log files and removing rotated logs...")
+		fmt.Println("Cleanup: Removing rotated and expired log files...")
 		_ = filepath.Walk("/var/log", func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return nil
@@ -153,14 +166,13 @@ func CleanServer() error {
 				name := info.Name()
 				if strings.HasSuffix(name, ".gz") || strings.Contains(name, ".log.") || strings.HasSuffix(name, ".old") {
 					_ = os.Remove(path)
-				} else if strings.HasSuffix(name, ".log") {
-					_ = os.Truncate(path, 0)
 				}
 			}
 			return nil
 		})
+		_ = exec.Command("journalctl", "--vacuum-time=7d").Run()
 	} else {
-		fmt.Println("Cleanup (Mock): Truncated log files in /var/log.")
+		fmt.Println("Cleanup (Mock): Cleaned rotated log files in /var/log.")
 	}
 
 	// 2. Clear old backup files (any backup zip files older than 3 days)
@@ -185,22 +197,25 @@ func CleanServer() error {
 		return nil
 	})
 
-	// 3. Clear package manager cache and temporary files (Linux)
+	// 3. Clear package manager cache and temporary files safely (Linux)
 	if runtime.GOOS == "linux" {
 		fmt.Println("Cleanup: Clearing package manager caches (apt-get clean)...")
 		_ = exec.Command("apt-get", "clean").Run()
 		_ = exec.Command("apt-get", "autoremove", "-y").Run()
 
-		fmt.Println("Cleanup: Clearing temporary directories (/tmp and /var/tmp)...")
-		_ = filepath.Walk("/tmp", func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
+		fmt.Println("Cleanup: Clearing AgilePanel temporary files in /tmp...")
+		entries, err := os.ReadDir("/tmp")
+		if err == nil {
+			for _, entry := range entries {
+				name := entry.Name()
+				if strings.HasPrefix(name, "phpmyadmin") || strings.HasPrefix(name, "import_db_") || strings.HasPrefix(name, "agilepanel") {
+					info, err := entry.Info()
+					if err == nil && time.Since(info.ModTime()) > 24*time.Hour {
+						_ = os.RemoveAll(filepath.Join("/tmp", name))
+					}
+				}
 			}
-			if path != "/tmp" && time.Since(info.ModTime()) > 24*time.Hour {
-				_ = os.RemoveAll(path)
-			}
-			return nil
-		})
+		}
 	} else {
 		fmt.Println("Cleanup (Mock): Cleared package manager cache and temp directories.")
 	}

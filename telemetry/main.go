@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -38,8 +39,11 @@ type ServerRecord struct {
 }
 
 var (
-	dataDir string
-	mu      sync.Mutex // Protects file operations from race conditions
+	dataDir       string
+	mu            sync.Mutex // Protects file operations from race conditions
+	cachedMetrics BadgeMetrics
+	cacheExpires  time.Time
+	uuidRegex     = regexp.MustCompile(`^[a-zA-Z0-9-]{10,64}$`)
 )
 
 func main() {
@@ -120,8 +124,8 @@ func handlePing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payload.UUID = strings.TrimSpace(payload.UUID)
-	if payload.UUID == "" || len(payload.UUID) < 10 {
-		http.Error(w, "Invalid UUID", http.StatusBadRequest)
+	if !uuidRegex.MatchString(payload.UUID) || filepath.Base(payload.UUID) != payload.UUID {
+		http.Error(w, "Invalid UUID format", http.StatusBadRequest)
 		return
 	}
 
@@ -175,6 +179,11 @@ func getMetrics() (BadgeMetrics, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	// Return cached metrics if within TTL (60 seconds)
+	if !cacheExpires.IsZero() && time.Now().Before(cacheExpires) {
+		return cachedMetrics, nil
+	}
+
 	files, err := os.ReadDir(dataDir)
 	if err != nil {
 		return BadgeMetrics{}, err
@@ -206,6 +215,9 @@ func getMetrics() (BadgeMetrics, error) {
 			metrics.TotalSites += rec.SiteCount
 		}
 	}
+
+	cachedMetrics = metrics
+	cacheExpires = time.Now().Add(60 * time.Second)
 
 	return metrics, nil
 }

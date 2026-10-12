@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -120,14 +119,14 @@ func TuneSwap() error {
 		}
 
 		// 5. Make swap persistent in fstab
-		fstabBytes, err := ioutil.ReadFile("/etc/fstab")
+		fstabBytes, err := os.ReadFile("/etc/fstab")
 		if err == nil && !strings.Contains(string(fstabBytes), "/swapfile") {
 			fstabStr := string(fstabBytes)
 			if !strings.HasSuffix(fstabStr, "\n") {
 				fstabStr += "\n"
 			}
 			fstabStr += "/swapfile none swap sw 0 0\n"
-			_ = ioutil.WriteFile("/etc/fstab", []byte(fstabStr), 0644)
+			_ = os.WriteFile("/etc/fstab", []byte(fstabStr), 0644)
 		}
 		fmt.Println("Swap: 2GB Swapfile successfully created and activated.")
 	}
@@ -150,7 +149,7 @@ func TuneSwap() error {
 		"net.ipv4.tcp_tw_reuse=1\n" +
 		"net.core.netdev_max_backlog=5000\n" +
 		"fs.file-max=200000\n"
-	_ = ioutil.WriteFile(sysctlConfPath, []byte(sysctlContent), 0644)
+	_ = os.WriteFile(sysctlConfPath, []byte(sysctlContent), 0644)
 
 	return nil
 }
@@ -214,7 +213,7 @@ read_rnd_buffer_size = 512K
 	for _, dir := range cnfDirs {
 		if _, err := os.Stat(dir); err == nil {
 			filePath := filepath.Join(dir, "99-agilepanel-tune.cnf")
-			if err := ioutil.WriteFile(filePath, []byte(cnfContent), 0644); err == nil {
+			if err := os.WriteFile(filePath, []byte(cnfContent), 0644); err == nil {
 				fmt.Printf("DB: Database optimization profile written to %s.\n", filePath)
 				written = true
 				break
@@ -226,7 +225,7 @@ read_rnd_buffer_size = 512K
 		// Fallback to /etc/mysql/conf.d/99-agilepanel-tune.cnf
 		filePath := "/etc/mysql/conf.d/99-agilepanel-tune.cnf"
 		_ = os.MkdirAll(filepath.Dir(filePath), 0755)
-		if err := ioutil.WriteFile(filePath, []byte(cnfContent), 0644); err == nil {
+		if err := os.WriteFile(filePath, []byte(cnfContent), 0644); err == nil {
 			fmt.Printf("DB: Database optimization profile written to fallback path %s.\n", filePath)
 		} else {
 			return fmt.Errorf("failed to write database tuning file")
@@ -236,8 +235,14 @@ read_rnd_buffer_size = 512K
 	// Trigger restart of MariaDB to apply
 	fmt.Println("DB: Restarting MariaDB service to apply changes...")
 	restartCmd := exec.Command("systemctl", "restart", "mariadb")
+	var restartErr bytes.Buffer
+	restartCmd.Stderr = &restartErr
 	if err := restartCmd.Run(); err != nil {
-		_ = exec.Command("systemctl", "restart", "mysql").Run()
+		fallbackCmd := exec.Command("systemctl", "restart", "mysql")
+		fallbackCmd.Stderr = &restartErr
+		if fbErr := fallbackCmd.Run(); fbErr != nil {
+			return fmt.Errorf("failed to restart MariaDB/MySQL service: %w (stderr: %s)", fbErr, restartErr.String())
+		}
 	}
 	return nil
 }
@@ -254,7 +259,7 @@ func TuneRedis() error {
 		return nil // Redis not installed or different path
 	}
 
-	data, err := ioutil.ReadFile(confPath)
+	data, err := os.ReadFile(confPath)
 	if err != nil {
 		return err
 	}
@@ -271,12 +276,15 @@ func TuneRedis() error {
 		modified = true
 	}
 
-	// Enable unixsocketperm 777
-	if strings.Contains(content, "# unixsocketperm ") || strings.Contains(content, "#unixsocketperm ") {
-		content = replaceLine(content, "unixsocketperm ", "unixsocketperm 777")
+	// Enable unixsocketperm 770 (secure permissions for socket group)
+	if strings.Contains(content, "unixsocketperm 777") {
+		content = strings.ReplaceAll(content, "unixsocketperm 777", "unixsocketperm 770")
 		modified = true
-	} else if !strings.Contains(content, "unixsocketperm 777") {
-		content += "\nunixsocketperm 777\n"
+	} else if strings.Contains(content, "# unixsocketperm ") || strings.Contains(content, "#unixsocketperm ") {
+		content = replaceLine(content, "unixsocketperm ", "unixsocketperm 770")
+		modified = true
+	} else if !strings.Contains(content, "unixsocketperm 770") {
+		content += "\nunixsocketperm 770\n"
 		modified = true
 	}
 
@@ -300,7 +308,7 @@ func TuneRedis() error {
 	}
 
 	if modified {
-		if err := ioutil.WriteFile(confPath, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(confPath, []byte(content), 0644); err != nil {
 			return err
 		}
 		fmt.Println("Redis: Socket and RAM optimizations applied to redis.conf.")
@@ -701,7 +709,7 @@ const welcomeHTML = `<!DOCTYPE html>
         <header>
             <div class="logo-container floating">
                 <span class="logo-icon">▲ AgilePanel</span>
-                <span class="logo-badge">v1.0.2</span>
+                <span class="logo-badge">v1.1.0</span>
             </div>
             <h1>Web Stack Successfully Initialized</h1>
             <p class="subtitle">Your High-Performance VPS is fully optimized and ready to serve next-generation web experiences.</p>

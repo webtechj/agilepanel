@@ -92,7 +92,7 @@ func DefaultState() *State {
 			UUID:                 uuidStr,
 			DefaultPHPVersion:    "8.3",
 			SupportedPHPVersions: []string{"8.1", "8.2", "8.3"},
-			CaddyPath:            "/usr/sbin/caddy",
+			CaddyPath:            "/usr/bin/caddy",
 			CaddyConfigPath:      "/etc/caddy/Caddyfile",
 			RedisSocketPath:      "/var/run/redis/redis-server.sock",
 			AdminUser:            "",

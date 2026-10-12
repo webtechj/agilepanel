@@ -48,7 +48,7 @@ func TestGeneratePHPPool(t *testing.T) {
 	if !strings.Contains(content, "php_admin_value[disable_functions] = exec,shell_exec,system,passthru,popen,proc_open,show_source") {
 		t.Error("expected disable_functions configuration in PHP pool config")
 	}
-	if !strings.Contains(content, "php_admin_value[open_basedir] = /var/www/phptest.org/:/tmp/:/usr/share/phpmyadmin/:/etc/phpmyadmin/:/var/lib/phpmyadmin/:/usr/share/php/") {
+	if !strings.Contains(content, "php_admin_value[open_basedir] = /var/www/phptest.org/:/tmp/:/usr/share/php/") {
 		t.Error("expected open_basedir configuration in PHP pool config")
 	}
 

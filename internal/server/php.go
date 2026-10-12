@@ -34,7 +34,7 @@ php_admin_value[memory_limit] = 128M
 php_admin_value[upload_max_filesize] = 100M
 php_admin_value[post_max_size] = 100M
 php_admin_value[disable_functions] = exec,shell_exec,system,passthru,popen,proc_open,show_source
-php_admin_value[open_basedir] = /var/www/{{.Domain}}/:/tmp/:/usr/share/phpmyadmin/:/etc/phpmyadmin/:/var/lib/phpmyadmin/:/usr/share/php/
+php_admin_value[open_basedir] = /var/www/{{.Domain}}/:/tmp/:/usr/share/php/
 `
 
 // GeneratePHPPool generates the PHP-FPM pool configuration string.

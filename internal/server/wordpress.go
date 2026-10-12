@@ -142,7 +142,7 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 		// Setup high-performance system cron to run WooCommerce background queries securely
 		if runtime.GOOS == "linux" {
 			cronPath := fmt.Sprintf("/etc/cron.d/agilepanel-cron-%s", strings.ReplaceAll(domain, ".", "-"))
-			cronContent := fmt.Sprintf("*/10 * * * * %s cd %s && wp cron event run --due-now >/dev/null 2>&1\n", username, publicDir)
+			cronContent := fmt.Sprintf("PATH=/usr/local/bin:/usr/bin:/bin\n*/10 * * * * %s cd %s && /usr/local/bin/wp cron event run --due-now >/dev/null 2>&1\n", username, publicDir)
 			if err := os.WriteFile(cronPath, []byte(cronContent), 0644); err == nil {
 				ui.PrintInfo(fmt.Sprintf("WooCommerce WP-Cron system task scheduled at %s", cronPath))
 			}

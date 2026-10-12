@@ -112,6 +112,7 @@ const caddyfileTemplateStr = `# Global Options Block
     }
     respond @hidden-files "Access Denied" 403
 
+    {{if ne .Type "html"}}
     # Block PHP execution in uploads directory
     @uploads-php {
         path_regexp (?i)^/wp-content/uploads/.*\.php$
@@ -126,12 +127,15 @@ const caddyfileTemplateStr = `# Global Options Block
 
     # PHP-FPM FastCGI pool coupling
     php_fastcgi unix//run/php/php{{.PHPVersion}}-fpm-{{.Domain}}.sock
+    {{end}}
 
+    {{if or (eq .Type "wp") (eq .Type "woocommerce") (eq .Type "")}}
     # WordPress Rewrite Rules (implicit in php_fastcgi, fallback below)
     @wp-uploaded-files {
         path_regexp wp-uploads ^/wp-content/uploads/(.*)$
     }
     rewrite @wp-uploaded-files /wp-content/uploads/{re.wp-uploads.1}
+    {{end}}
 }
 
 # Protected Staging website block
@@ -175,6 +179,7 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
     }
     respond @hidden-files "Access Denied" 403
 
+    {{if ne .Type "html"}}
     # Block PHP execution in uploads directory
     @uploads-php {
         path_regexp (?i)^/wp-content/uploads/.*\.php$
@@ -189,12 +194,15 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
 
     # PHP-FPM FastCGI pool coupling
     php_fastcgi unix//run/php/php{{.PHPVersion}}-fpm-{{.Domain}}.sock
+    {{end}}
 
+    {{if or (eq .Type "wp") (eq .Type "woocommerce") (eq .Type "")}}
     # WordPress Rewrite Rules (implicit in php_fastcgi, fallback below)
     @wp-uploaded-files {
         path_regexp wp-uploads ^/wp-content/uploads/(.*)$
     }
     rewrite @wp-uploaded-files /wp-content/uploads/{re.wp-uploads.1}
+    {{end}}
 }
 {{end}}
 {{end}}

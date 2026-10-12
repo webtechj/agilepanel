@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -141,7 +141,7 @@ func DeleteSiteDirectory(path string) error {
 
 // LockDirectory makes all files within the site directory immutable.
 func LockDirectory(path string) error {
-	parentDir := filepath.Dir(path) // /var/www/[domain]
+	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 
 	if runtime.GOOS != "linux" {
 		fmt.Printf("OS (Mock): chattr -R +i %s\n", parentDir)
@@ -161,7 +161,7 @@ func LockDirectory(path string) error {
 
 // UnlockDirectory removes the immutable flag from the site directory.
 func UnlockDirectory(path string) error {
-	parentDir := filepath.Dir(path) // /var/www/[domain]
+	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 
 	if runtime.GOOS != "linux" {
 		fmt.Printf("OS (Mock): chattr -R -i %s\n", parentDir)
@@ -224,7 +224,7 @@ func ResolvePublicIP() string {
 	resp, err := client.Get("https://api.ipify.org")
 	if err == nil {
 		defer resp.Body.Close()
-		ipBytes, err := ioutil.ReadAll(resp.Body)
+		ipBytes, err := io.ReadAll(resp.Body)
 		if err == nil {
 			ip := strings.TrimSpace(string(ipBytes))
 			if net.ParseIP(ip) != nil {
