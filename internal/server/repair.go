@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -29,8 +29,12 @@ func RepairInstallation(allowSSHPasswordRecovery bool) error {
 	// 3. Recreate PHP pools for all sites
 	ui.PrintStep(2, fmt.Sprintf("Recreating PHP pools for %d sites...", len(state.Sites)))
 	for _, site := range state.Sites {
+		if site.Type == "html" {
+			continue
+		}
 		ui.PrintInfo(fmt.Sprintf("Writing PHP pool for %s (PHP %s)...", site.Domain, site.PHPVersion))
-		if err := WritePHPPool(&site); err != nil {
+		siteCopy := site
+		if err := WritePHPPool(&siteCopy); err != nil {
 			ui.PrintWarning(fmt.Sprintf("Failed to write PHP pool config for %s: %v", site.Domain, err))
 		}
 	}
@@ -45,7 +49,7 @@ func RepairInstallation(allowSSHPasswordRecovery bool) error {
 	if runtime.GOOS == "linux" && allowSSHPasswordRecovery {
 		ui.PrintStep(4, "Restoring SSH configurations to allow password login (recovery mode)...")
 		sshdPath := "/etc/ssh/sshd_config"
-		if data, err := ioutil.ReadFile(sshdPath); err == nil {
+		if data, err := os.ReadFile(sshdPath); err == nil {
 			content := string(data)
 			modified := false
 			if strings.Contains(content, "PermitRootLogin prohibit-password") {
@@ -53,7 +57,7 @@ func RepairInstallation(allowSSHPasswordRecovery bool) error {
 				modified = true
 			}
 			if modified {
-				if err := ioutil.WriteFile(sshdPath, []byte(content), 0644); err == nil {
+				if err := os.WriteFile(sshdPath, []byte(content), 0644); err == nil {
 					_ = exec.Command("systemctl", "reload", "ssh").Run()
 					_ = exec.Command("systemctl", "reload", "sshd").Run()
 					ui.PrintInfo("SSH Configuration updated to allow password login. Reloaded SSH daemon.")

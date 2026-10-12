@@ -42,7 +42,7 @@ func TestHandlePing(t *testing.T) {
 		UUID:      "test-server-uuid-99999",
 		OS:        "linux",
 		Arch:      "amd64",
-		Version:   "1.0.2",
+		Version:   "1.1.0",
 		SiteCount: 3,
 	}
 
@@ -102,7 +102,7 @@ func TestHandlePingInvalid(t *testing.T) {
 	// Test missing UUID
 	payload := PingPayload{
 		OS:      "linux",
-		Version: "1.0.2",
+		Version: "1.1.0",
 	}
 	body, _ := json.Marshal(payload)
 	req2 := httptest.NewRequest("POST", "/api/ping", bytes.NewBuffer(body))
@@ -110,6 +110,20 @@ func TestHandlePingInvalid(t *testing.T) {
 	handlePing(w2, req2)
 	if w2.Result().StatusCode != http.StatusBadRequest {
 		t.Errorf("expected 400 Bad Request for missing UUID, got %d", w2.Result().StatusCode)
+	}
+
+	// Test path traversal UUID
+	payload3 := PingPayload{
+		UUID:    "../../evil-uuid-test",
+		OS:      "linux",
+		Version: "1.1.0",
+	}
+	body3, _ := json.Marshal(payload3)
+	req3 := httptest.NewRequest("POST", "/api/ping", bytes.NewBuffer(body3))
+	w3 := httptest.NewRecorder()
+	handlePing(w3, req3)
+	if w3.Result().StatusCode != http.StatusBadRequest {
+		t.Errorf("expected 400 Bad Request for path traversal UUID, got %d", w3.Result().StatusCode)
 	}
 }
 
@@ -123,14 +137,14 @@ func TestBadges(t *testing.T) {
 		{
 			UUID:      "server-1",
 			OS:        "linux",
-			Version:   "1.0.2",
+			Version:   "1.1.0",
 			SiteCount: 2,
 			LastSeen:  time.Now(), // Active
 		},
 		{
 			UUID:      "server-2",
 			OS:        "linux",
-			Version:   "1.0.2",
+			Version:   "1.1.0",
 			SiteCount: 5,
 			LastSeen:  time.Now().AddDate(0, 0, -10), // Inactive (> 7 days)
 		},

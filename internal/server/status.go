@@ -402,10 +402,9 @@ func RestartService(svc string) error {
 			}
 		}
 		if !valid {
-			targetServices = []string{svc}
-		} else {
-			targetServices = []string{svc}
+			return fmt.Errorf("unsupported service: %s (supported: caddy, mariadb, redis, php-fpm, or all)", svc)
 		}
+		targetServices = []string{svc}
 	}
 
 	for _, s := range targetServices {
