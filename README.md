@@ -116,6 +116,12 @@ AgilePanel is managed entirely via the `ap` command. Below is the complete list 
 | `ap site fix-permissions [domain]` | Recursively restores correct file (0644) and folder (0755) permissions. |
 | `ap site backup [domain]` | Generates separate manual ZIP backups of both web files and database schemas. |
 | `ap site backup-db [domain]` | Creates a raw SQL database backup inside the site's secure `/backup` folder. |
+| `ap site restore [domain] [ts]` | Restores website files and/or MariaDB database from local backup archives. |
+| `ap site doctor [domain]` | Runs automated health diagnostics (DNS, SSL, PHP-FPM, DB, error logs) with prescriptions. |
+| `ap site reset-pass [domain] [user] [pass]` | Emergency reset of WordPress administrator password via WP-CLI. |
+| `ap site safe-mode [domain] [on\|off]` | Toggles plugin deactivation to rescue site from White Screen of Death (500 errors). |
+| `ap site php-switch [domain] [version]` | Swaps active PHP version (8.1, 8.2, 8.3) and reloads Caddy sockets with zero downtime. |
+| `ap site optimize [domain]` | Defragments database tables, deletes expired transients, and clears spam comments. |
 | `ap site s3-list [domain] [--json]` | Lists recent S3 Cloud backup versions and timestamps for the site. |
 | `ap site s3-download [domain] [ts]` | Downloads a specific S3 backup archive to local storage by timestamp. |
 | `ap site s3-delete [domain] [ts]` | Deletes a specific S3 backup archive from cloud storage by timestamp. |

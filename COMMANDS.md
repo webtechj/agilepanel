@@ -69,6 +69,30 @@ Backs up only the database.
 Edits the site configuration.
 *   **Description**: Opens the PHP-FPM configuration pool file for the site in the system's default text editor.
 
+### `ap site doctor [domain]`
+Runs automated diagnostics and pre-flight health checks.
+*   **Description**: Audits DNS reachability, SSL certificate validity, PHP-FPM service state, MariaDB connectivity, WordPress core files, and recent fatal errors in logs. Outputs a clear health checklist with actionable remedies.
+
+### `ap site restore [domain] [backup-target]`
+Restores website files and/or MariaDB database from local backups.
+*   **Description**: Automatically unzips and rolls back site files (`htdocs`) and/or imports the database dump from the site's secure `/backup` folder. Supports `latest` or specific backup timestamps. Requires confirmation (or `-y`).
+
+### `ap site reset-pass [domain] [username] [password]`
+Resets WordPress administrator password.
+*   **Description**: Uses WP-CLI to update the administrator password in the database directly. If credentials are omitted, prompts or auto-generates a secure password.
+
+### `ap site safe-mode [domain] [on|off]`
+Toggles emergency safe mode to recover from White Screen of Death (WSOD).
+*   **Description**: Temporarily deactivates all active plugins via WP-CLI and snapshots their state to allow admin access during 500 errors. Passing `off` restores all previously active plugins.
+
+### `ap site php-switch [domain] [version]`
+Switches the active PHP version for a website.
+*   **Description**: Rebuilds the site's PHP-FPM pool for the new PHP version (e.g. `8.1`, `8.2`, `8.3`), seamlessly updates Caddyfile fastcgi routing sockets, and reloads services without downtime.
+
+### `ap site optimize [domain]`
+Optimizes database tables and clears expired cache/spam.
+*   **Description**: Defragments MariaDB tables (`wp db optimize`), removes expired transients, and deletes spam/trash comments to accelerate page generation.
+
 ---
 
 ## 🖥️ Server Administration (`ap server`)

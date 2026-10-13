@@ -317,6 +317,118 @@ var siteS3DeleteCmd = &cobra.Command{
 	},
 }
 
+var siteDoctorCmd = &cobra.Command{
+	Use:   "doctor [domain]",
+	Short: "Run automated health and connectivity diagnostics for a website",
+	Args:  cobra.RangeArgs(0, 1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		return site.Doctor(domain)
+	},
+}
+
+var siteRestoreCmd = &cobra.Command{
+	Use:   "restore [domain] [backup-target]",
+	Short: "Restore website files and/or MariaDB database from a backup archive",
+	Args:  cobra.RangeArgs(0, 2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		backupTarget := "latest"
+		if len(args) >= 2 {
+			backupTarget = args[1]
+		}
+		if !yesFlag {
+			confirmed, err := promptDoubleConfirm(domain, "restore from backup")
+			if err != nil {
+				return err
+			}
+			if !confirmed {
+				return fmt.Errorf("confirmation failed: domain name did not match or operation cancelled")
+			}
+		}
+		return site.Restore(domain, backupTarget)
+	},
+}
+
+var siteResetPassCmd = &cobra.Command{
+	Use:   "reset-pass [domain] [username] [password]",
+	Short: "Reset WordPress administrator password",
+	Args:  cobra.RangeArgs(0, 3),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		username := ""
+		if len(args) >= 2 {
+			username = args[1]
+		}
+		password := ""
+		if len(args) >= 3 {
+			password = args[2]
+		}
+		return site.ResetPassword(domain, username, password)
+	},
+}
+
+var siteSafeModeCmd = &cobra.Command{
+	Use:   "safe-mode [domain] [on|off]",
+	Short: "Toggle WordPress safe mode (deactivates/restores plugins to clear 500 errors)",
+	Args:  cobra.RangeArgs(0, 2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		action := "on"
+		if len(args) >= 2 {
+			action = args[1]
+		}
+		return site.SafeMode(domain, action)
+	},
+}
+
+var sitePHPSwitchCmd = &cobra.Command{
+	Use:   "php-switch [domain] [version]",
+	Short: "Switch active PHP version for a website (e.g. 8.1, 8.2, 8.3)",
+	Args:  cobra.RangeArgs(0, 2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		version := ""
+		if len(args) >= 2 {
+			version = args[1]
+		} else {
+			version, err = promptString("Enter new PHP version (e.g. 8.1, 8.2, 8.3): ")
+			if err != nil {
+				return err
+			}
+		}
+		return site.SwitchPHP(domain, version)
+	},
+}
+
+var siteOptimizeCmd = &cobra.Command{
+	Use:   "optimize [domain]",
+	Short: "Optimize database tables, clean expired transients, and clear spam records",
+	Args:  cobra.RangeArgs(0, 1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+		return site.Optimize(domain)
+	},
+}
+
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
@@ -331,6 +443,7 @@ func init() {
  
 	siteDeleteCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
 	siteLockCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
+	siteRestoreCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Bypass confirmation prompts")
  
 	siteCacheCleanCmd.Flags().BoolVar(&cleanWP, "wp", false, "Clean WordPress transients and internal cache")
 	siteCacheCleanCmd.Flags().BoolVar(&cleanRedis, "redis", false, "Clean Redis Object Cache")
@@ -352,6 +465,12 @@ func init() {
 	siteCmd.AddCommand(siteFixPermissionsCmd)
 	siteCmd.AddCommand(siteBackupDBCmd)
 	siteCmd.AddCommand(siteBackupCmd)
+	siteCmd.AddCommand(siteRestoreCmd)
+	siteCmd.AddCommand(siteDoctorCmd)
+	siteCmd.AddCommand(siteResetPassCmd)
+	siteCmd.AddCommand(siteSafeModeCmd)
+	siteCmd.AddCommand(sitePHPSwitchCmd)
+	siteCmd.AddCommand(siteOptimizeCmd)
 	siteCmd.AddCommand(siteS3ListCmd)
 	siteCmd.AddCommand(siteS3DownloadCmd)
 	siteCmd.AddCommand(siteS3DeleteCmd)

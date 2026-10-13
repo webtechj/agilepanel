@@ -402,6 +402,16 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 	ui.Row("System User", SanitizeUser(domain))
 	ui.Row("Public Directory", fmt.Sprintf("/var/www/%s/htdocs", domain))
 
+	// Pre-flight DNS check
+	resolvedIP, dnsMatches, dnsErr := CheckDomainDNS(domain)
+	if dnsErr != nil {
+		ui.RowBadge("DNS Status", "▲ Record Missing", ui.BrightYellow)
+	} else if !dnsMatches {
+		ui.RowBadge("DNS Status", fmt.Sprintf("▲ Resolves to %s", resolvedIP), ui.BrightYellow)
+	} else {
+		ui.RowBadge("DNS Status", fmt.Sprintf("● Points to this Server (%s)", serverIP), ui.BrightGreen)
+	}
+
 	ui.SectionHeader("DATABASE")
 	ui.Row("Name", dbName)
 	ui.Row("User", dbUser)
@@ -418,6 +428,11 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 
 	ui.Divider()
 	ui.PrintInfo("Save these credentials — the password cannot be retrieved later.")
+	if dnsErr != nil {
+		ui.PrintWarning(fmt.Sprintf("DNS Notice: Could not resolve %s. Point an A-record to %s for SSL to activate.", domain, serverIP))
+	} else if !dnsMatches {
+		ui.PrintWarning(fmt.Sprintf("DNS Notice: %s currently resolves to %s (server IP: %s). Point your domain's A-record to this VPS to activate Let's Encrypt SSL.", domain, resolvedIP, serverIP))
+	}
 	fmt.Println()
 
 	return nil
