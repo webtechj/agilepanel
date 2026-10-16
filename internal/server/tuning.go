@@ -13,28 +13,330 @@ import (
 	"agilepanel/internal/ui"
 )
 
+// SystemHardwareProfile captures audited specifications of the host machine.
+type SystemHardwareProfile struct {
+	TotalRAMMB     int64
+	FreeRAMMB      int64
+	TotalSwapMB    int64
+	FreeSwapMB     int64
+	CPUCores       int
+	DiskTotalGB    float64
+	DiskFreeGB     float64
+	DiskUsedGB     float64
+	IsSSD          bool
+	FilesystemType string
+	Virtualization string
+	IsContainer    bool
+}
+
+// AuditHardwareProfile inspects CPU, RAM, disk, virtualization, and storage type.
+func AuditHardwareProfile() *SystemHardwareProfile {
+	totalRAM, freeRAM, totalSwap, freeSwap, _ := readLinuxMemoryAndSwap()
+	totalDisk, usedDisk, freeDisk, _ := readDiskUsage()
+
+	cores := runtime.NumCPU()
+	if cores < 1 {
+		cores = 1
+	}
+
+	virtType, isContainer := detectVirtualization()
+	isSSD := detectStorageType()
+	fsType := detectRootFilesystem()
+
+	return &SystemHardwareProfile{
+		TotalRAMMB:     totalRAM / 1024,
+		FreeRAMMB:      freeRAM / 1024,
+		TotalSwapMB:    totalSwap / 1024,
+		FreeSwapMB:     freeSwap / 1024,
+		CPUCores:       cores,
+		DiskTotalGB:    float64(totalDisk) / (1024 * 1024 * 1024),
+		DiskFreeGB:     float64(freeDisk) / (1024 * 1024 * 1024),
+		DiskUsedGB:     float64(usedDisk) / (1024 * 1024 * 1024),
+		IsSSD:          isSSD,
+		FilesystemType: fsType,
+		Virtualization: virtType,
+		IsContainer:    isContainer,
+	}
+}
+
+func detectVirtualization() (string, bool) {
+	if runtime.GOOS != "linux" {
+		return "bare-metal", false
+	}
+
+	// 1. Try systemd-detect-virt
+	cmd := exec.Command("systemd-detect-virt")
+	out, err := cmd.Output()
+	if err == nil {
+		virt := strings.ToLower(strings.TrimSpace(string(out)))
+		if virt != "" && virt != "none" {
+			containerVirts := map[string]bool{
+				"lxc":            true,
+				"openvz":         true,
+				"docker":         true,
+				"podman":         true,
+				"containerd":     true,
+				"systemd-nspawn": true,
+				"wsl":            true,
+			}
+			return virt, containerVirts[virt]
+		}
+	}
+
+	// 2. Check container indicators
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return "docker", true
+	}
+	if _, err := os.Stat("/proc/user_beancounters"); err == nil {
+		return "openvz", true
+	}
+	if cgroupData, err := os.ReadFile("/proc/1/cgroup"); err == nil {
+		cgroupStr := string(cgroupData)
+		if strings.Contains(cgroupStr, "docker") {
+			return "docker", true
+		}
+		if strings.Contains(cgroupStr, "lxc") {
+			return "lxc", true
+		}
+	}
+
+	// 3. Check DMI product/vendor for VMs
+	for _, path := range []string{"/sys/class/dmi/id/product_name", "/sys/class/dmi/id/sys_vendor"} {
+		if data, err := os.ReadFile(path); err == nil {
+			str := strings.ToLower(string(data))
+			if strings.Contains(str, "kvm") {
+				return "kvm", false
+			}
+			if strings.Contains(str, "qemu") {
+				return "qemu", false
+			}
+			if strings.Contains(str, "vmware") {
+				return "vmware", false
+			}
+			if strings.Contains(str, "virtualbox") {
+				return "virtualbox", false
+			}
+			if strings.Contains(str, "xen") {
+				return "xen", false
+			}
+			if strings.Contains(str, "amazon") || strings.Contains(str, "digitalocean") || strings.Contains(str, "linode") || strings.Contains(str, "vultr") || strings.Contains(str, "hetzner") {
+				return "cloud-vps", false
+			}
+		}
+	}
+
+	return "bare-metal", false
+}
+
+func detectStorageType() bool {
+	if runtime.GOOS != "linux" {
+		return true // Default to SSD
+	}
+
+	entries, err := filepath.Glob("/sys/block/*/queue/rotational")
+	if err == nil && len(entries) > 0 {
+		for _, entry := range entries {
+			if strings.Contains(entry, "loop") || strings.Contains(entry, "ram") || strings.Contains(entry, "sr") {
+				continue
+			}
+			data, err := os.ReadFile(entry)
+			if err == nil {
+				val := strings.TrimSpace(string(data))
+				if val == "0" {
+					return true // Non-rotational SSD / NVMe
+				} else if val == "1" {
+					return false // Rotational HDD
+				}
+			}
+		}
+	}
+	return true // Cloud/VPS defaults to SSD
+}
+
+func detectRootFilesystem() string {
+	if runtime.GOOS != "linux" {
+		return "ext4"
+	}
+
+	data, err := os.ReadFile("/proc/mounts")
+	if err == nil {
+		lines := strings.Split(string(data), "\n")
+		for _, line := range lines {
+			fields := strings.Fields(line)
+			if len(fields) >= 3 && fields[1] == "/" {
+				return fields[2]
+			}
+		}
+	}
+
+	cmd := exec.Command("df", "-T", "/")
+	out, err := cmd.Output()
+	if err == nil {
+		lines := strings.Split(string(out), "\n")
+		if len(lines) >= 2 {
+			fields := strings.Fields(lines[1])
+			if len(fields) >= 2 {
+				return fields[1]
+			}
+		}
+	}
+	return "ext4"
+}
+
+func printHardwareAuditCard(p *SystemHardwareProfile) {
+	storageType := "NVMe/SSD"
+	if !p.IsSSD {
+		storageType = "Rotational HDD"
+	}
+
+	virtDesc := strings.ToUpper(p.Virtualization)
+	if p.IsContainer {
+		virtDesc += " (Container - Host Managed Kernel)"
+	} else if p.Virtualization == "kvm" || p.Virtualization == "qemu" {
+		virtDesc += " (Hardware Virtual Machine)"
+	}
+
+	fmt.Println()
+	fmt.Printf("  %s %s\n", ui.Accent("Hardware Audit:"), ui.Header("Audited Machine Specifications & Virtualization"))
+	fmt.Printf("  %s %-15s %s\n", ui.Muted("•"), ui.Label("CPU Cores:"), ui.Value(fmt.Sprintf("%d Cores / vCPUs (%s)", p.CPUCores, runtime.GOARCH)))
+	fmt.Printf("  %s %-15s %s\n", ui.Muted("•"), ui.Label("RAM / Memory:"), ui.Value(fmt.Sprintf("%.1f GB Total (%.1f GB Free)", float64(p.TotalRAMMB)/1024.0, float64(p.FreeRAMMB)/1024.0)))
+	fmt.Printf("  %s %-15s %s\n", ui.Muted("•"), ui.Label("Disk Storage:"), ui.Value(fmt.Sprintf("%.1f GB Total (%.1f GB Free) • %s [%s]", p.DiskTotalGB, p.DiskFreeGB, storageType, p.FilesystemType)))
+	fmt.Printf("  %s %-15s %s\n", ui.Muted("•"), ui.Label("Environment:"), ui.Value(virtDesc))
+	fmt.Println()
+}
+
+// CalculateBufferPoolMB dynamically allocates MariaDB buffer pool based on RAM.
+func CalculateBufferPoolMB(ramMB int64) int {
+	var ratio float64
+	if ramMB <= 1024 {
+		ratio = 0.25 // 25% on low-memory servers (<= 1GB)
+	} else if ramMB <= 4096 {
+		ratio = 0.30 // 30% on standard servers (1GB-4GB)
+	} else if ramMB <= 16384 {
+		ratio = 0.40 // 40% on mid-tier servers (4GB-16GB)
+	} else {
+		ratio = 0.50 // 50% on large enterprise servers (> 16GB)
+	}
+
+	mb := int(float64(ramMB) * ratio)
+	if mb < 128 {
+		mb = 128
+	}
+	return mb
+}
+
+// CalculatePoolInstances determines InnoDB buffer pool instances based on size and CPU cores.
+func CalculatePoolInstances(bufferPoolMB int, cpuCores int) int {
+	if bufferPoolMB < 1024 {
+		return 1
+	}
+	instances := bufferPoolMB / 1024
+	if instances > cpuCores {
+		instances = cpuCores
+	}
+	if instances < 1 {
+		instances = 1
+	}
+	return instances
+}
+
+// CalculateLogFileMB bounds InnoDB log file size between 48MB and 512MB (25% of buffer pool).
+func CalculateLogFileMB(bufferPoolMB int) int {
+	mb := bufferPoolMB / 4
+	if mb < 48 {
+		return 48
+	}
+	if mb > 512 {
+		return 512
+	}
+	return mb
+}
+
+// CalculateMaxConnections scales maximum database client connections with memory tiers.
+func CalculateMaxConnections(ramMB int64) int {
+	if ramMB <= 1024 {
+		return 30
+	} else if ramMB <= 4096 {
+		return 50
+	} else if ramMB <= 8192 {
+		return 80
+	}
+	return 150
+}
+
+// CalculateRedisMaxMemory dynamically allocates Redis RAM cache limits.
+func CalculateRedisMaxMemory(ramMB int64) string {
+	if ramMB <= 1024 {
+		return "64mb"
+	} else if ramMB <= 4096 {
+		return "128mb"
+	} else if ramMB <= 8192 {
+		return "256mb"
+	}
+	return "512mb"
+}
+
+// CalculateRecommendedSwapMB determines optimal swap size and checks disk capacity.
+func CalculateRecommendedSwapMB(ramMB int64, freeDiskGB float64) (swapMB int, shouldCreate bool, reason string) {
+	if freeDiskGB < 2.0 {
+		return 0, false, fmt.Sprintf("low disk space (%.1f GB available, minimum 2.0 GB required)", freeDiskGB)
+	}
+
+	targetMB := 2048
+	if ramMB <= 1024 {
+		targetMB = 1024
+	} else if ramMB <= 2048 {
+		targetMB = 2048
+	} else if ramMB <= 8192 {
+		targetMB = 2048
+	} else {
+		targetMB = 4096
+	}
+
+	// Never consume more than 25% of remaining free disk space
+	maxDiskMB := int(freeDiskGB * 1024 * 0.25)
+	if targetMB > maxDiskMB {
+		if maxDiskMB >= 512 {
+			targetMB = maxDiskMB
+		} else {
+			return 0, false, fmt.Sprintf("allocating swap would exceed 25%% of free disk space (%.1f GB free)", freeDiskGB)
+		}
+	}
+
+	return targetMB, true, ""
+}
+
 // TuneServer auto-tunes system swap memory and database parameters based on hardware resources.
 func TuneServer() error {
-	ui.PrintInfo("Starting AgilePanel Server Optimization checklist...")
+	profile := AuditHardwareProfile()
+	return TuneServerWithProfile(profile)
+}
 
-	// 1. Optimize Swap File
+// TuneServerWithProfile runs the tuning checklist using the audited hardware profile.
+func TuneServerWithProfile(profile *SystemHardwareProfile) error {
+	ui.PrintInfo("Starting AgilePanel Server Optimization checklist...")
+	printHardwareAuditCard(profile)
+
+	// 1. Optimize Swap File & Kernel Sysctl
 	ui.PrintStep(1, "Configuring system swap memory and kernel cache swappiness parameters...")
 	ui.PrintInfo("Explanatory Note: Adequate swap space prevents Linux out-of-memory (OOM) crashes. Tweaking swappiness and cache pressure keeps the server highly responsive under load.")
-	if err := TuneSwap(); err != nil {
-		ui.PrintWarning(fmt.Sprintf("Swap optimization failed: %v", err))
+	if err := TuneSwapWithProfile(profile); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Swap optimization encountered an issue: %v", err))
 	}
 
 	// 2. Optimize Database (MariaDB/MySQL)
 	ui.PrintStep(2, "Auditing hardware memory resources and auto-tuning MariaDB configuration...")
-	ui.PrintInfo("Explanatory Note: We dynamically allocate 30% of system RAM to the InnoDB buffer pool, reduce max connections to 50 for resource safety, and optimize caches for fast query resolution.")
-	if err := TuneDatabase(); err != nil {
+	poolMB := CalculateBufferPoolMB(profile.TotalRAMMB)
+	instances := CalculatePoolInstances(poolMB, profile.CPUCores)
+	ui.PrintInfo(fmt.Sprintf("Explanatory Note: Dynamically allocating %dMB to InnoDB buffer pool (%d instances across %d cores) for fast query resolution and resource safety.", poolMB, instances, profile.CPUCores))
+	if err := TuneDatabaseWithProfile(profile); err != nil {
 		ui.PrintWarning(fmt.Sprintf("Database optimization failed: %v", err))
 	}
 
 	// 3. Optimize Redis Socket Permissions
 	ui.PrintStep(3, "Configuring Redis Socket permissions and scaling policies...")
-	ui.PrintInfo("Explanatory Note: Using local UNIX socket paths instead of TCP loopbacks cuts down latency. Eviction policies ensure Redis stays memory-safe.")
-	if err := TuneRedis(); err != nil {
+	ui.PrintInfo(fmt.Sprintf("Explanatory Note: Using local UNIX socket paths instead of TCP loopbacks cuts down latency. Memory limit dynamically set to %s.", CalculateRedisMaxMemory(profile.TotalRAMMB)))
+	if err := TuneRedisWithProfile(profile); err != nil {
 		ui.PrintWarning(fmt.Sprintf("Redis optimization failed: %v", err))
 	}
 
@@ -63,10 +365,15 @@ func TuneServer() error {
 	return nil
 }
 
-// TuneSwap checks swap settings and sets up a 2GB swap file + sysctl tweaks if swap is missing.
+// TuneSwap checks swap settings and sets up an optimal swap file + sysctl tweaks if swap is missing.
 func TuneSwap() error {
+	return TuneSwapWithProfile(AuditHardwareProfile())
+}
+
+// TuneSwapWithProfile configures swap and kernel parameters based on hardware profile.
+func TuneSwapWithProfile(profile *SystemHardwareProfile) error {
 	if runtime.GOOS != "linux" {
-		fmt.Println("Swap (Mock): Configure 2GB swapfile and vm.swappiness=10")
+		fmt.Println("Swap (Mock): Configure swapfile and vm.swappiness=10")
 		return nil
 	}
 
@@ -89,114 +396,223 @@ func TuneSwap() error {
 	}
 
 	if hasSwap {
-		fmt.Println("Swap: Swap memory is already active. Skipping swapfile creation.")
+		fmt.Printf("Swap: Swap memory is already active (%d MB). Skipping swapfile creation.\n", profile.TotalSwapMB)
+	} else if profile.IsContainer {
+		fmt.Printf("Swap: Container virtualization detected (%s). Host node kernel manages memory limits; skipping guest swapfile creation.\n", profile.Virtualization)
 	} else {
-		fmt.Println("Swap: No swap space detected. Creating 2GB swap file...")
-		
-		// 1. Allocate file
-		falloc := exec.Command("fallocate", "-l", "2G", "/swapfile")
-		if err := falloc.Run(); err != nil {
-			// fallback to dd if fallocate fails
-			dd := exec.Command("dd", "if=/dev/zero", "of=/swapfile", "bs=1M", "count=2048")
-			if err := dd.Run(); err != nil {
-				return fmt.Errorf("failed to allocate swapfile space: %w", err)
+		swapMB, shouldCreate, reason := CalculateRecommendedSwapMB(profile.TotalRAMMB, profile.DiskFreeGB)
+		if !shouldCreate {
+			ui.PrintWarning(fmt.Sprintf("Skipping swapfile creation: %s.", reason))
+		} else {
+			fmt.Printf("Swap: No swap space detected. Creating %dMB swap file...\n", swapMB)
+			if err := createAndEnableSwapfile(swapMB, profile.FilesystemType); err != nil {
+				ui.PrintWarning(fmt.Sprintf("Swap creation encountered an issue: %v", err))
 			}
 		}
-		
-		// 2. Set permissions
-		if err := exec.Command("chmod", "600", "/swapfile").Run(); err != nil {
-			return fmt.Errorf("failed to chmod swapfile: %w", err)
-		}
-		
-		// 3. Make swap
-		if err := exec.Command("mkswap", "/swapfile").Run(); err != nil {
-			return fmt.Errorf("failed to mkswap swapfile: %w", err)
-		}
-		
-		// 4. Enable swap
-		if err := exec.Command("swapon", "/swapfile").Run(); err != nil {
-			return fmt.Errorf("failed to enable swapfile: %w", err)
-		}
-
-		// 5. Make swap persistent in fstab
-		fstabBytes, err := os.ReadFile("/etc/fstab")
-		if err == nil && !strings.Contains(string(fstabBytes), "/swapfile") {
-			fstabStr := string(fstabBytes)
-			if !strings.HasSuffix(fstabStr, "\n") {
-				fstabStr += "\n"
-			}
-			fstabStr += "/swapfile none swap sw 0 0\n"
-			_ = os.WriteFile("/etc/fstab", []byte(fstabStr), 0644)
-		}
-		fmt.Println("Swap: 2GB Swapfile successfully created and activated.")
 	}
 
-	// Optimize Sysctl parameters
+	// Always optimize Sysctl parameters regardless of swap creation outcome
+	return TuneSysctlWithProfile(profile)
+}
+
+func createAndEnableSwapfile(swapMB int, fsType string) error {
+	swapPath := "/swapfile"
+
+	// If Btrfs, ensure CoW is disabled before writing
+	if fsType == "btrfs" {
+		_ = exec.Command("truncate", "-s", "0", swapPath).Run()
+		_ = exec.Command("chattr", "+C", swapPath).Run()
+		_ = exec.Command("btrfs", "property", "set", swapPath, "compression", "none").Run()
+	}
+
+	// Step 1: Try fallocate first for fast allocation
+	fallocateSuccess := false
+	fallocCmd := exec.Command("fallocate", "-l", fmt.Sprintf("%dM", swapMB), swapPath)
+	if err := fallocCmd.Run(); err == nil {
+		_ = exec.Command("chmod", "600", swapPath).Run()
+		if mkErr := exec.Command("mkswap", swapPath).Run(); mkErr == nil {
+			var swaponErr bytes.Buffer
+			swaponCmd := exec.Command("swapon", swapPath)
+			swaponCmd.Stderr = &swaponErr
+			if err := swaponCmd.Run(); err == nil {
+				fallocateSuccess = true
+			} else {
+				// fallocate left sparse extents (exit status 255 on XFS/Btrfs/ext4)
+				fmt.Printf("Swap: fallocate created sparse extents (%s). Retrying with dd zero-fill allocation...\n", strings.TrimSpace(swaponErr.String()))
+				_ = exec.Command("swapoff", swapPath).Run()
+				_ = os.Remove(swapPath)
+			}
+		}
+	}
+
+	// Step 2: Fallback to dd if fallocate did not result in an active swapfile
+	if !fallocateSuccess {
+		_ = exec.Command("swapoff", swapPath).Run()
+		_ = os.Remove(swapPath)
+
+		if fsType == "btrfs" {
+			_ = exec.Command("truncate", "-s", "0", swapPath).Run()
+			_ = exec.Command("chattr", "+C", swapPath).Run()
+		}
+
+		ddCmd := exec.Command("dd", "if=/dev/zero", fmt.Sprintf("of=%s", swapPath), "bs=1M", fmt.Sprintf("count=%d", swapMB), "status=none")
+		var ddErr bytes.Buffer
+		ddCmd.Stderr = &ddErr
+		if err := ddCmd.Run(); err != nil {
+			_ = os.Remove(swapPath)
+			return fmt.Errorf("failed to allocate swapfile space with dd: %w (stderr: %s)", err, ddErr.String())
+		}
+
+		if err := exec.Command("chmod", "600", swapPath).Run(); err != nil {
+			_ = os.Remove(swapPath)
+			return fmt.Errorf("failed to chmod swapfile: %w", err)
+		}
+
+		var mkswapErr bytes.Buffer
+		mkswapCmd := exec.Command("mkswap", swapPath)
+		mkswapCmd.Stderr = &mkswapErr
+		if err := mkswapCmd.Run(); err != nil {
+			_ = os.Remove(swapPath)
+			return fmt.Errorf("failed to mkswap swapfile: %w (stderr: %s)", err, mkswapErr.String())
+		}
+
+		var swaponErr bytes.Buffer
+		swaponCmd := exec.Command("swapon", swapPath)
+		swaponCmd.Stderr = &swaponErr
+		if err := swaponCmd.Run(); err != nil {
+			_ = os.Remove(swapPath)
+			return fmt.Errorf("failed to enable swapfile: %w (stderr: %s)", err, strings.TrimSpace(swaponErr.String()))
+		}
+	}
+
+	// Step 3: Make swap persistent in fstab
+	fstabBytes, err := os.ReadFile("/etc/fstab")
+	if err == nil && !strings.Contains(string(fstabBytes), swapPath) {
+		fstabStr := string(fstabBytes)
+		if !strings.HasSuffix(fstabStr, "\n") {
+			fstabStr += "\n"
+		}
+		fstabStr += fmt.Sprintf("%s none swap sw 0 0\n", swapPath)
+		_ = os.WriteFile("/etc/fstab", []byte(fstabStr), 0644)
+	}
+
+	fmt.Printf("Swap: %dMB Swapfile successfully created and activated.\n", swapMB)
+	return nil
+}
+
+// TuneSysctlWithProfile applies kernel network and cache parameters.
+func TuneSysctlWithProfile(profile *SystemHardwareProfile) error {
 	fmt.Println("Swap: Tuning kernel network stack and cache settings...")
-	_ = exec.Command("sysctl", "vm.swappiness=10").Run()
-	_ = exec.Command("sysctl", "vm.vfs_cache_pressure=50").Run()
-	_ = exec.Command("sysctl", "net.core.somaxconn=65535").Run()
-	_ = exec.Command("sysctl", "net.ipv4.tcp_max_syn_backlog=65535").Run()
-	_ = exec.Command("sysctl", "net.ipv4.tcp_tw_reuse=1").Run()
-	_ = exec.Command("sysctl", "net.core.netdev_max_backlog=5000").Run()
-	_ = exec.Command("sysctl", "fs.file-max=200000").Run()
+
+	swappiness := "10"
+	if profile.TotalRAMMB <= 1500 {
+		swappiness = "20"
+	}
+
+	cachePressure := "50"
+	if !profile.IsSSD {
+		cachePressure = "100"
+	}
+
+	fileMax := "200000"
+	if profile.TotalRAMMB > 4096 {
+		fileMax = "1048576"
+	}
+
+	sysctlSettings := map[string]string{
+		"vm.swappiness":                swappiness,
+		"vm.vfs_cache_pressure":        cachePressure,
+		"net.core.somaxconn":           "65535",
+		"net.ipv4.tcp_max_syn_backlog": "65535",
+		"net.ipv4.tcp_tw_reuse":        "1",
+		"net.core.netdev_max_backlog":   "5000",
+		"fs.file-max":                  fileMax,
+	}
+
+	var confBuilder strings.Builder
+	for k, v := range sysctlSettings {
+		_ = exec.Command("sysctl", fmt.Sprintf("%s=%s", k, v)).Run()
+		confBuilder.WriteString(fmt.Sprintf("%s=%s\n", k, v))
+	}
 
 	sysctlConfPath := "/etc/sysctl.d/99-agilepanel.conf"
-	sysctlContent := "vm.swappiness=10\n" +
-		"vm.vfs_cache_pressure=50\n" +
-		"net.core.somaxconn=65535\n" +
-		"net.ipv4.tcp_max_syn_backlog=65535\n" +
-		"net.ipv4.tcp_tw_reuse=1\n" +
-		"net.core.netdev_max_backlog=5000\n" +
-		"fs.file-max=200000\n"
-	_ = os.WriteFile(sysctlConfPath, []byte(sysctlContent), 0644)
+	_ = os.WriteFile(sysctlConfPath, []byte(confBuilder.String()), 0644)
+
+	// Set file descriptor limits in limits.d
+	limitsDir := "/etc/security/limits.d"
+	if _, err := os.Stat(limitsDir); err == nil {
+		limitsContent := "* soft nofile 65535\n* hard nofile 65535\nroot soft nofile 65535\nroot hard nofile 65535\n"
+		_ = os.WriteFile(filepath.Join(limitsDir, "99-agilepanel.conf"), []byte(limitsContent), 0644)
+	}
 
 	return nil
 }
 
 // TuneDatabase configures MySQL/MariaDB tuning parameters.
 func TuneDatabase() error {
-	totalMemKB, _, err := readLinuxMemory()
-	
-	// Default to 1GB if error or non-linux
-	var memorySizeGB float64 = 1.0
-	if err == nil && totalMemKB > 0 {
-		memorySizeGB = float64(totalMemKB) / (1024 * 1024)
+	return TuneDatabaseWithProfile(AuditHardwareProfile())
+}
+
+// TuneDatabaseWithProfile configures MySQL/MariaDB parameters tuned to CPU cores, RAM, and disk drive type.
+func TuneDatabaseWithProfile(profile *SystemHardwareProfile) error {
+	bufferPoolMB := CalculateBufferPoolMB(profile.TotalRAMMB)
+	poolInstances := CalculatePoolInstances(bufferPoolMB, profile.CPUCores)
+	logFileMB := CalculateLogFileMB(bufferPoolMB)
+	maxConnections := CalculateMaxConnections(profile.TotalRAMMB)
+
+	tableOpenCache := maxConnections * 8
+	if tableOpenCache < 400 {
+		tableOpenCache = 400
+	} else if tableOpenCache > 4000 {
+		tableOpenCache = 4000
 	}
 
-	// Calculate InnoDB Buffer Pool size (approx. 30% of system RAM)
-	bufferPoolMB := int(memorySizeGB * 1024 * 0.30)
-	if bufferPoolMB < 128 {
-		bufferPoolMB = 128 // Minimum standard buffer size
+	ioCapacity := 2000
+	ioCapacityMax := 4000
+	flushNeighbors := 0
+	if !profile.IsSSD {
+		ioCapacity = 200
+		ioCapacityMax = 400
+		flushNeighbors = 1
 	}
-	
-	// Log file size is 25% of buffer pool size, capped at 256M
-	logFileMB := bufferPoolMB / 4
-	if logFileMB < 48 {
-		logFileMB = 48
-	} else if logFileMB > 256 {
-		logFileMB = 256
+
+	ioThreads := profile.CPUCores * 2
+	if ioThreads < 4 {
+		ioThreads = 4
+	} else if ioThreads > 8 {
+		ioThreads = 8
 	}
 
 	cnfContent := fmt.Sprintf(`# AgilePanel Custom MariaDB Optimizations
+# Auto-tuned for: %d CPU cores, %d MB RAM, SSD=%t
 [mysqld]
 innodb_buffer_pool_size = %dM
+innodb_buffer_pool_instances = %d
 innodb_log_file_size = %dM
 innodb_flush_log_at_trx_commit = 2
 innodb_flush_method = O_DIRECT
+innodb_io_capacity = %d
+innodb_io_capacity_max = %d
+innodb_flush_neighbors = %d
+innodb_read_io_threads = %d
+innodb_write_io_threads = %d
 query_cache_type = 0
 query_cache_size = 0
 key_buffer_size = 32M
 thread_cache_size = 8
-table_open_cache = 400
+table_open_cache = %d
 tmp_table_size = 32M
 max_heap_table_size = 32M
-max_connections = 50
+max_connections = %d
 max_allowed_packet = 64M
 join_buffer_size = 256K
 sort_buffer_size = 256K
 read_rnd_buffer_size = 512K
-`, bufferPoolMB, logFileMB)
+`, profile.CPUCores, profile.TotalRAMMB, profile.IsSSD,
+		bufferPoolMB, poolInstances, logFileMB,
+		ioCapacity, ioCapacityMax, flushNeighbors,
+		ioThreads, ioThreads,
+		tableOpenCache, maxConnections)
 
 	if runtime.GOOS != "linux" {
 		fmt.Printf("DB (Mock): Generate tuning configuration:\n%s", cnfContent)
@@ -222,7 +638,6 @@ read_rnd_buffer_size = 512K
 	}
 
 	if !written {
-		// Fallback to /etc/mysql/conf.d/99-agilepanel-tune.cnf
 		filePath := "/etc/mysql/conf.d/99-agilepanel-tune.cnf"
 		_ = os.MkdirAll(filepath.Dir(filePath), 0755)
 		if err := os.WriteFile(filePath, []byte(cnfContent), 0644); err == nil {
@@ -249,8 +664,14 @@ read_rnd_buffer_size = 512K
 
 // TuneRedis configures Redis socket paths and permissions.
 func TuneRedis() error {
+	return TuneRedisWithProfile(AuditHardwareProfile())
+}
+
+// TuneRedisWithProfile configures Redis socket paths and permissions tuned to hardware profile.
+func TuneRedisWithProfile(profile *SystemHardwareProfile) error {
+	maxMem := CalculateRedisMaxMemory(profile.TotalRAMMB)
 	if runtime.GOOS != "linux" {
-		fmt.Println("Redis (Mock): Configure UNIX socket and RAM optimizations in redis.conf")
+		fmt.Printf("Redis (Mock): Configure UNIX socket and %s RAM optimizations in redis.conf\n", maxMem)
 		return nil
 	}
 
@@ -290,7 +711,7 @@ func TuneRedis() error {
 
 	// Dynamic RAM/eviction configurations
 	redisConfigs := map[string]string{
-		"maxmemory":              "128mb",
+		"maxmemory":              maxMem,
 		"maxmemory-policy":      "allkeys-lru",
 		"save":                   `""`,
 		"appendonly":             "no",
@@ -311,7 +732,7 @@ func TuneRedis() error {
 		if err := os.WriteFile(confPath, []byte(content), 0644); err != nil {
 			return err
 		}
-		fmt.Println("Redis: Socket and RAM optimizations applied to redis.conf.")
+		fmt.Printf("Redis: Socket and dynamic %s RAM optimizations applied to redis.conf.\n", maxMem)
 		
 		// Restart service
 		_ = exec.Command("systemctl", "restart", "redis-server").Run()

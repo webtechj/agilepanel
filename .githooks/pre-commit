@@ -1,0 +1,29 @@
+#!/bin/sh
+# AgilePanel Git Pre-Commit Hook
+# Prevents unrequired files, AI outputs, runtime state, and build artifacts from being committed.
+
+FORBIDDEN_PATTERNS="^graphify-out/|^\.graphify|^\.agents/|^\.gemini/|^state\.json|^metrics_history\.json|^etc/|^var/|^tmp/|^data/|^telemetry/data/|\.log$|\.exe$|\.test$|\.out$|^\.env"
+
+# Only check Added, Copied, or Modified files (ignore deletions of previously tracked unwanted files)
+STAGED_FORBIDDEN=$(git diff --cached --name-only --diff-filter=d | grep -E "$FORBIDDEN_PATTERNS")
+
+if [ -n "$STAGED_FORBIDDEN" ]; then
+    echo "================================================================================"
+    echo " [ERROR] Git commit blocked: Unrequired/generated files are staged for commit!"
+    echo "================================================================================"
+    echo "The following files should NOT be committed to the repository:"
+    echo "$STAGED_FORBIDDEN" | while read -r file; do
+        echo "  [x] $file"
+    done
+    echo ""
+    echo "To unstage these files while keeping them on your disk, run:"
+    echo "$STAGED_FORBIDDEN" | while read -r file; do
+        echo "  git rm -r --cached \"$file\""
+    done
+    echo ""
+    echo "Or run: git reset <file> to unstage before committing."
+    echo "================================================================================"
+    exit 1
+fi
+
+exit 0

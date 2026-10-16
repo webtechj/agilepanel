@@ -30,9 +30,11 @@ php_admin_value[opcache.memory_consumption] = 256
 php_admin_value[opcache.validate_timestamps] = 0
 php_admin_value[opcache.interned_strings_buffer] = 16
 php_admin_value[opcache.max_accelerated_files] = 10000
-php_admin_value[memory_limit] = 128M
+php_admin_value[memory_limit] = {{.MemoryLimit}}
 php_admin_value[upload_max_filesize] = 100M
 php_admin_value[post_max_size] = 100M
+php_admin_value[max_execution_time] = {{.MaxExecutionTime}}
+php_admin_value[max_input_vars] = {{.MaxInputVars}}
 php_admin_value[disable_functions] = exec,shell_exec,system,passthru,popen,proc_open,show_source
 php_admin_value[open_basedir] = /var/www/{{.Domain}}/:/tmp/:/usr/share/php/
 `
@@ -50,21 +52,54 @@ func GeneratePHPPool(site *config.SiteConfig) (string, error) {
 		}
 	}
 
+	memoryLimit := site.MemoryLimit
+	if memoryLimit == "" {
+		if site.Type == "woocommerce" {
+			memoryLimit = "256M"
+		} else {
+			memoryLimit = "128M"
+		}
+	}
+
+	maxExecutionTime := site.MaxExecutionTime
+	if maxExecutionTime <= 0 {
+		if memoryLimit == "256M" || memoryLimit == "512M" || site.Type == "woocommerce" {
+			maxExecutionTime = 300
+		} else {
+			maxExecutionTime = 60
+		}
+	}
+
+	maxInputVars := site.MaxInputVars
+	if maxInputVars <= 0 {
+		if memoryLimit == "256M" || memoryLimit == "512M" || site.Type == "woocommerce" {
+			maxInputVars = 5000
+		} else {
+			maxInputVars = 1000
+		}
+	}
+
 	tmpl, err := template.New("phppool").Parse(phpPoolTemplateStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse PHP pool template: %w", err)
 	}
 
 	data := struct {
-		Domain      string
-		SystemUser  string
-		PHPVersion  string
-		MaxChildren int
+		Domain           string
+		SystemUser       string
+		PHPVersion       string
+		MaxChildren      int
+		MemoryLimit      string
+		MaxExecutionTime int
+		MaxInputVars     int
 	}{
-		Domain:      site.Domain,
-		SystemUser:  site.SystemUser,
-		PHPVersion:  site.PHPVersion,
-		MaxChildren: maxChildren,
+		Domain:           site.Domain,
+		SystemUser:       site.SystemUser,
+		PHPVersion:       site.PHPVersion,
+		MaxChildren:      maxChildren,
+		MemoryLimit:      memoryLimit,
+		MaxExecutionTime: maxExecutionTime,
+		MaxInputVars:     maxInputVars,
 	}
 
 	var buf bytes.Buffer

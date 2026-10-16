@@ -39,7 +39,7 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 *   **System User Isolation**: Automatically provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
 *   **Hardened PHP Defaults**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
 *   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes.
-*   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/`, and shield sensitive scripts (`xmlrpc.php`, `install.php`).
+*   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/` (including double extensions like `.php.jpg` and alternate executable scripts like `.phtml`, `.phar`), and shield sensitive scripts (`xmlrpc.php`, `install.php`).
 
 ### 🚀 High-Performance Optimizations
 *   **Hardware-Aware Tuning**: The `ap server tune` command automatically scales the MariaDB InnoDB buffer pool (allocated to 30% of system RAM), configures high-speed transaction flushes, and disables unnecessary replication logging.
@@ -116,6 +116,12 @@ AgilePanel is managed entirely via the `ap` command. Below is the complete list 
 | `ap site fix-permissions [domain]` | Recursively restores correct file (0644) and folder (0755) permissions. |
 | `ap site backup [domain]` | Generates separate manual ZIP backups of both web files and database schemas. |
 | `ap site backup-db [domain]` | Creates a raw SQL database backup inside the site's secure `/backup` folder. |
+| `ap site restore [domain] [ts]` | Restores website files and/or MariaDB database from local backup archives. |
+| `ap site doctor [domain]` | Runs automated health diagnostics (DNS, SSL, PHP-FPM, DB, error logs) with prescriptions. |
+| `ap site reset-pass [domain] [user] [pass]` | Emergency reset of WordPress administrator password via WP-CLI. |
+| `ap site safe-mode [domain] [on\|off]` | Toggles plugin deactivation to rescue site from White Screen of Death (500 errors). |
+| `ap site php-switch [domain] [version]` | Swaps active PHP version (8.1, 8.2, 8.3) and reloads Caddy sockets with zero downtime. |
+| `ap site optimize [domain]` | Defragments database tables, deletes expired transients, and clears spam comments. |
 | `ap site s3-list [domain] [--json]` | Lists recent S3 Cloud backup versions and timestamps for the site. |
 | `ap site s3-download [domain] [ts]` | Downloads a specific S3 backup archive to local storage by timestamp. |
 | `ap site s3-delete [domain] [ts]` | Deletes a specific S3 backup archive from cloud storage by timestamp. |

@@ -52,7 +52,7 @@ func promptLine(label string) string {
 }
 
 // Create provisions a site's infrastructure.
-func Create(domain string, phpVersion string, siteType string, dbOpt string, importFiles string, importDB string, wpUser string, wpPass string, wpEmail string, wpName string) error {
+func Create(domain string, phpVersion string, siteType string, dbOpt string, importFiles string, importDB string, wpUser string, wpPass string, wpEmail string, wpName string, memoryOpt ...string) error {
 	if err := ValidateDomain(domain); err != nil {
 		return err
 	}
@@ -63,6 +63,31 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 	}
 	if siteType != "wp" && siteType != "woocommerce" && siteType != "laravel" && siteType != "php" && siteType != "html" {
 		return fmt.Errorf("invalid site type '%s' (supported: wp, woocommerce, laravel, php, html)", siteType)
+	}
+
+	var memoryLimit string
+	if len(memoryOpt) > 0 {
+		memoryLimit = strings.TrimSpace(memoryOpt[0])
+	}
+	if memoryLimit == "" {
+		if siteType == "woocommerce" {
+			memoryLimit = "256M"
+		} else {
+			memoryLimit = "128M"
+		}
+	} else {
+		u := strings.ToUpper(memoryLimit)
+		if !strings.HasSuffix(u, "M") && !strings.HasSuffix(u, "G") {
+			u = u + "M"
+		}
+		memoryLimit = u
+	}
+
+	maxExecutionTime := 60
+	maxInputVars := 1000
+	if memoryLimit == "256M" || memoryLimit == "512M" || siteType == "woocommerce" {
+		maxExecutionTime = 300
+		maxInputVars = 5000
 	}
 
 	installWP := siteType == "wp" || siteType == "woocommerce"
@@ -186,15 +211,18 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 
 		// 7. Write PHP-FPM Pool config
 		newSite := config.SiteConfig{
-			Domain:       strings.ToLower(domain),
-			PHPVersion:   phpVersion,
-			PublicDir:    publicDir,
-			DatabaseName: dbName,
-			DatabaseUser: dbUser,
-			DatabasePass: dbPassword,
-			SystemUser:   systemUser,
-			IsLocked:     false,
-			Type:         siteType,
+			Domain:           strings.ToLower(domain),
+			PHPVersion:       phpVersion,
+			PublicDir:        publicDir,
+			DatabaseName:     dbName,
+			DatabaseUser:     dbUser,
+			DatabasePass:     dbPassword,
+			SystemUser:       systemUser,
+			IsLocked:         false,
+			Type:             siteType,
+			MemoryLimit:      memoryLimit,
+			MaxExecutionTime: maxExecutionTime,
+			MaxInputVars:     maxInputVars,
 		}
 		if !createDB {
 			newSite.DatabaseName = ""
@@ -335,6 +363,9 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 				_ = server.DeleteSystemUser(systemUser)
 				return fmt.Errorf("WordPress installation failed: %w", err)
 			}
+			if memoryLimit != "" {
+				_ = server.TuneWordPressMemory(systemUser, publicDir, memoryLimit)
+			}
 		} else {
 			htdocsPath := filepath.Join(server.GetSiteRootDir(publicDir), "htdocs")
 			if siteType == "html" {
@@ -399,8 +430,19 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 	ui.Row("Domain", domain)
 	ui.Row("Staging URL", stagingURL)
 	ui.Row("PHP Version", phpVersion)
+	ui.Row("PHP Memory Limit", memoryLimit)
 	ui.Row("System User", SanitizeUser(domain))
 	ui.Row("Public Directory", fmt.Sprintf("/var/www/%s/htdocs", domain))
+
+	// Pre-flight DNS check
+	resolvedIP, dnsMatches, dnsErr := CheckDomainDNS(domain)
+	if dnsErr != nil {
+		ui.RowBadge("DNS Status", "▲ Record Missing", ui.BrightYellow)
+	} else if !dnsMatches {
+		ui.RowBadge("DNS Status", fmt.Sprintf("▲ Resolves to %s", resolvedIP), ui.BrightYellow)
+	} else {
+		ui.RowBadge("DNS Status", fmt.Sprintf("● Points to this Server (%s)", serverIP), ui.BrightGreen)
+	}
 
 	ui.SectionHeader("DATABASE")
 	ui.Row("Name", dbName)
@@ -418,6 +460,11 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 
 	ui.Divider()
 	ui.PrintInfo("Save these credentials — the password cannot be retrieved later.")
+	if dnsErr != nil {
+		ui.PrintWarning(fmt.Sprintf("DNS Notice: Could not resolve %s. Point an A-record to %s for SSL to activate.", domain, serverIP))
+	} else if !dnsMatches {
+		ui.PrintWarning(fmt.Sprintf("DNS Notice: %s currently resolves to %s (server IP: %s). Point your domain's A-record to this VPS to activate Let's Encrypt SSL.", domain, resolvedIP, serverIP))
+	}
 	fmt.Println()
 
 	return nil

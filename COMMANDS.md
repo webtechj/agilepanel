@@ -14,6 +14,8 @@ Creates a new website on the server.
     *   `--php [version]`: Specify the PHP version to use (e.g., `8.2`, `8.3`). If omitted, prompts interactively.
     *   `--wp`: Automatically installs WordPress (alias for `--type=wp`).
     *   `--type [type]`: Specify the type of site to create: `wp` (WordPress), `woocommerce` (optimized WooCommerce/caching setup), `laravel`, `php` (Custom PHP), or `html` (Static HTML). Defaults to `wp`.
+    *   `--heavy-plugins`: Optimizes PHP memory (256MB), `max_input_vars` (5000), and execution timeout (300s) for heavy page builders like Elementor or WooCommerce. Prompts interactively during creation if omitted.
+    *   `--memory [size]`: Explicitly define custom PHP memory limit (e.g., `128M`, `256M`, `512M`).
 
 ### `ap site delete [domain]`
 Completely deletes a website.
@@ -68,6 +70,41 @@ Backs up only the database.
 ### `ap site edit [domain]`
 Edits the site configuration.
 *   **Description**: Opens the PHP-FPM configuration pool file for the site in the system's default text editor.
+
+### `ap site doctor [domain]`
+Runs automated diagnostics and pre-flight health checks.
+*   **Description**: Audits DNS reachability, SSL certificate validity, PHP-FPM service state, MariaDB connectivity, WordPress core files, and recent fatal errors in logs. Outputs a clear health checklist with actionable remedies.
+
+### `ap site restore [domain] [backup-target]`
+Restores website files and/or MariaDB database from local backups.
+*   **Description**: Automatically unzips and rolls back site files (`htdocs`) and/or imports the database dump from the site's secure `/backup` folder. Supports `latest` or specific backup timestamps. Requires confirmation (or `-y`).
+
+### `ap site reset-pass [domain] [username] [password]`
+Resets WordPress administrator password.
+*   **Description**: Uses WP-CLI to update the administrator password in the database directly. If credentials are omitted, prompts or auto-generates a secure password.
+
+### `ap site safe-mode [domain] [on|off]`
+Toggles emergency safe mode to recover from White Screen of Death (WSOD).
+*   **Description**: Temporarily deactivates all active plugins via WP-CLI and snapshots their state to allow admin access during 500 errors. Passing `off` restores all previously active plugins.
+
+### `ap site update [domain] [flags]`
+Updates PHP version, memory limits, and performance parameters for an existing website.
+*   **Description**: Updates PHP runtime version and/or PHP memory allocation with seamless zero-downtime reloads. For WordPress sites, automatically updates `WP_MEMORY_LIMIT` and `WP_MAX_MEMORY_LIMIT` inside `wp-config.php`.
+*   **Flags**:
+    *   `--php83`: Switch website to PHP 8.3 immediately (e.g. `ap site update sitename.com --php83`).
+    *   `--php82`: Switch website to PHP 8.2 immediately.
+    *   `--php81`: Switch website to PHP 8.1 immediately.
+    *   `--php [version]`: Specify target PHP version (e.g. `8.3`, `8.2`).
+    *   `--memory [size]`: Set PHP memory limit (e.g., `256M`, `512M`, `128M`).
+    *   `--heavy-plugins`: Apply high-performance profile (256MB memory, 5000 max_input_vars, 300s timeout) for Elementor, WooCommerce, etc.
+
+### `ap site php-switch [domain] [version]`
+Switches the active PHP version for a website.
+*   **Description**: Rebuilds the site's PHP-FPM pool for the new PHP version (e.g. `8.1`, `8.2`, `8.3`), seamlessly updates Caddyfile fastcgi routing sockets, and reloads services without downtime.
+
+### `ap site optimize [domain]`
+Optimizes database tables and clears expired cache/spam.
+*   **Description**: Defragments MariaDB tables (`wp db optimize`), removes expired transients, and deletes spam/trash comments to accelerate page generation.
 
 ---
 

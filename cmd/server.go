@@ -264,8 +264,6 @@ var serverTuneCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		ui.PrintSuccess("Server Performance Tuning Completed")
-		ui.PrintInfo("AgilePanel has audited your server hardware resources and configured optimized database buffers (30% RAM), Redis UNIX socket connections, persistent swap memories, and strict cache systems.")
 		ui.Divider()
 		fmt.Println()
 		return nil

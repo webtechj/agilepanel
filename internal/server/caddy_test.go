@@ -1,6 +1,7 @@
 package server
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 
@@ -75,8 +76,8 @@ func TestGenerateCaddyfile(t *testing.T) {
 	if !strings.Contains(content, "@hidden-files") || !strings.Contains(content, "path */.*") {
 		t.Error("expected hidden files blocking configuration in Caddyfile")
 	}
-	if !strings.Contains(content, "@uploads-php") || !strings.Contains(content, "path_regexp (?i)^/wp-content/uploads/.*\\.php$") {
-		t.Error("expected PHP uploads blocking configuration in Caddyfile")
+	if !strings.Contains(content, "@uploads-php") || !strings.Contains(content, "path_regexp (?i)^/wp-content/uploads/.*(?:\x5c.php[0-9]*|\x5c.phtml|\x5c.phar|\x5c.phps|\x5c.pht|\x5c.inc)(\x5c.|\x5c/|$)") {
+		t.Error("expected hardened PHP uploads blocking configuration in Caddyfile")
 	}
 	if !strings.Contains(content, "@blocked-php") || !strings.Contains(content, "path /xmlrpc.php /wp-admin/install.php") {
 		t.Error("expected sensitive PHP paths blocking configuration in Caddyfile")
@@ -98,3 +99,61 @@ func TestGenerateCaddyfile(t *testing.T) {
 		t.Error("expected sitetwo.net PHP 8.2 FPM socket definition")
 	}
 }
+
+func TestUploadsSecurityRegex(t *testing.T) {
+	re, err := regexp.Compile(`(?i)^/wp-content/uploads/.*(?:\.php[0-9]*|\.phtml|\.phar|\.phps|\.pht|\.inc)(\.|\/|$)`)
+	if err != nil {
+		t.Fatalf("failed to compile hardened uploads regex: %v", err)
+	}
+
+	blockedTests := []string{
+		"/wp-content/uploads/shell.php",
+		"/wp-content/uploads/2026/04/shell.PHP",
+		"/wp-content/uploads/shell.php.jpg",
+		"/wp-content/uploads/shell.php.png",
+		"/wp-content/uploads/nested/dir/shell.php.jpeg",
+		"/wp-content/uploads/shell.php.",
+		"/wp-content/uploads/shell.php/",
+		"/wp-content/uploads/shell.php/test.jpg",
+		"/wp-content/uploads/shell.phtml",
+		"/wp-content/uploads/shell.phtml.jpg",
+		"/wp-content/uploads/shell.phar",
+		"/wp-content/uploads/shell.phar.png",
+		"/wp-content/uploads/shell.php3",
+		"/wp-content/uploads/shell.php5",
+		"/wp-content/uploads/shell.php7",
+		"/wp-content/uploads/shell.php8",
+		"/wp-content/uploads/shell.phps",
+		"/wp-content/uploads/shell.pht",
+		"/wp-content/uploads/shell.inc",
+		"/wp-content/uploads/shell.inc.jpg",
+		"/wp-content/uploads/shell.php.suspected",
+		"/wp-content/uploads/shell.php.bak",
+	}
+
+	for _, path := range blockedTests {
+		if !re.MatchString(path) {
+			t.Errorf("expected path to be blocked by uploads security filter: %s", path)
+		}
+	}
+
+	allowedTests := []string{
+		"/wp-content/uploads/photo.jpg",
+		"/wp-content/uploads/2026/04/banner.png",
+		"/wp-content/uploads/document.pdf",
+		"/wp-content/uploads/philippines.jpg",
+		"/wp-content/uploads/graph-php-conference.jpg",
+		"/wp-content/uploads/zinc.jpg",
+		"/wp-content/uploads/file.inclusive.jpg",
+		"/wp-content/uploads/2024/01/image_php_test.png",
+		"/wp-content/uploads/php.png",
+		"/wp-content/themes/mytheme/style.css",
+	}
+
+	for _, path := range allowedTests {
+		if re.MatchString(path) {
+			t.Errorf("expected path to be ALLOWED (not blocked) by uploads security filter: %s", path)
+		}
+	}
+}
+
