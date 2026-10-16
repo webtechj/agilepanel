@@ -124,6 +124,11 @@ func Doctor(domain string) error {
 	if _, err := os.Stat(poolPath); err == nil {
 		ui.RowBadge("PHP Pool Config", "● Active", ui.BrightGreen)
 		ui.Row("PHP Version", targetSite.PHPVersion)
+		memLimit := targetSite.MemoryLimit
+		if memLimit == "" {
+			memLimit = "128M (default)"
+		}
+		ui.Row("PHP Memory Limit", memLimit)
 		ui.Row("Config File", poolPath)
 	} else {
 		ui.RowBadge("PHP Pool Config", "✖ Missing", ui.BrightRed)
@@ -205,6 +210,36 @@ func Doctor(domain string) error {
 				fmt.Sprintf("PHP Fatal Error: A plugin or theme is crashing WordPress. Run 'ap site safe-mode %s on' to temporarily deactivate plugins and restore access.", domain))
 		} else {
 			ui.RowBadge("Error Log Audit", "● No Fatal Errors Detected", ui.BrightGreen)
+		}
+
+		// Audit plugins for resource-intensive page builders / e-commerce
+		pluginsDir := filepath.Join(targetSite.PublicDir, "wp-content", "plugins")
+		heavyFound := []string{}
+		checkHeavy := []struct {
+			name string
+			slug string
+		}{
+			{"Elementor", "elementor"},
+			{"WooCommerce", "woocommerce"},
+			{"Divi Builder", "divi-builder"},
+			{"WPBakery", "js_composer"},
+			{"WPML", "sitepress-multilingual-cms"},
+		}
+		for _, hp := range checkHeavy {
+			if _, err := os.Stat(filepath.Join(pluginsDir, hp.slug)); err == nil {
+				heavyFound = append(heavyFound, hp.name)
+			}
+		}
+
+		if len(heavyFound) > 0 {
+			activeMem := targetSite.MemoryLimit
+			if activeMem == "" || activeMem == "128M" {
+				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("▲ 128M (Low for %s)", strings.Join(heavyFound, ", ")), ui.BrightYellow)
+				recommendations = append(recommendations,
+					fmt.Sprintf("Heavy Plugins Detected (%s): Active memory limit is 128M. Recommended: 256M. Run 'ap site update %s --memory 256M' to allocate 256MB.", strings.Join(heavyFound, ", "), domain))
+			} else {
+				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("● %s (Optimized for %s)", activeMem, strings.Join(heavyFound, ", ")), ui.BrightGreen)
+			}
 		}
 	}
 

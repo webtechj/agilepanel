@@ -69,3 +69,31 @@ func TestGeneratePHPPool(t *testing.T) {
 		t.Error("expected PHP post max size configuration")
 	}
 }
+
+func TestGeneratePHPPoolCustomMemory(t *testing.T) {
+	site := &config.SiteConfig{
+		Domain:       "heavy-store.com",
+		PHPVersion:   "8.3",
+		PublicDir:    "/var/www/heavy-store.com/htdocs",
+		DatabaseName: "db_heavy_store",
+		DatabaseUser: "usr_heavy_store",
+		SystemUser:   "wp_heavy_store",
+		Type:         "woocommerce",
+		MemoryLimit:  "256M",
+	}
+
+	content, err := GeneratePHPPool(site)
+	if err != nil {
+		t.Fatalf("failed to generate PHP pool: %v", err)
+	}
+
+	if !strings.Contains(content, "php_admin_value[memory_limit] = 256M") {
+		t.Errorf("expected memory_limit = 256M for woocommerce/heavy site, got:\n%s", content)
+	}
+	if !strings.Contains(content, "php_admin_value[max_input_vars] = 5000") {
+		t.Errorf("expected max_input_vars = 5000, got:\n%s", content)
+	}
+	if !strings.Contains(content, "php_admin_value[max_execution_time] = 300") {
+		t.Errorf("expected max_execution_time = 300, got:\n%s", content)
+	}
+}

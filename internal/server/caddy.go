@@ -113,9 +113,9 @@ const caddyfileTemplateStr = `# Global Options Block
     respond @hidden-files "Access Denied" 403
 
     {{if ne .Type "html"}}
-    # Block PHP execution in uploads directory
+    # Block PHP execution in uploads directory (including double extensions & alternate scripts)
     @uploads-php {
-        path_regexp (?i)^/wp-content/uploads/.*\.php$
+        path_regexp (?i)^/wp-content/uploads/.*(?:\.php[0-9]*|\.phtml|\.phar|\.phps|\.pht|\.inc)(\.|\/|$)
     }
     respond @uploads-php "Access Denied" 403
 
@@ -180,9 +180,9 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
     respond @hidden-files "Access Denied" 403
 
     {{if ne .Type "html"}}
-    # Block PHP execution in uploads directory
+    # Block PHP execution in uploads directory (including double extensions & alternate scripts)
     @uploads-php {
-        path_regexp (?i)^/wp-content/uploads/.*\.php$
+        path_regexp (?i)^/wp-content/uploads/.*(?:\.php[0-9]*|\.phtml|\.phar|\.phps|\.pht|\.inc)(\.|\/|$)
     }
     respond @uploads-php "Access Denied" 403
 

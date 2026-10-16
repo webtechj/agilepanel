@@ -47,6 +47,9 @@ type SiteConfig struct {
 	WPAdminUser       string    `json:"wp_admin_user,omitempty"`
 	WPAdminEmail      string    `json:"wp_admin_email,omitempty"`
 	Type              string    `json:"type,omitempty"`
+	MemoryLimit       string    `json:"memory_limit,omitempty"`
+	MaxExecutionTime  int       `json:"max_execution_time,omitempty"`
+	MaxInputVars      int       `json:"max_input_vars,omitempty"`
 	StagingUnlocked   bool      `json:"staging_unlocked,omitempty"`
 	BackupInterval    string    `json:"backup_interval,omitempty"`
 	LastBackupTime    time.Time `json:"last_backup_time,omitempty"`

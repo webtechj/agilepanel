@@ -39,7 +39,7 @@ By eliminating bloated web UIs and heavy daemon overhead (typical in platforms l
 *   **System User Isolation**: Automatically provisions each site under its own unprivileged system user (`wp_[sanitized_domain]`) to prevent cross-site security leaks.
 *   **Hardened PHP Defaults**: Restricts directory access using `open_basedir` and disables dangerous system execution commands (like `exec`, `shell_exec`, `system`) by default.
 *   **Automatic Namespace Obfuscation**: Generates randomized prefixes (e.g. `db_a1b2c3_`) for database namespaces, user credentials, and WordPress table prefixes.
-*   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/`, and shield sensitive scripts (`xmlrpc.php`, `install.php`).
+*   **Caddy Security Filters**: Out-of-the-box filtering to block dotfiles (e.g. `.git`, `.env`), deny PHP execution recursively inside `/wp-content/uploads/` (including double extensions like `.php.jpg` and alternate executable scripts like `.phtml`, `.phar`), and shield sensitive scripts (`xmlrpc.php`, `install.php`).
 
 ### 🚀 High-Performance Optimizations
 *   **Hardware-Aware Tuning**: The `ap server tune` command automatically scales the MariaDB InnoDB buffer pool (allocated to 30% of system RAM), configures high-speed transaction flushes, and disables unnecessary replication logging.

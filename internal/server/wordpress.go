@@ -121,13 +121,20 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 	}
 
 	// 7. General WordPress performance settings optimizations
-	ui.PrintStep(7, "Applying standard performance optimizations (revisions limits, clean permalinks)...")
+	ui.PrintStep(7, "Applying standard performance optimizations (revisions limits, clean permalinks, memory)...")
 	// Limit post revisions to 3 to keep DB lightweight
 	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_POST_REVISIONS", "3", "--raw", "--path="+publicDir)
 	// Clean up permalinks structure to /%postname%/ (highly recommended for SEO/speed)
 	_ = RunAsUser(username, homeDir, "wp", "permalink", "structure", "/%postname%/", "--path="+publicDir)
 	// Clean default plugins
 	_ = RunAsUser(username, homeDir, "wp", "plugin", "delete", "hello", "--path="+publicDir)
+	// Set baseline memory limits in wp-config.php
+	wpMem := "128M"
+	if siteType == "woocommerce" {
+		wpMem = "256M"
+	}
+	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_MEMORY_LIMIT", wpMem, "--path="+publicDir)
+	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_MAX_MEMORY_LIMIT", wpMem, "--path="+publicDir)
 
 	// 8. WooCommerce Specific Caching Compatibility & Scaling Optimization
 	if siteType == "woocommerce" {
@@ -170,4 +177,16 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 	}
 
 	return adminPassword, nil
+}
+
+// TuneWordPressMemory configures WP_MEMORY_LIMIT and WP_MAX_MEMORY_LIMIT in wp-config.php.
+func TuneWordPressMemory(username string, publicDir string, memoryLimit string) error {
+	if memoryLimit == "" {
+		memoryLimit = "128M"
+	}
+	homeDir := filepath.Dir(publicDir)
+	if err := RunAsUser(username, homeDir, "wp", "config", "set", "WP_MEMORY_LIMIT", memoryLimit, "--path="+publicDir); err != nil {
+		return err
+	}
+	return RunAsUser(username, homeDir, "wp", "config", "set", "WP_MAX_MEMORY_LIMIT", memoryLimit, "--path="+publicDir)
 }

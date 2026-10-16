@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"agilepanel/internal/site"
+	"agilepanel/internal/ui"
 )
 
 var (
@@ -25,6 +26,16 @@ var (
 	wpAdminPass  string
 	wpAdminEmail string
 	wpAdminName  string
+
+	createHeavyPlugins bool
+	createMemoryLimit  string
+
+	updatePHP    string
+	updatePHP81  bool
+	updatePHP82  bool
+	updatePHP83  bool
+	updateMemory string
+	updateHeavy  bool
 )
 
 var siteCmd = &cobra.Command{
@@ -100,7 +111,25 @@ var siteCreateCmd = &cobra.Command{
 			}
 		}
 
-		return site.Create(domain, actualPHP, actualType, dbOpt, importFiles, importDB, wpAdminUser, wpAdminPass, wpAdminEmail, wpAdminName)
+		actualMemory := createMemoryLimit
+		if createHeavyPlugins && actualMemory == "" {
+			actualMemory = "256M"
+		}
+		if actualType == "woocommerce" && actualMemory == "" {
+			actualMemory = "256M"
+		}
+
+		if (actualType == "wp" || actualType == "woocommerce") && !cmd.Flags().Changed("memory") && !cmd.Flags().Changed("heavy-plugins") && actualType != "woocommerce" {
+			resp, err := promptString("Will this site use heavy plugins (e.g. Elementor, WooCommerce, Divi)? (y/N) [N]: ")
+			if err == nil {
+				resp = strings.ToLower(strings.TrimSpace(resp))
+				if resp == "y" || resp == "yes" {
+					actualMemory = "256M"
+				}
+			}
+		}
+
+		return site.Create(domain, actualPHP, actualType, dbOpt, importFiles, importDB, wpAdminUser, wpAdminPass, wpAdminEmail, wpAdminName, actualMemory)
 	},
 }
 
@@ -429,10 +458,57 @@ var siteOptimizeCmd = &cobra.Command{
 	},
 }
 
+var siteUpdateCmd = &cobra.Command{
+	Use:   "update [domain]",
+	Short: "Update PHP version, memory limits, and performance parameters for a website",
+	Args:  cobra.RangeArgs(0, 1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain, err := getDomainArg(args)
+		if err != nil {
+			return err
+		}
+
+		targetPHP := updatePHP
+		if updatePHP83 {
+			targetPHP = "8.3"
+		} else if updatePHP82 {
+			targetPHP = "8.2"
+		} else if updatePHP81 {
+			targetPHP = "8.1"
+		}
+
+		targetMemory := updateMemory
+		if updateHeavy {
+			targetMemory = "256M"
+		}
+
+		if targetPHP == "" && targetMemory == "" {
+			ui.Banner("Update Website Settings: " + domain)
+			p, err := promptString("Enter new PHP version (e.g. 8.2, 8.3) or leave blank to keep current: ")
+			if err != nil {
+				return err
+			}
+			targetPHP = p
+
+			memResp, err := promptString("Allocate 256MB memory for heavy plugins (Elementor, WooCommerce)? (y/N) [N]: ")
+			if err == nil {
+				memResp = strings.ToLower(strings.TrimSpace(memResp))
+				if memResp == "y" || memResp == "yes" {
+					targetMemory = "256M"
+				}
+			}
+		}
+
+		return site.Update(domain, targetPHP, targetMemory, updateHeavy)
+	},
+}
+
 func init() {
 	siteCreateCmd.Flags().StringVar(&phpVersion, "php", "", "PHP version to use (e.g. 8.3)")
 	siteCreateCmd.Flags().BoolVar(&installWP, "wp", false, "Install WordPress automatically (alias for --type=wp)")
 	siteCreateCmd.Flags().StringVar(&siteType, "type", "wp", "Type of site to create: wp, woocommerce, laravel, php, html")
+	siteCreateCmd.Flags().BoolVar(&createHeavyPlugins, "heavy-plugins", false, "Tune PHP settings for heavy plugins like Elementor or WooCommerce (256MB memory)")
+	siteCreateCmd.Flags().StringVar(&createMemoryLimit, "memory", "", "Set PHP memory limit (e.g. 128M, 256M, 512M)")
 	siteCreateCmd.Flags().StringVar(&createDBFlag, "db", "default", "Create MariaDB database for site: true, false, default")
 	siteCreateCmd.Flags().StringVar(&importFiles, "import-files", "", "Path to imported website files ZIP")
 	siteCreateCmd.Flags().StringVar(&importDB, "import-db", "", "Path to imported database SQL/ZIP file")
@@ -452,7 +528,15 @@ func init() {
  
 	siteS3ListCmd.Flags().BoolVar(&s3JsonFlag, "json", false, "Output results in raw JSON format")
 
+	siteUpdateCmd.Flags().StringVar(&updatePHP, "php", "", "PHP version to switch to (e.g. 8.1, 8.2, 8.3)")
+	siteUpdateCmd.Flags().BoolVar(&updatePHP81, "php81", false, "Update website to PHP 8.1")
+	siteUpdateCmd.Flags().BoolVar(&updatePHP82, "php82", false, "Update website to PHP 8.2")
+	siteUpdateCmd.Flags().BoolVar(&updatePHP83, "php83", false, "Update website to PHP 8.3")
+	siteUpdateCmd.Flags().StringVar(&updateMemory, "memory", "", "Set PHP memory limit (e.g. 128M, 256M, 512M)")
+	siteUpdateCmd.Flags().BoolVar(&updateHeavy, "heavy-plugins", false, "Optimize for heavy plugins like Elementor or WooCommerce (256MB memory)")
+
 	siteCmd.AddCommand(siteCreateCmd)
+	siteCmd.AddCommand(siteUpdateCmd)
 	siteCmd.AddCommand(siteDeleteCmd)
 	siteCmd.AddCommand(siteListCmd)
 	siteCmd.AddCommand(siteInfoCmd)
