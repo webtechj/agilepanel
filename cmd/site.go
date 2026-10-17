@@ -346,6 +346,8 @@ var siteS3DeleteCmd = &cobra.Command{
 	},
 }
 
+var siteDoctorFix bool
+
 var siteDoctorCmd = &cobra.Command{
 	Use:   "doctor [domain]",
 	Short: "Run automated health and connectivity diagnostics for a website",
@@ -355,7 +357,7 @@ var siteDoctorCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return site.Doctor(domain)
+		return site.DoctorWithFix(domain, siteDoctorFix)
 	},
 }
 
@@ -527,6 +529,7 @@ func init() {
 	siteCacheCleanCmd.Flags().BoolVar(&cleanCaddy, "caddy", false, "Clean Caddy edge cache")
  
 	siteS3ListCmd.Flags().BoolVar(&s3JsonFlag, "json", false, "Output results in raw JSON format")
+	siteDoctorCmd.Flags().BoolVar(&siteDoctorFix, "fix", false, "Automatically apply non-destructive fixes for all discovered issues")
 
 	siteUpdateCmd.Flags().StringVar(&updatePHP, "php", "", "PHP version to switch to (e.g. 8.1, 8.2, 8.3)")
 	siteUpdateCmd.Flags().BoolVar(&updatePHP81, "php81", false, "Update website to PHP 8.1")

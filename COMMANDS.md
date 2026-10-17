@@ -176,6 +176,12 @@ Disables secondary GUI dashboard session security PIN locks in the event of admi
 Shows a detailed visual dashboard of AgilePanel installation.
 *   **Description**: Renders an ASCII banner and displays CLI version, binary path, config state file path, host OS and CPU architecture, server public IP, hosted site counts, Web GUI Addon status, and running stack services with their socket and config file paths.
 
+### `ap doctor [domain] [--fix]`
+Automated diagnostic, triage, and self-healing engine for websites and server stack.
+*   **Description**: Proactively discovers issues via synthetic TLS/SNI probes (loopback port 443), HTTP response checks, Caddy log audits, PHP-FPM socket and memory sizing, and MariaDB queries. Pinpoints root causes for Cloudflare Error 525, 502 Bad Gateway, and 500 PHP Memory Exhaustion.
+*   **Flags**:
+    *   `--fix`: Automatically applies safe, non-destructive auto-remediation recipes (e.g., adding WWW redirect block to Caddyfile, auto-scaling PHP memory limit from 128M to 256M/512M) and verifies recovery.
+
 ### `ap repair [flags]`
 Runs a non-destructive configuration repair.
 *   **Description**: Scans and rebuilds all core PHP-FPM pools, Caddy configurations, and server settings. Realigns directories without touching site files, databases, or user credentials.
