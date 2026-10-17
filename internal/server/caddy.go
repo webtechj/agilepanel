@@ -3,10 +3,12 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"text/template"
 
 	"agilepanel/internal/config"
@@ -138,6 +140,18 @@ const caddyfileTemplateStr = `# Global Options Block
     {{end}}
 }
 
+{{if isApex .Domain}}
+# Canonical WWW to Apex redirect block (Prevents Cloudflare 525 SSL Handshake Failures)
+www.{{.Domain}} {
+    redir https://{{.Domain}}{uri} permanent
+}
+{{else if isWWW .Domain}}
+# Canonical Apex to WWW redirect block
+{{trimWWW .Domain}} {
+    redir https://{{.Domain}}{uri} permanent
+}
+{{end}}
+
 # Protected Staging website block
 {{if $.ServerIP}}
 http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
@@ -208,9 +222,49 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
 {{end}}
 `
 
+// IsApexDomain returns true if the domain is a root/apex domain (e.g. missbaha.com, rusicaa.com, example.co.uk)
+func IsApexDomain(domain string) bool {
+	domain = strings.ToLower(strings.TrimSpace(domain))
+	if domain == "" || domain == "localhost" || net.ParseIP(domain) != nil {
+		return false
+	}
+	if strings.HasPrefix(domain, "www.") {
+		return false
+	}
+	parts := strings.Split(domain, ".")
+	if len(parts) == 2 {
+		return true
+	}
+	// Common 2-part ccTLDs like .co.uk, .com.au, .org.in, .gov.in, .edu.pk
+	if len(parts) == 3 {
+		secondLevel := parts[1]
+		commonSLDs := map[string]bool{
+			"co": true, "com": true, "org": true, "net": true, "gov": true, "edu": true, "ac": true,
+		}
+		if commonSLDs[secondLevel] && len(parts[2]) == 2 {
+			return true
+		}
+	}
+	return false
+}
+
+// IsWWWDomain returns true if domain starts with "www."
+func IsWWWDomain(domain string) bool {
+	return strings.HasPrefix(strings.ToLower(strings.TrimSpace(domain)), "www.")
+}
+
+// TrimWWW returns the apex domain without "www." prefix
+func TrimWWW(domain string) string {
+	return strings.TrimPrefix(strings.ToLower(strings.TrimSpace(domain)), "www.")
+}
+
 // GenerateCaddyfile programmatically generates the full Caddyfile configuration.
 func GenerateCaddyfile(state *config.State) (string, error) {
-	tmpl, err := template.New("caddyfile").Parse(caddyfileTemplateStr)
+	tmpl, err := template.New("caddyfile").Funcs(template.FuncMap{
+		"isApex":  IsApexDomain,
+		"isWWW":   IsWWWDomain,
+		"trimWWW": TrimWWW,
+	}).Parse(caddyfileTemplateStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse Caddyfile template: %w", err)
 	}

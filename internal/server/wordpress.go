@@ -114,6 +114,12 @@ func InstallWordPress(username string, domain string, publicDir string, dbName s
 		return "", fmt.Errorf("wp config set WP_CACHE_KEY_PREFIX failed: %w", err)
 	}
 
+	// Micro-timeouts to prevent PHP worker stalls during Redis locking/restarts
+	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_REDIS_TIMEOUT", "1", "--raw", "--path="+publicDir)
+	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_REDIS_READ_TIMEOUT", "1", "--raw", "--path="+publicDir)
+	// Enable selective flush to isolate cache purges per site prefix
+	_ = RunAsUser(username, homeDir, "wp", "config", "set", "WP_REDIS_SELECTIVE_FLUSH", "true", "--raw", "--path="+publicDir)
+
 	// 6. Enable Redis Cache
 	ui.PrintStep(6, "Activating Redis Object Cache engine (object-cache.php drop-in)...")
 	if err := RunAsUser(username, homeDir, "wp", "redis", "enable", "--path="+publicDir); err != nil {

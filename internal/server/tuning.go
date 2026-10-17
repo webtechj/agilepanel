@@ -347,8 +347,15 @@ func TuneServerWithProfile(profile *SystemHardwareProfile) error {
 		ui.PrintWarning(fmt.Sprintf("Default webserver initialization failed: %v", err))
 	}
 
-	// 5. Install Metrics Cron Job
-	ui.PrintStep(5, "Installing real-time system metrics logging daemon...")
+	// 5. Auto-tune PHP-FPM Pools for hosted sites
+	ui.PrintStep(5, "Auditing and auto-tuning PHP-FPM worker pools according to available RAM...")
+	ui.PrintInfo("Explanatory Note: PHP-FPM pools are scaled using net available RAM after subtracting database and cache footprints, with dynamic warm workers for eCommerce.")
+	if err := TunePHPPoolsWithProfile(profile); err != nil {
+		ui.PrintWarning(fmt.Sprintf("PHP pool tuning encountered an issue: %v", err))
+	}
+
+	// 6. Install Metrics Cron Job
+	ui.PrintStep(6, "Installing real-time system metrics logging daemon...")
 	ui.PrintInfo("Explanatory Note: A cron job runs every 5 minutes under root to capture performance snapshots, helping you visualize real-time resource trends.")
 	if err := installMetricsCron(); err != nil {
 		ui.PrintWarning(fmt.Sprintf("Metrics cron job installation failed: %v", err))
@@ -520,13 +527,18 @@ func TuneSysctlWithProfile(profile *SystemHardwareProfile) error {
 	}
 
 	sysctlSettings := map[string]string{
-		"vm.swappiness":                swappiness,
-		"vm.vfs_cache_pressure":        cachePressure,
-		"net.core.somaxconn":           "65535",
-		"net.ipv4.tcp_max_syn_backlog": "65535",
-		"net.ipv4.tcp_tw_reuse":        "1",
-		"net.core.netdev_max_backlog":   "5000",
-		"fs.file-max":                  fileMax,
+		"vm.swappiness":                   swappiness,
+		"vm.vfs_cache_pressure":           cachePressure,
+		"vm.dirty_background_ratio":       "5",
+		"vm.dirty_ratio":                  "10",
+		"net.core.default_qdisc":          "fq",
+		"net.ipv4.tcp_congestion_control": "bbr",
+		"net.core.somaxconn":              "65535",
+		"net.ipv4.tcp_max_syn_backlog":    "65535",
+		"net.ipv4.tcp_tw_reuse":           "1",
+		"net.ipv4.tcp_fin_timeout":        "15",
+		"net.core.netdev_max_backlog":      "5000",
+		"fs.file-max":                     fileMax,
 	}
 
 	var confBuilder strings.Builder
@@ -545,6 +557,44 @@ func TuneSysctlWithProfile(profile *SystemHardwareProfile) error {
 		_ = os.WriteFile(filepath.Join(limitsDir, "99-agilepanel.conf"), []byte(limitsContent), 0644)
 	}
 
+	return nil
+}
+
+// TunePHPPools reconfigures PHP-FPM pools for all sites according to audited hardware.
+func TunePHPPools() error {
+	return TunePHPPoolsWithProfile(AuditHardwareProfile())
+}
+
+// TunePHPPoolsWithProfile auto-tunes PHP-FPM pools for all configured sites based on system profile.
+func TunePHPPoolsWithProfile(profile *SystemHardwareProfile) error {
+	statePath := config.GetStatePath()
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		// No state file or uninitialized panel; nothing to tune yet
+		return nil
+	}
+
+	reloadedVersions := make(map[string]bool)
+	count := 0
+	for _, site := range state.Sites {
+		if site.PHPVersion == "" || site.Type == "html" {
+			continue
+		}
+		if err := WritePHPPool(&site); err != nil {
+			ui.PrintWarning(fmt.Sprintf("Failed to update pool for %s: %v", site.Domain, err))
+		} else {
+			reloadedVersions[site.PHPVersion] = true
+			count++
+		}
+	}
+
+	for ver := range reloadedVersions {
+		_ = ReloadPHP(ver)
+	}
+
+	if count > 0 {
+		fmt.Printf("PHP: Successfully auto-tuned %d PHP-FPM pool(s) for hardware profile.\n", count)
+	}
 	return nil
 }
 
@@ -1130,7 +1180,7 @@ const welcomeHTML = `<!DOCTYPE html>
         <header>
             <div class="logo-container floating">
                 <span class="logo-icon">▲ AgilePanel</span>
-                <span class="logo-badge">v1.1.0</span>
+                <span class="logo-badge">v1.1.5</span>
             </div>
             <h1>Web Stack Successfully Initialized</h1>
             <p class="subtitle">Your High-Performance VPS is fully optimized and ready to serve next-generation web experiences.</p>
