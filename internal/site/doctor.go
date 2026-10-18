@@ -239,6 +239,10 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	// Tracking remediation triggers
 	needsCaddyWWWFix := false
 	needsMemoryScale := false
+	needsOrphanCleanup := false
+	var orphanedVersions []string
+	needsOpcacheFix := false
+	needsPMFix := false
 	var recommendedMemory = "256M"
 
 	ui.Banner("Site Doctor Diagnostic Report: " + strings.ToUpper(targetSite.Domain))
@@ -388,21 +392,62 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	// -------------------------------------------------------------
 	ui.SectionHeader("5. PHP-FPM PROCESS MANAGER & MEMORY SIZING")
 	poolPath := server.GetPHPPoolPath(targetSite.PHPVersion, targetSite.Domain)
-	if _, err := os.Stat(poolPath); err == nil {
+	poolConfig, poolErr := server.ReadPHPPoolConfig(targetSite.PHPVersion, targetSite.Domain)
+
+	activePoolMem := targetSite.MemoryLimit
+	if poolErr == nil && poolConfig != nil {
 		ui.RowBadge("PHP Pool Config", "● Active", ui.BrightGreen)
 		ui.Row("PHP Version", targetSite.PHPVersion)
-		memLimit := targetSite.MemoryLimit
-		if memLimit == "" {
-			memLimit = "128M (default)"
+		if poolConfig.MemoryLimit != "" {
+			activePoolMem = poolConfig.MemoryLimit
+		} else if activePoolMem == "" {
+			activePoolMem = "128M"
 		}
-		ui.Row("PHP Memory Limit", memLimit)
+		ui.Row("PHP Memory Limit (Pool)", activePoolMem)
+		ui.Row("Process Manager (PM)", fmt.Sprintf("%s (max_children: %d)", poolConfig.PM, poolConfig.MaxChildren))
 		ui.Row("Config File", poolPath)
+
+		// Check OPcache validate_timestamps
+		if poolConfig.OpcacheValidateTimestamps == 0 {
+			ui.RowBadge("OPcache Timestamps", "▲ Disabled (0) — Code updates require daemon reload", ui.BrightYellow)
+			recommendations = append(recommendations,
+				fmt.Sprintf("OPcache Timestamps Disabled: opcache.validate_timestamps is 0 for '%s'. Script and wp-config.php updates are not dynamically detected. Run 'ap site doctor %s --fix' to enable validation.", targetSite.Domain, targetSite.Domain))
+			needsOpcacheFix = true
+			fixableIssues = append(fixableIssues, "Disabled OPcache timestamp validation (validate_timestamps = 0)")
+		} else {
+			ui.RowBadge("OPcache Timestamps", fmt.Sprintf("● Enabled (revalidate_freq: %ds)", poolConfig.OpcacheRevalidateFreq), ui.BrightGreen)
+		}
+
+		// Check PM concurrency
+		if poolConfig.MaxChildren > 25 {
+			ui.RowBadge("PM Concurrency", fmt.Sprintf("▲ High Allocation (%d workers) — OOM Risk", poolConfig.MaxChildren), ui.BrightYellow)
+			recommendations = append(recommendations,
+				fmt.Sprintf("PHP-FPM Worker Pool Overallocated: max_children is %d. On VPS memory, traffic spikes risk OS OOM termination. Run 'ap site doctor %s --fix' to balance workers.", poolConfig.MaxChildren, targetSite.Domain))
+			needsPMFix = true
+			fixableIssues = append(fixableIssues, fmt.Sprintf("Overallocated PHP-FPM max_children (%d)", poolConfig.MaxChildren))
+		} else {
+			ui.RowBadge("PM Concurrency", fmt.Sprintf("● Balanced (pm=%s, max_children=%d)", poolConfig.PM, poolConfig.MaxChildren), ui.BrightGreen)
+		}
 	} else {
 		ui.RowBadge("PHP Pool Config", "✖ Missing", ui.BrightRed)
 		ui.Row("Target Path", poolPath)
 		recommendations = append(recommendations,
 			fmt.Sprintf("PHP Pool Missing: Run 'ap site doctor %s --fix' to rebuild pool configurations.", targetSite.Domain))
 		fixableIssues = append(fixableIssues, "Missing PHP-FPM pool configuration")
+	}
+
+	// Check for Orphaned / Inactive PHP Pools across other versions
+	orphanedVersions = server.FindOrphanedPHPPools(targetSite.Domain, targetSite.PHPVersion, state.Global.SupportedPHPVersions)
+	if len(orphanedVersions) > 0 {
+		ui.RowBadge("Inactive PHP Pools", fmt.Sprintf("▲ Orphaned Pool in PHP %s", strings.Join(orphanedVersions, ", ")), ui.BrightYellow)
+		ui.Row("Orphan Config", fmt.Sprintf("Leftover config found in /etc/php/%s/fpm/pool.d/%s.conf while site runs PHP %s", strings.Join(orphanedVersions, ", "), targetSite.Domain, targetSite.PHPVersion))
+		recommendations = append(recommendations,
+			fmt.Sprintf("Inactive PHP Pool Detected: Leftover pool config for '%s' exists in PHP %s. Run 'ap site doctor %s --fix' to purge orphaned pools.",
+				targetSite.Domain, strings.Join(orphanedVersions, ", "), targetSite.Domain))
+		needsOrphanCleanup = true
+		fixableIssues = append(fixableIssues, fmt.Sprintf("Orphaned PHP %s pool configuration", strings.Join(orphanedVersions, ", ")))
+	} else {
+		ui.RowBadge("Inactive PHP Pools", "● None (Clean Runtime Isolation)", ui.BrightGreen)
 	}
 
 	// Worker starvation check
@@ -450,17 +495,38 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	isWP := targetSite.Type == "wp" || targetSite.Type == "woocommerce" || targetSite.Type == ""
 	if isWP {
 		ui.SectionHeader("7. WORDPRESS APPLICATION & ERROR LOGS")
-		wpConfigPath := filepath.Join(server.GetSiteRootDir(targetSite.PublicDir), "wp-config.php")
-		if _, err := os.Stat(wpConfigPath); err == nil {
-			ui.RowBadge("Configuration File", "● Secured in parent root", ui.BrightGreen)
+		wpConfigPath := server.FindWPConfigPath(targetSite.PublicDir)
+		if wpConfigPath != "" {
+			ui.RowBadge("Configuration File", "● Found", ui.BrightGreen)
+			ui.Row("wp-config.php Path", wpConfigPath)
 		} else {
-			altPath := filepath.Join(targetSite.PublicDir, "wp-config.php")
-			if _, err := os.Stat(altPath); err == nil {
-				ui.RowBadge("Configuration File", "● Found in webroot", ui.BrightGreen)
-			} else {
-				ui.RowBadge("Configuration File", "✖ wp-config.php Not Found", ui.BrightRed)
+			ui.RowBadge("Configuration File", "✖ wp-config.php Not Found", ui.BrightRed)
+			recommendations = append(recommendations,
+				fmt.Sprintf("WordPress Core Missing: wp-config.php was not found. Run 'ap site reinstall %s' to restore core files.", targetSite.Domain))
+		}
+
+		// Inspect WP_MEMORY_LIMIT in wp-config.php and detect conflict with PHP pool
+		wpMem, wpMaxMem, _ := server.ReadWordPressMemoryLimit(targetSite.PublicDir)
+		if wpMem != "" {
+			ui.Row("WP_MEMORY_LIMIT", wpMem)
+			if wpMaxMem != "" && wpMaxMem != wpMem {
+				ui.Row("WP_MAX_MEMORY_LIMIT", wpMaxMem)
+			}
+
+			// Check for conflict: wp-config.php requests more memory than pool allows
+			if server.CompareMemory(wpMem, activePoolMem) > 0 {
+				needsMemoryScale = true
+				if server.CompareMemory(wpMem, recommendedMemory) > 0 {
+					recommendedMemory = wpMem
+				}
+				ui.RowBadge("Memory Limit Conflict", fmt.Sprintf("✖ CRITICAL: wp-config requests %s, pool caps at %s", wpMem, activePoolMem), ui.BrightRed)
+				ui.Row("Conflict Details", fmt.Sprintf("PHP-FPM php_admin_value[memory_limit] (%s) overrides wp-config.php (%s). WordPress cannot allocate requested memory, causing fatal OOM crashes.", activePoolMem, wpMem))
 				recommendations = append(recommendations,
-					fmt.Sprintf("WordPress Core Missing: wp-config.php was not found. Run 'ap site reinstall %s' to restore core files.", targetSite.Domain))
+					fmt.Sprintf("PHP Memory Conflict: wp-config.php specifies WP_MEMORY_LIMIT '%s' but PHP-FPM pool caps at '%s' via php_admin_value. Run 'ap site doctor %s --fix' to upgrade pool to %s.",
+						wpMem, activePoolMem, targetSite.Domain, wpMem))
+				fixableIssues = append(fixableIssues, fmt.Sprintf("Memory Limit Conflict (wp-config requests %s, pool caps at %s)", wpMem, activePoolMem))
+			} else {
+				ui.RowBadge("Memory Alignment", fmt.Sprintf("● Aligned (wp-config: %s, pool: %s)", wpMem, activePoolMem), ui.BrightGreen)
 			}
 		}
 
@@ -493,9 +559,11 @@ func DoctorWithFix(domain string, autoFix bool) error {
 
 			if hasOOMFatal {
 				needsMemoryScale = true
-				recommendedMemory = "256M"
+				if server.CompareMemory("256M", recommendedMemory) > 0 {
+					recommendedMemory = "256M"
+				}
 				recommendations = append(recommendations,
-					fmt.Sprintf("PHP Fatal Memory Exhaustion Detected: Site crashed due to 128M memory limit. Run 'ap site doctor %s --fix' to auto-upgrade to 256M.", targetSite.Domain))
+					fmt.Sprintf("PHP Fatal Memory Exhaustion Detected: Site crashed due to memory limit exhaustion. Run 'ap site doctor %s --fix' to auto-upgrade to %s.", targetSite.Domain, recommendedMemory))
 				fixableIssues = append(fixableIssues, "PHP Memory Exhaustion (Fatal Error in debug.log)")
 			} else {
 				recommendations = append(recommendations,
@@ -527,19 +595,20 @@ func DoctorWithFix(domain string, autoFix bool) error {
 		}
 
 		if len(heavyFound) > 0 {
-			activeMem := targetSite.MemoryLimit
-			if activeMem == "" || activeMem == "128M" {
+			if targetSite.MemoryLimit == "" || targetSite.MemoryLimit == "128M" || server.CompareMemory("256M", activePoolMem) > 0 {
 				needsMemoryScale = true
-				recommendedMemory = "256M"
-				if len(heavyFound) >= 3 {
+				if server.CompareMemory("256M", recommendedMemory) > 0 {
+					recommendedMemory = "256M"
+				}
+				if len(heavyFound) >= 3 && server.CompareMemory("512M", recommendedMemory) > 0 {
 					recommendedMemory = "512M"
 				}
-				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("▲ 128M (Low for %s)", strings.Join(heavyFound, ", ")), ui.BrightYellow)
+				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("▲ %s (Low for %s)", activePoolMem, strings.Join(heavyFound, ", ")), ui.BrightYellow)
 				recommendations = append(recommendations,
-					fmt.Sprintf("Heavy Plugins Detected (%s): Active memory limit is 128M. Recommended: %s. Run 'ap site doctor %s --fix' to auto-upgrade.", strings.Join(heavyFound, ", "), recommendedMemory, targetSite.Domain))
+					fmt.Sprintf("Heavy Plugins Detected (%s): Active memory limit is %s. Recommended: %s. Run 'ap site doctor %s --fix' to auto-upgrade.", strings.Join(heavyFound, ", "), activePoolMem, recommendedMemory, targetSite.Domain))
 				fixableIssues = append(fixableIssues, fmt.Sprintf("Under-allocated PHP Memory for heavy plugins (%s)", strings.Join(heavyFound, ", ")))
 			} else {
-				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("● %s (Optimized for %s)", activeMem, strings.Join(heavyFound, ", ")), ui.BrightGreen)
+				ui.RowBadge("Plugin Memory Sizing", fmt.Sprintf("● %s (Optimized for %s)", activePoolMem, strings.Join(heavyFound, ", ")), ui.BrightGreen)
 			}
 		}
 	}
@@ -559,7 +628,7 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	// -------------------------------------------------------------
 	// Auto-Remediation Execution (--fix flag)
 	// -------------------------------------------------------------
-	if autoFix && (needsCaddyWWWFix || needsMemoryScale || len(fixableIssues) > 0) {
+	if autoFix && (needsCaddyWWWFix || needsMemoryScale || needsOrphanCleanup || needsOpcacheFix || needsPMFix || len(fixableIssues) > 0) {
 		ui.Divider()
 		ui.Banner("STARTING AUTOMATIC REMEDIATION & HEALING")
 		ui.PrintInfo(fmt.Sprintf("Found %d auto-healable issue(s). Applying safe, non-destructive remedies...", len(fixableIssues)))
@@ -584,14 +653,46 @@ func DoctorWithFix(domain string, autoFix bool) error {
 			}
 		}
 
-		// 2. Fix PHP Memory Limit (Scales to 256M or 512M)
-		if needsMemoryScale {
-			ui.PrintStep(2, fmt.Sprintf("Scaling PHP memory limit from %s to %s for %s...", targetSite.MemoryLimit, recommendedMemory, targetSite.Domain))
-			targetSite.MemoryLimit = recommendedMemory
+		// 2. Clean up Orphaned / Inactive PHP Pools
+		if needsOrphanCleanup && len(orphanedVersions) > 0 {
+			ui.PrintStep(2, fmt.Sprintf("Purging orphaned PHP pool configs in PHP %s...", strings.Join(orphanedVersions, ", ")))
+			cleaned, err := server.DeleteOrphanedPHPPools(targetSite.Domain, targetSite.PHPVersion, state.Global.SupportedPHPVersions)
+			if err != nil {
+				ui.PrintWarning(fmt.Sprintf("Failed to remove some orphaned pools: %v", err))
+			} else {
+				ui.PrintSuccess(fmt.Sprintf("Purged orphaned PHP pools (%s) and reloaded daemons.", strings.Join(cleaned, ", ")))
+			}
+		}
+
+		// 3. Fix PHP Memory Limit, OPcache, and PM Configuration
+		if needsMemoryScale || needsOpcacheFix || needsPMFix {
+			targetMem := targetSite.MemoryLimit
+			if needsMemoryScale {
+				targetMem = recommendedMemory
+			}
+			if targetMem == "" {
+				if isWP {
+					targetMem = "256M"
+				} else {
+					targetMem = "128M"
+				}
+			}
+
+			ui.PrintStep(3, fmt.Sprintf("Synchronizing PHP pool configuration for %s (memory=%s, opcache validate=1, safe PM bounds)...", targetSite.Domain, targetMem))
+			targetSite.MemoryLimit = targetMem
+			if targetMem == "256M" || targetMem == "512M" {
+				targetSite.MaxExecutionTime = 300
+				targetSite.MaxInputVars = 5000
+			}
+
 			_ = config.WithLockedState(statePath, func(s *config.State) error {
 				for i, st := range s.Sites {
 					if strings.EqualFold(st.Domain, targetSite.Domain) {
-						s.Sites[i].MemoryLimit = recommendedMemory
+						s.Sites[i].MemoryLimit = targetMem
+						if targetMem == "256M" || targetMem == "512M" {
+							s.Sites[i].MaxExecutionTime = 300
+							s.Sites[i].MaxInputVars = 5000
+						}
 						break
 					}
 				}
@@ -605,13 +706,17 @@ func DoctorWithFix(domain string, autoFix bool) error {
 				if err := server.ReloadPHP(targetSite.PHPVersion); err != nil {
 					ui.PrintWarning(fmt.Sprintf("Failed to reload PHP %s: %v", targetSite.PHPVersion, err))
 				} else {
-					ui.PrintSuccess(fmt.Sprintf("PHP memory_limit successfully upgraded to %s. Fatal OOM errors eliminated.", recommendedMemory))
+					ui.PrintSuccess(fmt.Sprintf("PHP-FPM pool upgraded: memory_limit=%s, opcache validate=1, safe PM bounds applied.", targetMem))
 				}
+			}
+
+			if isWP {
+				_ = server.TuneWordPressMemory(targetSite.SystemUser, targetSite.PublicDir, targetMem)
 			}
 		}
 
-		// 3. Re-run verification check
-		ui.PrintStep(3, "Performing post-repair verification probe...")
+		// 4. Re-run verification check
+		ui.PrintStep(4, "Performing post-repair verification probe...")
 		postProbe := probeLocalHTTP(targetSite.Domain)
 		if postProbe.StatusCode == 200 || postProbe.StatusCode == 301 || postProbe.StatusCode == 302 {
 			ui.PrintSuccess(fmt.Sprintf("Post-repair verification passed! Site responded with HTTP %d.", postProbe.StatusCode))

@@ -1,13 +1,31 @@
 package server
 
 import (
-	"bytes"
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"os/exec"
+	"regexp"
 	"runtime"
+	"strings"
+	"time"
 )
+
+var sqlIdentifierRegex = regexp.MustCompile(`^[a-zA-Z0-9_]{1,64}$`)
+
+// ValidateSQLIdentifier checks that an identifier consists strictly of alphanumeric and underscore characters.
+func ValidateSQLIdentifier(ident string) error {
+	if !sqlIdentifierRegex.MatchString(ident) {
+		return fmt.Errorf("invalid SQL identifier %q: must be 1-64 alphanumeric or underscore characters", ident)
+	}
+	return nil
+}
+
+// EscapeSQLString escapes single quotes and backslashes for safe embedding in SQL statements.
+func EscapeSQLString(s string) string {
+	s = strings.ReplaceAll(s, "\\", "\\\\")
+	s = strings.ReplaceAll(s, "'", "\\'")
+	return s
+}
 
 // GenerateSecurePassword generates a random 24-character alphanumeric password.
 func GenerateSecurePassword() (string, error) {
@@ -53,12 +71,21 @@ func GenerateSecurePrefix(length int) (string, error) {
 
 // CreateDatabase provisions a MariaDB database and user with appropriate privileges.
 func CreateDatabase(dbName string, dbUser string, dbPassword string) error {
+	if err := ValidateSQLIdentifier(dbName); err != nil {
+		return fmt.Errorf("invalid database name: %w", err)
+	}
+	if err := ValidateSQLIdentifier(dbUser); err != nil {
+		return fmt.Errorf("invalid database user: %w", err)
+	}
+
+	escapedPassword := EscapeSQLString(dbPassword)
+
 	sqlQuery := fmt.Sprintf(
 		"CREATE DATABASE IF NOT EXISTS `%s`; "+
 			"CREATE USER IF NOT EXISTS '%s'@'localhost' IDENTIFIED BY '%s'; "+
 			"GRANT ALL PRIVILEGES ON `%s`.* TO '%s'@'localhost'; "+
 			"FLUSH PRIVILEGES;",
-		dbName, dbUser, dbPassword, dbName, dbUser,
+		dbName, dbUser, escapedPassword, dbName, dbUser,
 	)
 
 	if runtime.GOOS != "linux" {
@@ -66,11 +93,14 @@ func CreateDatabase(dbName string, dbUser string, dbPassword string) error {
 		return nil
 	}
 
-	cmd := exec.Command("mysql", "-u", "root", "-e", sqlQuery)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to create database and user: %w (stderr: %s)", err, stderr.String())
+	opts := CommandOptions{
+		Timeout:       30 * time.Second,
+		AllowAutoHeal: true,
+		RetryCount:    1,
+	}
+	_, err := SmartExecute("mysql", []string{"-u", "root", "-e", sqlQuery}, opts)
+	if err != nil {
+		return fmt.Errorf("failed to create database and user: %w", err)
 	}
 
 	fmt.Printf("DB: Created database %s and user %s successfully.\n", dbName, dbUser)
@@ -79,6 +109,13 @@ func CreateDatabase(dbName string, dbUser string, dbPassword string) error {
 
 // DeleteDatabase removes the database and user.
 func DeleteDatabase(dbName string, dbUser string) error {
+	if err := ValidateSQLIdentifier(dbName); err != nil {
+		return fmt.Errorf("invalid database name: %w", err)
+	}
+	if err := ValidateSQLIdentifier(dbUser); err != nil {
+		return fmt.Errorf("invalid database user: %w", err)
+	}
+
 	sqlQuery := fmt.Sprintf(
 		"DROP DATABASE IF EXISTS `%s`; "+
 			"DROP USER IF EXISTS '%s'@'localhost';",
@@ -90,11 +127,14 @@ func DeleteDatabase(dbName string, dbUser string) error {
 		return nil
 	}
 
-	cmd := exec.Command("mysql", "-u", "root", "-e", sqlQuery)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to delete database and user: %w (stderr: %s)", err, stderr.String())
+	opts := CommandOptions{
+		Timeout:       30 * time.Second,
+		AllowAutoHeal: true,
+		RetryCount:    1,
+	}
+	_, err := SmartExecute("mysql", []string{"-u", "root", "-e", sqlQuery}, opts)
+	if err != nil {
+		return fmt.Errorf("failed to delete database and user: %w", err)
 	}
 
 	fmt.Printf("DB: Dropped database %s and user %s successfully.\n", dbName, dbUser)

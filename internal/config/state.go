@@ -112,9 +112,9 @@ func DefaultState() *State {
 func WithLockedState(statePath string, fn func(*State) error) error {
 	lockPath := statePath + ".lock"
 	
-	// Ensure parent directory exists
+	// Ensure parent directory exists with root-only 0700 permissions
 	dir := filepath.Dir(statePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return fmt.Errorf("failed to create state directory: %w", err)
 	}
 
@@ -153,9 +153,9 @@ func WithLockedState(statePath string, fn func(*State) error) error {
 func ReadState(statePath string) (*State, error) {
 	lockPath := statePath + ".lock"
 	
-	// Ensure parent directory exists
+	// Ensure parent directory exists with root-only 0700 permissions
 	dir := filepath.Dir(statePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, fmt.Errorf("failed to create state directory: %w", err)
 	}
 
@@ -178,7 +178,7 @@ func ReadState(statePath string) (*State, error) {
 }
 
 func readState(statePath string) (*State, error) {
-	file, err := os.OpenFile(statePath, os.O_RDWR|os.O_CREATE, 0660)
+	file, err := os.OpenFile(statePath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -230,9 +230,9 @@ func writeState(statePath string, state *State) error {
 		return err
 	}
 
-	// Write to temporary file first, then rename (atomic swap)
+	// Write to temporary file first, then rename (atomic swap) with 0600 mode
 	tmpPath := statePath + ".tmp"
-	if err := os.WriteFile(tmpPath, data, 0660); err != nil {
+	if err := os.WriteFile(tmpPath, data, 0600); err != nil {
 		return err
 	}
 
@@ -240,6 +240,7 @@ func writeState(statePath string, state *State) error {
 		_ = os.Remove(tmpPath)
 		return err
 	}
+	_ = os.Chmod(statePath, 0600)
 
 	return nil
 }

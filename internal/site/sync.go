@@ -176,6 +176,16 @@ func Sync() error {
 						}
 					}
 
+					// Detect memory limit from wp-config.php if applicable
+					memLimit := ""
+					if wpMem, _, err := server.ReadWordPressMemoryLimit(publicDir); err == nil && wpMem != "" {
+						memLimit = wpMem
+					} else if siteType == "woocommerce" {
+						memLimit = "256M"
+					} else {
+						memLimit = "128M"
+					}
+
 					importedSite := config.SiteConfig{
 						Domain:       domain,
 						PHPVersion:   phpVersion,
@@ -186,10 +196,11 @@ func Sync() error {
 						SystemUser:   systemUser,
 						IsLocked:     false,
 						Type:         siteType,
+						MemoryLimit:  memLimit,
 					}
 
 					s.Sites = append(s.Sites, importedSite)
-					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (Type: %s, PHP %s, DB %s)", domain, siteType, phpVersion, dbName))
+					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (Type: %s, PHP %s, Memory %s, DB %s)", domain, siteType, phpVersion, memLimit, dbName))
 				}
 			}
 		}
@@ -200,6 +211,9 @@ func Sync() error {
 				continue
 			}
 			ui.PrintInfo(fmt.Sprintf("Syncing PHP pool for site: %s", site.Domain))
+			// Clean up any orphaned pool files for this domain in other PHP versions
+			_, _ = server.DeleteOrphanedPHPPools(site.Domain, site.PHPVersion, s.Global.SupportedPHPVersions)
+
 			siteCopy := site
 			if err := server.WritePHPPool(&siteCopy); err != nil {
 				ui.PrintWarning(fmt.Sprintf("Failed to write PHP pool config for %s: %v", site.Domain, err))

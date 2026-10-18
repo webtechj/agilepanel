@@ -349,13 +349,20 @@ func TuneServerWithProfile(profile *SystemHardwareProfile) error {
 
 	// 5. Auto-tune PHP-FPM Pools for hosted sites
 	ui.PrintStep(5, "Auditing and auto-tuning PHP-FPM worker pools according to available RAM...")
-	ui.PrintInfo("Explanatory Note: PHP-FPM pools are scaled using net available RAM after subtracting database and cache footprints, with dynamic warm workers for eCommerce.")
+	ui.PrintInfo("Explanatory Note: PHP-FPM pools are scaled using net available RAM after subtracting database and cache footprints, dynamically balanced across total site density.")
 	if err := TunePHPPoolsWithProfile(profile); err != nil {
 		ui.PrintWarning(fmt.Sprintf("PHP pool tuning encountered an issue: %v", err))
 	}
 
-	// 6. Install Metrics Cron Job
-	ui.PrintStep(6, "Installing real-time system metrics logging daemon...")
+	// 6. Configure systemd user slice resource limits & daemon priorities
+	ui.PrintStep(6, "Configuring systemd multi-tenant user slices and daemon priorities...")
+	ui.PrintInfo("Explanatory Note: User slices enforce task limits (TasksMax=150) per site tenant, while guaranteeing scheduling priority (CPUWeight=1000) for MariaDB and Caddy.")
+	if err := TuneSystemdResourceSlices(); err != nil {
+		ui.PrintWarning(fmt.Sprintf("Systemd slice configuration encountered an issue: %v", err))
+	}
+
+	// 7. Install Metrics Cron Job
+	ui.PrintStep(7, "Installing real-time system metrics logging daemon...")
 	ui.PrintInfo("Explanatory Note: A cron job runs every 5 minutes under root to capture performance snapshots, helping you visualize real-time resource trends.")
 	if err := installMetricsCron(); err != nil {
 		ui.PrintWarning(fmt.Sprintf("Metrics cron job installation failed: %v", err))
@@ -369,6 +376,43 @@ func TuneServerWithProfile(profile *SystemHardwareProfile) error {
 		config.PingAsync(s)
 	}
 
+	return nil
+}
+
+// TuneSystemdResourceSlices provisions user slice constraints and daemon priorities.
+func TuneSystemdResourceSlices() error {
+	if runtime.GOOS != "linux" {
+		fmt.Println("Systemd (Mock): Configured user slice resource limits and daemon priorities.")
+		return nil
+	}
+
+	// 1. User slice configuration: limits per system user (wp_*)
+	userSliceDir := "/etc/systemd/system/user-.slice.d"
+	_ = os.MkdirAll(userSliceDir, 0755)
+	sliceConf := `[Slice]
+TasksMax=150
+CPUWeight=100
+MemoryHigh=75%
+`
+	_ = os.WriteFile(filepath.Join(userSliceDir, "50-agilepanel.conf"), []byte(sliceConf), 0644)
+
+	// 2. High scheduling priority for MariaDB
+	mariaDropinDir := "/etc/systemd/system/mariadb.service.d"
+	_ = os.MkdirAll(mariaDropinDir, 0755)
+	priorityConf := `[Service]
+CPUWeight=1000
+IOWeight=1000
+`
+	_ = os.WriteFile(filepath.Join(mariaDropinDir, "50-agilepanel-priority.conf"), []byte(priorityConf), 0644)
+
+	// 3. High scheduling priority for Caddy
+	caddyDropinDir := "/etc/systemd/system/caddy.service.d"
+	_ = os.MkdirAll(caddyDropinDir, 0755)
+	_ = os.WriteFile(filepath.Join(caddyDropinDir, "50-agilepanel-priority.conf"), []byte(priorityConf), 0644)
+
+	// Reload systemd daemons to apply slice and dropin updates
+	_ = exec.Command("systemctl", "daemon-reload").Run()
+	fmt.Println("Systemd: Applied multi-tenant user slice resource limits and daemon priorities.")
 	return nil
 }
 
@@ -576,11 +620,15 @@ func TunePHPPoolsWithProfile(profile *SystemHardwareProfile) error {
 
 	reloadedVersions := make(map[string]bool)
 	count := 0
+	siteCount := len(state.Sites)
+	if siteCount < 1 {
+		siteCount = 1
+	}
 	for _, site := range state.Sites {
 		if site.PHPVersion == "" || site.Type == "html" {
 			continue
 		}
-		if err := WritePHPPool(&site); err != nil {
+		if err := WritePHPPoolWithSiteCount(&site, siteCount); err != nil {
 			ui.PrintWarning(fmt.Sprintf("Failed to update pool for %s: %v", site.Domain, err))
 		} else {
 			reloadedVersions[site.PHPVersion] = true
@@ -774,6 +822,16 @@ func TuneRedisWithProfile(profile *SystemHardwareProfile) error {
 		var changed bool
 		content, changed = setOrAppendRedisConfig(content, key, val)
 		if changed {
+			modified = true
+		}
+	}
+
+	// Multi-tenant Redis security hardening: disable destructive commands on shared socket
+	dangerousCommands := []string{"FLUSHALL", "FLUSHDB", "CONFIG", "SHUTDOWN", "DEBUG"}
+	for _, cmd := range dangerousCommands {
+		directive := fmt.Sprintf(`rename-command %s ""`, cmd)
+		if !strings.Contains(content, directive) {
+			content += fmt.Sprintf("\n%s\n", directive)
 			modified = true
 		}
 	}
@@ -1180,7 +1238,7 @@ const welcomeHTML = `<!DOCTYPE html>
         <header>
             <div class="logo-container floating">
                 <span class="logo-icon">▲ AgilePanel</span>
-                <span class="logo-badge">v1.1.6</span>
+                <span class="logo-badge">v1.1.7</span>
             </div>
             <h1>Web Stack Successfully Initialized</h1>
             <p class="subtitle">Your High-Performance VPS is fully optimized and ready to serve next-generation web experiences.</p>

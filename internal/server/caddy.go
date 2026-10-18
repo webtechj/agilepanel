@@ -121,9 +121,9 @@ const caddyfileTemplateStr = `# Global Options Block
     }
     respond @uploads-php "Access Denied" 403
 
-    # Block access to xmlrpc.php, install.php, and wp-config.php
+    # Block access to xmlrpc.php, install.php, and wp-config.php and database/backup files
     @blocked-php {
-        path /xmlrpc.php /wp-admin/install.php /wp-config.php
+        path /xmlrpc.php /wp-admin/install.php /wp-config.php *.sql *.tar.gz *.tgz *.bak *.swp *.env *.log *.ini php.ini .user.ini
     }
     respond @blocked-php "Access Denied" 403
 
@@ -200,9 +200,9 @@ http://{{.Domain}}.{{$.ServerIP}}.sslip.io {
     }
     respond @uploads-php "Access Denied" 403
 
-    # Block access to xmlrpc.php, install.php, and wp-config.php
+    # Block access to xmlrpc.php, install.php, and wp-config.php and database/backup files
     @blocked-php {
-        path /xmlrpc.php /wp-admin/install.php /wp-config.php
+        path /xmlrpc.php /wp-admin/install.php /wp-config.php *.sql *.tar.gz *.tgz *.bak *.swp *.env *.log *.ini php.ini .user.ini
     }
     respond @blocked-php "Access Denied" 403
 

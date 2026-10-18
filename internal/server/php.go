@@ -1,12 +1,16 @@
 package server
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
+	"strings"
 	"text/template"
 
 	"agilepanel/internal/config"
@@ -48,6 +52,9 @@ php_admin_value[post_max_size] = 100M
 php_admin_value[max_execution_time] = {{.MaxExecutionTime}}
 php_admin_value[max_input_vars] = {{.MaxInputVars}}
 php_admin_value[disable_functions] = exec,shell_exec,system,passthru,popen,proc_open,show_source
+php_admin_value[upload_tmp_dir] = /var/www/{{.Domain}}/tmp/
+php_admin_value[sys_temp_dir] = /var/www/{{.Domain}}/tmp/
+php_admin_value[session.save_path] = /var/www/{{.Domain}}/tmp/
 php_admin_value[open_basedir] = /var/www/{{.Domain}}/:/tmp/:/usr/share/php/
 `
 
@@ -113,6 +120,25 @@ func CalculatePHPMaxChildren(totalRAMKB int64, siteType string) int {
 	return maxChildren
 }
 
+// CalculateMultiSitePHPMaxChildren dynamically bounds max_children according to available RAM, site count, and workload.
+func CalculateMultiSitePHPMaxChildren(totalRAMKB int64, siteType string, totalSites int) int {
+	if totalSites <= 1 {
+		return CalculatePHPMaxChildren(totalRAMKB, siteType)
+	}
+	singleMax := CalculatePHPMaxChildren(totalRAMKB, siteType)
+	scaleFactor := 2.0 / float64(totalSites)
+	balanced := int(float64(singleMax) * scaleFactor)
+
+	minFloor := 2
+	if balanced < minFloor {
+		balanced = minFloor
+	}
+	if balanced > singleMax {
+		balanced = singleMax
+	}
+	return balanced
+}
+
 // CalculateOpcacheSettings dynamically scales OPcache memory according to physical RAM.
 func CalculateOpcacheSettings(totalRAMKB int64) (memoryMB int, stringsMB int) {
 	if totalRAMKB <= 0 {
@@ -131,8 +157,22 @@ func CalculateOpcacheSettings(totalRAMKB int64) (memoryMB int, stringsMB int) {
 
 // GeneratePHPPool generates the PHP-FPM pool configuration string.
 func GeneratePHPPool(site *config.SiteConfig) (string, error) {
+	return GeneratePHPPoolWithSiteCount(site, 0)
+}
+
+// GeneratePHPPoolWithSiteCount generates the PHP-FPM pool configuration string factoring in total hosted sites.
+func GeneratePHPPoolWithSiteCount(site *config.SiteConfig, totalSites int) (string, error) {
+	if totalSites <= 0 {
+		statePath := config.GetStatePath()
+		if s, err := config.ReadState(statePath); err == nil && len(s.Sites) > 0 {
+			totalSites = len(s.Sites)
+		} else {
+			totalSites = 1
+		}
+	}
+
 	totalRAM, _, _ := readLinuxMemory()
-	maxChildren := CalculatePHPMaxChildren(totalRAM, site.Type)
+	maxChildren := CalculateMultiSitePHPMaxChildren(totalRAM, site.Type, totalSites)
 	opcacheMem, opcacheStrings := CalculateOpcacheSettings(totalRAM)
 
 	// Smart Adaptive PM policy:
@@ -244,7 +284,12 @@ func GetPHPPoolPath(version string, domain string) string {
 
 // WritePHPPool writes the generated PHP pool configuration to disk.
 func WritePHPPool(site *config.SiteConfig) error {
-	content, err := GeneratePHPPool(site)
+	return WritePHPPoolWithSiteCount(site, 0)
+}
+
+// WritePHPPoolWithSiteCount writes the generated PHP pool configuration factoring in total hosted sites.
+func WritePHPPoolWithSiteCount(site *config.SiteConfig, totalSites int) error {
+	content, err := GeneratePHPPoolWithSiteCount(site, totalSites)
 	if err != nil {
 		return err
 	}
@@ -295,3 +340,125 @@ func ReloadPHP(version string) error {
 	fmt.Printf("PHP: Reloaded %s successfully.\n", serviceName)
 	return nil
 }
+
+// PHPPoolConfig encapsulates parsed PHP-FPM pool parameters from disk.
+type PHPPoolConfig struct {
+	Domain                    string
+	PHPVersion                string
+	FilePath                  string
+	PM                        string
+	MaxChildren               int
+	StartServers              int
+	MinSpareServers           int
+	MaxSpareServers           int
+	MemoryLimit               string
+	OpcacheValidateTimestamps int
+	OpcacheRevalidateFreq     int
+	DisableFunctions          string
+	OpenBasedir               string
+}
+
+// ReadPHPPoolConfig parses an existing PHP-FPM pool configuration file from disk.
+func ReadPHPPoolConfig(version string, domain string) (*PHPPoolConfig, error) {
+	poolPath := GetPHPPoolPath(version, domain)
+	f, err := os.Open(poolPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	cfg := &PHPPoolConfig{
+		Domain:                    domain,
+		PHPVersion:                version,
+		FilePath:                  poolPath,
+		OpcacheValidateTimestamps: 1, // Default baseline if not overridden
+	}
+
+	rePM := regexp.MustCompile(`^\s*pm\s*=\s*([a-zA-Z0-9_-]+)`)
+	reMaxChildren := regexp.MustCompile(`^\s*pm\.max_children\s*=\s*(\d+)`)
+	reStartServers := regexp.MustCompile(`^\s*pm\.start_servers\s*=\s*(\d+)`)
+	reMinSpare := regexp.MustCompile(`^\s*pm\.min_spare_servers\s*=\s*(\d+)`)
+	reMaxSpare := regexp.MustCompile(`^\s*pm\.max_spare_servers\s*=\s*(\d+)`)
+	reMem := regexp.MustCompile(`^\s*php_(?:admin_)?value\[memory_limit\]\s*=\s*([^ \r\n;]+)`)
+	reOpcacheVal := regexp.MustCompile(`^\s*php_(?:admin_)?value\[opcache\.validate_timestamps\]\s*=\s*(\d+)`)
+	reOpcacheFreq := regexp.MustCompile(`^\s*php_(?:admin_)?value\[opcache\.revalidate_freq\]\s*=\s*(\d+)`)
+	reDisableFuncs := regexp.MustCompile(`^\s*php_(?:admin_)?value\[disable_functions\]\s*=\s*([^ \r\n;]+)`)
+	reOpenBasedir := regexp.MustCompile(`^\s*php_(?:admin_)?value\[open_basedir\]\s*=\s*([^ \r\n;]+)`)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, ";") || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+
+		if m := rePM.FindStringSubmatch(line); len(m) > 1 {
+			cfg.PM = m[1]
+		} else if m := reMaxChildren.FindStringSubmatch(line); len(m) > 1 {
+			cfg.MaxChildren, _ = strconv.Atoi(m[1])
+		} else if m := reStartServers.FindStringSubmatch(line); len(m) > 1 {
+			cfg.StartServers, _ = strconv.Atoi(m[1])
+		} else if m := reMinSpare.FindStringSubmatch(line); len(m) > 1 {
+			cfg.MinSpareServers, _ = strconv.Atoi(m[1])
+		} else if m := reMaxSpare.FindStringSubmatch(line); len(m) > 1 {
+			cfg.MaxSpareServers, _ = strconv.Atoi(m[1])
+		} else if m := reMem.FindStringSubmatch(line); len(m) > 1 {
+			cfg.MemoryLimit = m[1]
+		} else if m := reOpcacheVal.FindStringSubmatch(line); len(m) > 1 {
+			cfg.OpcacheValidateTimestamps, _ = strconv.Atoi(m[1])
+		} else if m := reOpcacheFreq.FindStringSubmatch(line); len(m) > 1 {
+			cfg.OpcacheRevalidateFreq, _ = strconv.Atoi(m[1])
+		} else if m := reDisableFuncs.FindStringSubmatch(line); len(m) > 1 {
+			cfg.DisableFunctions = m[1]
+		} else if m := reOpenBasedir.FindStringSubmatch(line); len(m) > 1 {
+			cfg.OpenBasedir = m[1]
+		}
+	}
+
+	return cfg, scanner.Err()
+}
+
+// FindOrphanedPHPPools returns a list of PHP versions having an inactive pool file for this domain.
+func FindOrphanedPHPPools(domain string, activeVersion string, supportedVersions []string) []string {
+	var candidates []string
+	seen := make(map[string]bool)
+	for _, v := range supportedVersions {
+		if !seen[v] {
+			candidates = append(candidates, v)
+			seen[v] = true
+		}
+	}
+	for _, v := range []string{"7.4", "8.0", "8.1", "8.2", "8.3", "8.4"} {
+		if !seen[v] {
+			candidates = append(candidates, v)
+			seen[v] = true
+		}
+	}
+
+	var orphaned []string
+	for _, v := range candidates {
+		if v == activeVersion {
+			continue
+		}
+		path := GetPHPPoolPath(v, domain)
+		if _, err := os.Stat(path); err == nil {
+			orphaned = append(orphaned, v)
+		}
+	}
+	return orphaned
+}
+
+// DeleteOrphanedPHPPools removes all leftover pool configs for other PHP versions and reloads them.
+func DeleteOrphanedPHPPools(domain string, activeVersion string, supportedVersions []string) ([]string, error) {
+	orphaned := FindOrphanedPHPPools(domain, activeVersion, supportedVersions)
+	var removed []string
+	for _, v := range orphaned {
+		if err := DeletePHPPool(v, domain); err == nil {
+			removed = append(removed, v)
+			_ = ReloadPHP(v)
+		}
+	}
+	return removed, nil
+}
+
