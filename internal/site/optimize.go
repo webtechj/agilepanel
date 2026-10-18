@@ -43,7 +43,13 @@ func Optimize(domain string) error {
 
 		// 2. Clean spam / trash comments
 		ui.PrintStep(2, "Purging spam and trash comments...")
-		_ = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", "comment", "delete", "$(wp comment list --status=spam,trash --format=ids)", "--force", "--path="+targetSite.PublicDir)
+		res, err := server.SmartRunAsUser(targetSite.SystemUser, homeDir, targetSite.PublicDir, "wp", "comment", "list", "--status=spam,trash", "--format=ids", "--path="+targetSite.PublicDir)
+		if err == nil && res != nil && len(strings.Fields(res.Stdout)) > 0 {
+			ids := strings.Fields(res.Stdout)
+			deleteArgs := append([]string{"comment", "delete"}, ids...)
+			deleteArgs = append(deleteArgs, "--force", "--path="+targetSite.PublicDir)
+			_ = server.RunAsUser(targetSite.SystemUser, homeDir, "wp", deleteArgs...)
+		}
 
 		// 3. Optimize MariaDB tables
 		if targetSite.DatabaseName != "" {

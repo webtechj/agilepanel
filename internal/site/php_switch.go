@@ -54,12 +54,23 @@ func SwitchPHP(domain string, newVersion string) error {
 
 		ui.Banner(fmt.Sprintf("Switching PHP Version: %s (%s ➔ %s)", domain, oldVersion, newVersion))
 
-		// 1. Remove old PHP pool configuration
-		ui.PrintStep(1, fmt.Sprintf("Removing PHP %s pool configuration...", oldVersion))
+		// 1. Remove old PHP pool configuration and purge any orphaned pools across other versions
+		ui.PrintStep(1, fmt.Sprintf("Removing PHP %s pool and cleaning any orphaned pools...", oldVersion))
+		_, _ = server.DeleteOrphanedPHPPools(domain, newVersion, s.Global.SupportedPHPVersions)
 		_ = server.DeletePHPPool(oldVersion, domain)
 
-		// 2. Update site configuration in state
+		// 2. Preserve memory limits from state, wp-config.php, or existing pool
+		if s.Sites[foundIdx].MemoryLimit == "" {
+			if wpMem, _, err := server.ReadWordPressMemoryLimit(s.Sites[foundIdx].PublicDir); err == nil && wpMem != "" {
+				s.Sites[foundIdx].MemoryLimit = wpMem
+			} else if oldPool, err := server.ReadPHPPoolConfig(oldVersion, domain); err == nil && oldPool.MemoryLimit != "" {
+				s.Sites[foundIdx].MemoryLimit = oldPool.MemoryLimit
+			}
+		}
+
+		// 3. Update site configuration in state
 		s.Sites[foundIdx].PHPVersion = newVersion
+
 
 		// 3. Generate and write new PHP pool configuration
 		ui.PrintStep(2, fmt.Sprintf("Generating and provisioning PHP %s pool configuration...", newVersion))

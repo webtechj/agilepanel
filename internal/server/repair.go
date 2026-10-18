@@ -34,7 +34,7 @@ func RepairInstallation(allowSSHPasswordRecovery bool) error {
 		}
 		ui.PrintInfo(fmt.Sprintf("Writing PHP pool for %s (PHP %s)...", site.Domain, site.PHPVersion))
 		siteCopy := site
-		if err := WritePHPPool(&siteCopy); err != nil {
+		if err := WritePHPPoolWithSiteCount(&siteCopy, len(state.Sites)); err != nil {
 			ui.PrintWarning(fmt.Sprintf("Failed to write PHP pool config for %s: %v", site.Domain, err))
 		}
 	}

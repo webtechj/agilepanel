@@ -1,42 +1,43 @@
 package server
 
 import (
-	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
+	"time"
 
 	"agilepanel/internal/ui"
 )
 
-// RunAsUser executes a command on Linux using sudo as the target system user.
+// RunAsUser executes a command on Linux using sudo as the target system user with intelligent output interception and error diagnostics.
 func RunAsUser(username string, homeDir string, command string, args ...string) error {
-	if runtime.GOOS != "linux" {
-		fullArgs := append([]string{command}, args...)
-		if homeDir != "" {
-			fmt.Printf("WP-CLI (Mock): Run as %s (HOME=%s): %v\n", username, homeDir, fullArgs)
-		} else {
-			fmt.Printf("WP-CLI (Mock): Run as %s: %v\n", username, fullArgs)
-		}
-		return nil
+	opts := CommandOptions{
+		RunAsUser:     username,
+		HomeDir:       homeDir,
+		AllowAutoHeal: true,
+		RetryCount:    1,
+		Timeout:       120 * time.Second,
 	}
+	_, err := SmartExecute(command, args, opts)
+	return err
+}
 
-	var sudoArgs []string
-	if homeDir != "" {
-		sudoArgs = append([]string{"-u", username, "env", "HOME=" + homeDir, command}, args...)
-	} else {
-		sudoArgs = append([]string{"-u", username, command}, args...)
+// RunAsUserWithSite executes a command as system user with site context for automated self-healing (e.g. unlocking immutable locks).
+func RunAsUserWithSite(username string, homeDir string, publicDir string, command string, args ...string) error {
+	opts := CommandOptions{
+		RunAsUser:     username,
+		HomeDir:       homeDir,
+		SitePublicDir: publicDir,
+		AllowAutoHeal: true,
+		RetryCount:    1,
+		Timeout:       120 * time.Second,
 	}
-	cmd := exec.Command("sudo", sudoArgs...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("WP-CLI error running %s: %w (stderr: %s)", command, err, stderr.String())
-	}
-	return nil
+	_, err := SmartExecute(command, args, opts)
+	return err
 }
 
 // InstallWordPress downloads, installs, and configures WordPress and its Redis Object Cache.
@@ -190,9 +191,99 @@ func TuneWordPressMemory(username string, publicDir string, memoryLimit string) 
 	if memoryLimit == "" {
 		memoryLimit = "128M"
 	}
-	homeDir := filepath.Dir(publicDir)
+	homeDir := GetSiteRootDir(publicDir)
 	if err := RunAsUser(username, homeDir, "wp", "config", "set", "WP_MEMORY_LIMIT", memoryLimit, "--path="+publicDir); err != nil {
 		return err
 	}
 	return RunAsUser(username, homeDir, "wp", "config", "set", "WP_MAX_MEMORY_LIMIT", memoryLimit, "--path="+publicDir)
 }
+
+// FindWPConfigPath searches for wp-config.php in parent directory or public webroot.
+func FindWPConfigPath(publicDir string) string {
+	if publicDir == "" {
+		return ""
+	}
+	// 1. Direct webroot check
+	webrootPath := filepath.Join(publicDir, "wp-config.php")
+	if _, err := os.Stat(webrootPath); err == nil {
+		return webrootPath
+	}
+	// 2. Immediate parent directory (e.g. /var/www/domain/ when publicDir is /var/www/domain/htdocs)
+	parentDir := filepath.Dir(publicDir)
+	parentPath := filepath.Join(parentDir, "wp-config.php")
+	if _, err := os.Stat(parentPath); err == nil {
+		return parentPath
+	}
+	// 3. Site root directory
+	siteRootDir := GetSiteRootDir(publicDir)
+	siteRootPath := filepath.Join(siteRootDir, "wp-config.php")
+	if _, err := os.Stat(siteRootPath); err == nil {
+		return siteRootPath
+	}
+	return ""
+}
+
+// ParseMemoryMB converts memory limit strings (e.g. "128M", "256M", "1G", "512") into integer megabytes.
+func ParseMemoryMB(mem string) int {
+	mem = strings.ToUpper(strings.TrimSpace(mem))
+	if mem == "" {
+		return 0
+	}
+	multiplier := 1
+	if strings.HasSuffix(mem, "G") {
+		multiplier = 1024
+		mem = strings.TrimSuffix(mem, "G")
+	} else if strings.HasSuffix(mem, "M") {
+		multiplier = 1
+		mem = strings.TrimSuffix(mem, "M")
+	} else if strings.HasSuffix(mem, "K") {
+		multiplier = 0
+		mem = strings.TrimSuffix(mem, "K")
+	}
+	val, err := strconv.Atoi(mem)
+	if err != nil {
+		return 0
+	}
+	return val * multiplier
+}
+
+// CompareMemory compares two memory string definitions (e.g. "256M", "128M").
+// Returns 1 if memA > memB, -1 if memA < memB, 0 if equal.
+func CompareMemory(memA string, memB string) int {
+	mbA := ParseMemoryMB(memA)
+	mbB := ParseMemoryMB(memB)
+	if mbA > mbB {
+		return 1
+	} else if mbA < mbB {
+		return -1
+	}
+	return 0
+}
+
+// ReadWordPressMemoryLimit extracts WP_MEMORY_LIMIT and WP_MAX_MEMORY_LIMIT from wp-config.php.
+func ReadWordPressMemoryLimit(publicDir string) (string, string, error) {
+	configPath := FindWPConfigPath(publicDir)
+	if configPath == "" {
+		return "", "", fmt.Errorf("wp-config.php not found")
+	}
+
+	contentBytes, err := os.ReadFile(configPath)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read wp-config.php at %s: %w", configPath, err)
+	}
+	content := string(contentBytes)
+
+	var wpMem, wpMaxMem string
+	reWP := regexp.MustCompile(`(?i)define\s*\(\s*['"]WP_MEMORY_LIMIT['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+	if match := reWP.FindStringSubmatch(content); len(match) > 1 {
+		wpMem = strings.TrimSpace(match[1])
+	}
+
+	reWPMax := regexp.MustCompile(`(?i)define\s*\(\s*['"]WP_MAX_MEMORY_LIMIT['"]\s*,\s*['"]([^'"]+)['"]\s*\)`)
+	if match := reWPMax.FindStringSubmatch(content); len(match) > 1 {
+		wpMaxMem = strings.TrimSpace(match[1])
+	}
+
+	return wpMem, wpMaxMem, nil
+}
+

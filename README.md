@@ -532,7 +532,7 @@ AgilePanel collects minimal, fully anonymized usage telemetry solely to track ac
 ### What is Collected?
 * A randomly generated unique server UUID (stored locally in `/etc/agilepanel/state.json`)
 * Host Operating System & CPU Architecture (e.g. `linux / amd64`)
-* Current AgilePanel binary version (e.g. `1.1.6`)
+* Current AgilePanel binary version (e.g. `1.1.7`)
 * Total count of hosted WordPress sites
 
 > [!NOTE]

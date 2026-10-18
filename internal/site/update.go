@@ -80,7 +80,9 @@ func Update(domain string, targetPHP string, targetMemory string, heavyPlugins b
 		// 2. Evaluate Memory / Heavy Plugin update
 		currentMem := site.MemoryLimit
 		if currentMem == "" {
-			if site.Type == "woocommerce" {
+			if wpMem, _, err := server.ReadWordPressMemoryLimit(site.PublicDir); err == nil && wpMem != "" {
+				currentMem = wpMem
+			} else if site.Type == "woocommerce" {
 				currentMem = "256M"
 			} else {
 				currentMem = "128M"
@@ -106,7 +108,8 @@ func Update(domain string, targetPHP string, targetMemory string, heavyPlugins b
 		// Apply changes to site state
 		if phpChanged {
 			ui.PrintStep(1, fmt.Sprintf("Switching PHP runtime from %s to %s...", oldPHP, finalPHP))
-			// Remove old pool config
+			// Remove old pool config and any orphaned pool configs across other versions
+			_, _ = server.DeleteOrphanedPHPPools(domain, finalPHP, s.Global.SupportedPHPVersions)
 			_ = server.DeletePHPPool(oldPHP, domain)
 			site.PHPVersion = finalPHP
 		}

@@ -94,8 +94,10 @@ func ProvisionSiteDirectory(path string, systemUser string) error {
 	confPath := filepath.Join(parentDir, "conf")
 	backupPath := filepath.Join(parentDir, "backup")
 
+	tmpPath := filepath.Join(parentDir, "tmp")
+
 	// Create directories (including the target path itself, which might be a public subfolder)
-	for _, dir := range []string{htdocsPath, confPath, backupPath, path} {
+	for _, dir := range []string{htdocsPath, confPath, backupPath, tmpPath, path} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
@@ -123,6 +125,9 @@ func ProvisionSiteDirectory(path string, systemUser string) error {
 		return fmt.Errorf("failed to set directory permissions: %w", err)
 	}
 
+	// Secure tmp directory to 0750 so other site users cannot inspect temporary files
+	_ = exec.Command("chmod", "0750", tmpPath).Run()
+
 	fmt.Printf("OS: Provisioned site folders under %s with owner %s.\n", parentDir, systemUser)
 	return nil
 }
@@ -139,16 +144,25 @@ func DeleteSiteDirectory(path string) error {
 	return nil
 }
 
-// LockDirectory makes all files within the site directory immutable.
+// LockDirectory makes all regular files and directories within the site immutable,
+// excluding logs, backups, and tmp so logging, backups, and temporary files continue to function,
+// and skipping symbolic links which do not support Linux file attributes.
 func LockDirectory(path string) error {
 	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 
 	if runtime.GOOS != "linux" {
-		fmt.Printf("OS (Mock): chattr -R +i %s\n", parentDir)
+		fmt.Printf("OS (Mock): Locking site directory %s (immutable)\n", parentDir)
 		return nil
 	}
 
-	cmd := exec.Command("chattr", "-R", "+i", parentDir)
+	// 1. Exclude logs, backup, and tmp directories from being locked
+	// 2. Select only regular files (-type f) and directories (-type d)
+	// 3. Skip symbolic links (-type l) and special files which cause chattr to fail with "Operation not supported"
+	cmd := exec.Command("find", parentDir,
+		"(", "-name", "logs", "-o", "-name", "log", "-o", "-name", "backup", "-o", "-name", "tmp", ")", "-prune",
+		"-o", "(", "-type", "f", "-o", "-type", "d", ")",
+		"-exec", "chattr", "-f", "+i", "{}", "+",
+	)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
@@ -159,16 +173,20 @@ func LockDirectory(path string) error {
 	return nil
 }
 
-// UnlockDirectory removes the immutable flag from the site directory.
+// UnlockDirectory removes the immutable flag from the site directory and its contents.
 func UnlockDirectory(path string) error {
 	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 
 	if runtime.GOOS != "linux" {
-		fmt.Printf("OS (Mock): chattr -R -i %s\n", parentDir)
+		fmt.Printf("OS (Mock): Unlocking site directory %s\n", parentDir)
 		return nil
 	}
 
-	cmd := exec.Command("chattr", "-R", "-i", parentDir)
+	// Remove immutable flag from regular files and directories, safely skipping symlinks.
+	cmd := exec.Command("find", parentDir,
+		"(", "-type", "f", "-o", "-type", "d", ")",
+		"-exec", "chattr", "-f", "-i", "{}", "+",
+	)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {

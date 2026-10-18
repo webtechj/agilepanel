@@ -154,6 +154,31 @@ func TestCalculatePHPMaxChildren(t *testing.T) {
 	}
 }
 
+func TestCalculateMultiSitePHPMaxChildren(t *testing.T) {
+	ram4GB := int64(4096 * 1024)
+
+	// Single site on 4GB
+	singleSite := CalculateMultiSitePHPMaxChildren(ram4GB, "wp", 1)
+	if singleSite < 25 || singleSite > 45 {
+		t.Errorf("expected 25-45 workers for 1 site on 4GB RAM, got %d", singleSite)
+	}
+
+	// 5 sites on 4GB
+	fiveSites := CalculateMultiSitePHPMaxChildren(ram4GB, "wp", 5)
+	if fiveSites >= singleSite {
+		t.Errorf("expected 5 sites to have lower max_children than 1 site, got %d vs %d", fiveSites, singleSite)
+	}
+	if fiveSites < 4 || fiveSites > 16 {
+		t.Errorf("expected 4-16 workers per site for 5 sites on 4GB RAM, got %d", fiveSites)
+	}
+
+	// 20 sites on 4GB
+	twentySites := CalculateMultiSitePHPMaxChildren(ram4GB, "wp", 20)
+	if twentySites < 2 || twentySites > 5 {
+		t.Errorf("expected 2-5 workers per site for 20 sites on 4GB RAM, got %d", twentySites)
+	}
+}
+
 func TestCalculateOpcacheSettings(t *testing.T) {
 	mem1GB, str1GB := CalculateOpcacheSettings(1024 * 1024)
 	if mem1GB != 64 || str1GB != 8 {
@@ -175,3 +200,68 @@ func TestCalculateOpcacheSettings(t *testing.T) {
 		t.Errorf("16GB tier: got mem=%d, str=%d; want 512, 64", mem16GB, str16GB)
 	}
 }
+
+func TestReadPHPPoolConfigAndOrphaned(t *testing.T) {
+	site := &config.SiteConfig{
+		Domain:      "orphantest.com",
+		PHPVersion:  "8.3",
+		PublicDir:   "/var/www/orphantest.com/htdocs",
+		SystemUser:  "wp_orphantest",
+		Type:        "woocommerce",
+		MemoryLimit: "256M",
+	}
+
+	if err := WritePHPPool(site); err != nil {
+		t.Fatalf("WritePHPPool failed: %v", err)
+	}
+	defer DeletePHPPool("8.3", "orphantest.com")
+
+	cfg, err := ReadPHPPoolConfig("8.3", "orphantest.com")
+	if err != nil {
+		t.Fatalf("ReadPHPPoolConfig failed: %v", err)
+	}
+
+	if cfg.Domain != "orphantest.com" {
+		t.Errorf("expected domain orphantest.com, got %s", cfg.Domain)
+	}
+	if cfg.MemoryLimit != "256M" {
+		t.Errorf("expected MemoryLimit 256M, got %s", cfg.MemoryLimit)
+	}
+	if cfg.OpcacheValidateTimestamps != 1 {
+		t.Errorf("expected OpcacheValidateTimestamps = 1, got %d", cfg.OpcacheValidateTimestamps)
+	}
+	if cfg.OpcacheRevalidateFreq != 2 {
+		t.Errorf("expected OpcacheRevalidateFreq = 2, got %d", cfg.OpcacheRevalidateFreq)
+	}
+	if cfg.PM != "dynamic" {
+		t.Errorf("expected PM = dynamic, got %s", cfg.PM)
+	}
+
+	// Create a dummy pool in 8.2 to simulate an orphaned pool
+	site82 := *site
+	site82.PHPVersion = "8.2"
+	if err := WritePHPPool(&site82); err != nil {
+		t.Fatalf("WritePHPPool 8.2 failed: %v", err)
+	}
+	defer DeletePHPPool("8.2", "orphantest.com")
+
+	orphans := FindOrphanedPHPPools("orphantest.com", "8.3", []string{"8.1", "8.2", "8.3"})
+	if len(orphans) == 0 || orphans[0] != "8.2" {
+		t.Errorf("expected orphaned pool in 8.2, got %v", orphans)
+	}
+
+	cleaned, err := DeleteOrphanedPHPPools("orphantest.com", "8.3", []string{"8.1", "8.2", "8.3"})
+	if err != nil {
+		t.Fatalf("DeleteOrphanedPHPPools failed: %v", err)
+	}
+	if len(cleaned) == 0 || cleaned[0] != "8.2" {
+		t.Errorf("expected cleaned version 8.2, got %v", cleaned)
+	}
+
+	// Check that orphans are now empty
+	postOrphans := FindOrphanedPHPPools("orphantest.com", "8.3", []string{"8.1", "8.2", "8.3"})
+	if len(postOrphans) != 0 {
+		t.Errorf("expected 0 orphans after delete, got %v", postOrphans)
+	}
+}
+
