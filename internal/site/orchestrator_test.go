@@ -377,3 +377,50 @@ func TestLaravelAndHTMLSiteOrchestration(t *testing.T) {
 	}
 }
 
+func TestSystemUserCollisionPrevention(t *testing.T) {
+	tempDir := t.TempDir()
+	statePath := filepath.Join(tempDir, "state.json")
+	os.Setenv("AGILEPANEL_STATE_PATH", statePath)
+	os.Setenv("AGILEPANEL_TEST_MODE", "true")
+	defer os.Unsetenv("AGILEPANEL_STATE_PATH")
+	defer os.Unsetenv("AGILEPANEL_TEST_MODE")
+
+	// Domain A and Domain B share the first 27 characters and would collide when truncated to 30 chars
+	domA := "extremelylongdomainnameforwordpressprojecttesting.org"
+	domB := "extremelylongdomainnameforwordpressprojecttesting.net"
+
+	err := Create(domA, "8.3", "html", "false", "", "", "", "", "", "")
+	if err != nil {
+		t.Fatalf("failed to create %s: %v", domA, err)
+	}
+
+	err = Create(domB, "8.3", "html", "false", "", "", "", "", "", "")
+	if err != nil {
+		t.Fatalf("failed to create %s: %v", domB, err)
+	}
+
+	state, err := config.ReadState(statePath)
+	if err != nil {
+		t.Fatalf("failed to read state: %v", err)
+	}
+
+	var userA, userB string
+	for _, s := range state.Sites {
+		if s.Domain == domA {
+			userA = s.SystemUser
+		} else if s.Domain == domB {
+			userB = s.SystemUser
+		}
+	}
+
+	if userA == "" || userB == "" {
+		t.Fatalf("expected both sites to have system users, got userA=%s, userB=%s", userA, userB)
+	}
+
+	if userA == userB {
+		t.Fatalf("system user collision occurred: both sites got '%s'", userA)
+	}
+	t.Logf("Collision resolved cleanly: userA=%s, userB=%s", userA, userB)
+}
+
+
