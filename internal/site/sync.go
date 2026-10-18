@@ -36,10 +36,16 @@ func SelfUpdate() error {
 
 	fmt.Printf("Self-Update: Fetching latest binary from %s...\n", url)
 	tmpFile := destPath + ".tmp"
-
-	cmd := exec.Command("curl", "-L", "-o", tmpFile, url)
+	cmd := exec.Command("curl", "-fsSL", "--proto", "=https", "--tlsv1.2", "-o", tmpFile, url)
 	if err := cmd.Run(); err != nil {
+		_ = os.Remove(tmpFile)
 		return fmt.Errorf("failed to download new binary: %w", err)
+	}
+
+	info, err := os.Stat(tmpFile)
+	if err != nil || info.Size() < 1024*1024 { // AgilePanel binary is several MBs; sanity check against truncated HTML error pages
+		_ = os.Remove(tmpFile)
+		return fmt.Errorf("downloaded binary is truncated or invalid (file size: %d bytes)", info.Size())
 	}
 
 	if err := os.Chmod(tmpFile, 0755); err != nil {
@@ -92,9 +98,16 @@ func Sync() error {
 
 					// Check if already registered
 					alreadyTracked := false
-					for _, site := range s.Sites {
+					for i, site := range s.Sites {
 						if strings.EqualFold(site.Domain, domain) {
 							alreadyTracked = true
+							// Reconcile lock status if out of sync with filesystem
+							domainPath := filepath.Join(webRoot, name)
+							fsLocked := server.IsDirectoryLocked(domainPath)
+							if site.IsLocked != fsLocked {
+								s.Sites[i].IsLocked = fsLocked
+								ui.PrintInfo(fmt.Sprintf("Reconciled lock state for %s: is_locked=%v (synchronized with filesystem)", domain, fsLocked))
+							}
 							break
 						}
 					}
@@ -186,6 +199,7 @@ func Sync() error {
 						memLimit = "128M"
 					}
 
+					fsLocked := server.IsDirectoryLocked(domainPath)
 					importedSite := config.SiteConfig{
 						Domain:       domain,
 						PHPVersion:   phpVersion,
@@ -194,13 +208,13 @@ func Sync() error {
 						DatabaseUser: dbUser,
 						DatabasePass: dbPass,
 						SystemUser:   systemUser,
-						IsLocked:     false,
+						IsLocked:     fsLocked,
 						Type:         siteType,
 						MemoryLimit:  memLimit,
 					}
 
 					s.Sites = append(s.Sites, importedSite)
-					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (Type: %s, PHP %s, Memory %s, DB %s)", domain, siteType, phpVersion, memLimit, dbName))
+					ui.PrintInfo(fmt.Sprintf("Imported pre-existing site: %s (Type: %s, PHP %s, Memory %s, DB %s, Locked: %v)", domain, siteType, phpVersion, memLimit, dbName, fsLocked))
 				}
 			}
 		}

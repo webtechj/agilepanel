@@ -37,7 +37,7 @@ func UnlockGuiPanel() error {
 		return fmt.Errorf("failed to marshal gui auth: %w", err)
 	}
 
-	return os.WriteFile(path, newData, 0644)
+	return os.WriteFile(path, newData, 0600)
 }
 
 // SecureServer audits and seals security loopholes on Ubuntu Server.
@@ -146,6 +146,20 @@ func SecureServer() error {
 		}
 	} else {
 		fmt.Println("Security (Mock): Hardened PermitRootLogin inside sshd_config.")
+	}
+
+	// 4. Secure AgilePanel state and configuration files (root-only mode 0600/0700)
+	if runtime.GOOS == "linux" {
+		fmt.Println("Security: Enforcing strict permissions on /etc/agilepanel and secrets...")
+		_ = os.Chmod("/etc/agilepanel", 0700)
+		_ = os.Chmod("/etc/agilepanel/state.json", 0600)
+		if _, err := os.Stat("/etc/agilepanel/gui_auth.json"); err == nil {
+			_ = os.Chmod("/etc/agilepanel/gui_auth.json", 0600)
+		}
+		if _, err := os.Stat("/etc/caddy/Caddyfile"); err == nil {
+			_ = os.Chmod("/etc/caddy/Caddyfile", 0640)
+			_ = exec.Command("chown", "root:caddy", "/etc/caddy/Caddyfile").Run()
+		}
 	}
 
 	return nil

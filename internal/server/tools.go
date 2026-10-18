@@ -207,9 +207,16 @@ func InstallGui() error {
 	} else {
 		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
 	}
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
+	downloadCmd := exec.Command("curl", "-fsSL", "--proto", "=https", "--tlsv1.2", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
+		_ = os.Remove(destPath)
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
+	}
+
+	info, err := os.Stat(destPath)
+	if err != nil || info.Size() < 1024*1024 {
+		_ = os.Remove(destPath)
+		return fmt.Errorf("downloaded agilepanel-gui binary is truncated or invalid")
 	}
 
 	fmt.Println("Tools: Setting executable permissions on GUI binary...")
@@ -377,9 +384,16 @@ func UpdateGui() error {
 	} else {
 		guiURL = "https://github.com/webtechj/agilepanel-gui/releases/latest/download/agilepanel-gui-linux-amd64"
 	}
-	downloadCmd := exec.Command("curl", "-L", "-o", destPath, guiURL)
+	downloadCmd := exec.Command("curl", "-fsSL", "--proto", "=https", "--tlsv1.2", "-o", destPath, guiURL)
 	if err := downloadCmd.Run(); err != nil {
+		_ = os.Remove(destPath)
 		return fmt.Errorf("failed to download agilepanel-gui binary: %w", err)
+	}
+
+	info, err := os.Stat(destPath)
+	if err != nil || info.Size() < 1024*1024 {
+		_ = os.Remove(destPath)
+		return fmt.Errorf("downloaded agilepanel-gui binary is truncated or invalid")
 	}
 
 	fmt.Println("Tools: Setting executable permissions on GUI binary...")

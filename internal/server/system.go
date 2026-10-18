@@ -1,6 +1,7 @@
 package server
 
 import (
+	"archive/zip"
 	"bytes"
 	"fmt"
 	"io"
@@ -40,6 +41,9 @@ func CreateSystemUser(username string) error {
 			return fmt.Errorf("failed to create system user: %w (stderr: %s)", err, stderr.String())
 		}
 	}
+
+	// 3. Add system user to redis group so PHP-FPM pool can connect to Redis UNIX socket
+	_ = exec.Command("usermod", "-a", "-G", "redis", username).Run()
 
 	fmt.Printf("OS: Created system user and group %s successfully.\n", username)
 	return nil
@@ -120,10 +124,14 @@ func ProvisionSiteDirectory(path string, systemUser string) error {
 		}
 	}
 
-	chmodCmd := exec.Command("chmod", "-R", "0755", parentDir)
-	if err := chmodCmd.Run(); err != nil {
-		return fmt.Errorf("failed to set directory permissions: %w", err)
-	}
+	// Restrict parent directory to 0750 (owner rwx, group r-x, others ---)
+	// Owner is systemUser, group is caddy. This prevents other tenants (wp_other) from traversing into this site.
+	_ = exec.Command("chmod", "0750", parentDir).Run()
+	_ = exec.Command("chmod", "0750", htdocsPath).Run()
+	_ = exec.Command("chmod", "0750", confPath).Run()
+
+	// Secure backup directory to 0700 so database dumps cannot be accessed by web server or other users
+	_ = exec.Command("chmod", "0700", backupPath).Run()
 
 	// Secure tmp directory to 0750 so other site users cannot inspect temporary files
 	_ = exec.Command("chmod", "0750", tmpPath).Run()
@@ -144,9 +152,55 @@ func DeleteSiteDirectory(path string) error {
 	return nil
 }
 
+// IsDirectoryLocked checks if the site root directory has the Linux immutable attribute (+i).
+func IsDirectoryLocked(path string) bool {
+	parentDir := GetSiteRootDir(path)
+	if runtime.GOOS != "linux" {
+		return false
+	}
+	cmd := exec.Command("lsattr", "-d", parentDir)
+	out, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+	// lsattr format: "----i---------e------- /var/www/domain"
+	fields := strings.Fields(string(out))
+	if len(fields) > 0 {
+		attrs := fields[0]
+		if len(attrs) >= 5 && attrs[4] == 'i' {
+			return true
+		}
+		if strings.Contains(attrs, "i") {
+			return true
+		}
+	}
+	return false
+}
+
+// unlockDirectoryInternal removes the immutable flag from all files and directories under parentDir without logging.
+func unlockDirectoryInternal(parentDir string) error {
+	if runtime.GOOS != "linux" {
+		return nil
+	}
+
+	// Remove immutable flag from regular files and directories, safely skipping symlinks.
+	cmd := exec.Command("find", parentDir,
+		"(", "-type", "f", "-o", "-type", "d", ")",
+		"-exec", "chattr", "-f", "-i", "{}", "+",
+	)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to remove immutable flag: %w (stderr: %s)", err, stderr.String())
+	}
+	return nil
+}
+
 // LockDirectory makes all regular files and directories within the site immutable,
 // excluding logs, backups, and tmp so logging, backups, and temporary files continue to function,
 // and skipping symbolic links which do not support Linux file attributes.
+// It is fully idempotent: any existing immutable flags are cleanly cleared first to prevent
+// Linux ext4 EPERM errors when setting +i on HTree-indexed directories.
 func LockDirectory(path string) error {
 	parentDir := GetSiteRootDir(path) // /var/www/[domain]
 
@@ -155,9 +209,19 @@ func LockDirectory(path string) error {
 		return nil
 	}
 
-	// 1. Exclude logs, backup, and tmp directories from being locked
-	// 2. Select only regular files (-type f) and directories (-type d)
-	// 3. Skip symbolic links (-type l) and special files which cause chattr to fail with "Operation not supported"
+	// 1. Linux ext4 idempotency guard:
+	// HTree-indexed directories (wp-includes, wp-admin, large plugin directories with EXT4_INDEX_FL)
+	// cause the ext4 kernel to reject 'chattr +i' with EPERM (exit code 1) if they already have
+	// the immutable flag set.
+	// We first clear any existing immutable flags across the directory. Clearing immutable
+	// attributes ('chattr -i') is idempotent and always succeeds on ext4 regardless of prior state.
+	if err := unlockDirectoryInternal(parentDir); err != nil {
+		return fmt.Errorf("pre-lock unlock failed: %w", err)
+	}
+
+	// 2. Exclude logs, backup, and tmp directories from being locked
+	// 3. Select only regular files (-type f) and directories (-type d)
+	// 4. Skip symbolic links (-type l) and special files which cause chattr to fail with "Operation not supported"
 	cmd := exec.Command("find", parentDir,
 		"(", "-name", "logs", "-o", "-name", "log", "-o", "-name", "backup", "-o", "-name", "tmp", ")", "-prune",
 		"-o", "(", "-type", "f", "-o", "-type", "d", ")",
@@ -182,15 +246,8 @@ func UnlockDirectory(path string) error {
 		return nil
 	}
 
-	// Remove immutable flag from regular files and directories, safely skipping symlinks.
-	cmd := exec.Command("find", parentDir,
-		"(", "-type", "f", "-o", "-type", "d", ")",
-		"-exec", "chattr", "-f", "-i", "{}", "+",
-	)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to remove immutable flag: %w (stderr: %s)", err, stderr.String())
+	if err := unlockDirectoryInternal(parentDir); err != nil {
+		return err
 	}
 
 	fmt.Printf("OS: Site directory %s removed from immutable status (unlocked).\n", parentDir)
@@ -215,19 +272,26 @@ func FixPermissions(parentDir string, systemUser string) error {
 		}
 	}
 
-	// 2. Set directory permissions recursively to 0755
-	findDirsCmd := exec.Command("find", parentDir, "-type", "d", "-exec", "chmod", "0755", "{}", "+")
+	// 2. Set directory permissions recursively to 0750 (owner rwx, group r-x, others ---)
+	findDirsCmd := exec.Command("find", parentDir, "-type", "d", "-exec", "chmod", "0750", "{}", "+")
 	_ = findDirsCmd.Run()
 
 	// 3. Set file permissions recursively to 0644
 	findFilesCmd := exec.Command("find", parentDir, "-type", "f", "-exec", "chmod", "0644", "{}", "+")
 	_ = findFilesCmd.Run()
 
-	// 4. Secure wp-config.php specifically in parentDir (if exists)
-	wpConfigPath := filepath.Join(parentDir, "wp-config.php")
-	if _, err := os.Stat(wpConfigPath); err == nil {
-		chmodConfigCmd := exec.Command("chmod", "0600", wpConfigPath)
-		_ = chmodConfigCmd.Run()
+	// 4. Secure backup and tmp directories specifically
+	backupDir := filepath.Join(parentDir, "backup")
+	_ = exec.Command("chmod", "0700", backupDir).Run()
+	tmpDir := filepath.Join(parentDir, "tmp")
+	_ = exec.Command("chmod", "0750", tmpDir).Run()
+
+	// 5. Secure wp-config.php specifically in parentDir and parentDir/htdocs (if exists)
+	for _, wpCfg := range []string{filepath.Join(parentDir, "wp-config.php"), filepath.Join(parentDir, "htdocs", "wp-config.php")} {
+		if _, err := os.Stat(wpCfg); err == nil {
+			chmodConfigCmd := exec.Command("chmod", "0600", wpCfg)
+			_ = chmodConfigCmd.Run()
+		}
 	}
 
 	fmt.Printf("OS: Fixed file/directory permissions recursively under %s.\n", parentDir)
@@ -264,3 +328,71 @@ func ResolvePublicIP() string {
 	}
 	return "127.0.0.1"
 }
+
+// SafeExtractZip safely unpacks a ZIP archive into destDir with strict Zip Slip path traversal guards,
+// directory containment verification, and symbolic link rejection.
+func SafeExtractZip(srcZip string, destDir string) error {
+	r, err := zip.OpenReader(srcZip)
+	if err != nil {
+		return fmt.Errorf("failed to open zip file %s: %w", srcZip, err)
+	}
+	defer r.Close()
+
+	destDirClean := filepath.Clean(destDir)
+
+	for _, f := range r.File {
+		// Clean and sanitize target path
+		targetPath := filepath.Join(destDirClean, f.Name)
+		targetPathClean := filepath.Clean(targetPath)
+
+		// Strict Zip Slip defense: target must be inside destDirClean
+		if !strings.HasPrefix(targetPathClean, destDirClean+string(os.PathSeparator)) && targetPathClean != destDirClean {
+			return fmt.Errorf("security violation: illegal path '%s' outside destination directory", f.Name)
+		}
+
+		// Reject symbolic links to prevent symlink traversal attacks
+		if f.Mode()&os.ModeSymlink != 0 {
+			continue // Skip symbolic links for security
+		}
+
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(targetPathClean, 0755); err != nil {
+				return fmt.Errorf("failed to create directory in zip: %w", err)
+			}
+			continue
+		}
+
+		// Ensure parent directory exists
+		if err := os.MkdirAll(filepath.Dir(targetPathClean), 0755); err != nil {
+			return fmt.Errorf("failed to create parent directory for %s: %w", targetPathClean, err)
+		}
+
+		// Open source entry in zip
+		rc, err := f.Open()
+		if err != nil {
+			return fmt.Errorf("failed to read file '%s' from zip: %w", f.Name, err)
+		}
+
+		// Strip setuid/setgid bits; enforce regular file mode 0644 (or 0755 if executable)
+		mode := os.FileMode(0644)
+		if f.Mode()&0111 != 0 {
+			mode = 0755
+		}
+
+		outFile, err := os.OpenFile(targetPathClean, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, mode)
+		if err != nil {
+			rc.Close()
+			return fmt.Errorf("failed to create file '%s': %w", targetPathClean, err)
+		}
+
+		_, copyErr := io.Copy(outFile, rc)
+		rc.Close()
+		outFile.Close()
+		if copyErr != nil {
+			return fmt.Errorf("failed to write content to '%s': %w", targetPathClean, copyErr)
+		}
+	}
+
+	return nil
+}
+

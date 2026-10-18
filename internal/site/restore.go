@@ -125,14 +125,8 @@ func Restore(domain string, backupTarget string) error {
 	// 2. Restore Files
 	if targetFilesZip != "" {
 		ui.PrintStep(2, fmt.Sprintf("Extracting website files from %s...", filepath.Base(targetFilesZip)))
-		if runtime.GOOS == "linux" {
-			unzipCmd := exec.Command("unzip", "-o", "-q", targetFilesZip, "-d", parentDir)
-			if err := unzipCmd.Run(); err != nil {
-				return fmt.Errorf("failed to unzip website files: %w", err)
-			}
-		} else {
-			// Mock extraction in non-linux
-			fmt.Printf("Mock unzip: %s into %s\n", targetFilesZip, parentDir)
+		if err := server.SafeExtractZip(targetFilesZip, parentDir); err != nil {
+			return fmt.Errorf("failed to safely extract website files: %w", err)
 		}
 
 		// Reapply correct ownership and permissions
@@ -149,22 +143,13 @@ func Restore(domain string, backupTarget string) error {
 
 		if strings.HasSuffix(targetDBBackup, ".zip") {
 			// Unzip the SQL file temporarily
-			if runtime.GOOS == "linux" {
-				unzipCmd := exec.Command("unzip", "-o", "-q", targetDBBackup, "-d", backupDir)
-				if err := unzipCmd.Run(); err != nil {
-					return fmt.Errorf("failed to extract database dump from ZIP: %w", err)
-				}
-				// Look for extracted SQL file
-				candidate := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
-				if _, err := os.Stat(candidate); err == nil {
-					sqlPathToImport = candidate
-					needCleanup = true
-				}
-			} else {
-				// Mock extraction
-				mockSql := filepath.Join(backupDir, "mock_restore.sql")
-				_ = os.WriteFile(mockSql, []byte("-- mock sql"), 0644)
-				sqlPathToImport = mockSql
+			if err := server.SafeExtractZip(targetDBBackup, backupDir); err != nil {
+				return fmt.Errorf("failed to safely extract database dump from ZIP: %w", err)
+			}
+			// Look for extracted SQL file
+			candidate := filepath.Join(backupDir, fmt.Sprintf("%s-db.sql", domain))
+			if _, err := os.Stat(candidate); err == nil {
+				sqlPathToImport = candidate
 				needCleanup = true
 			}
 		}

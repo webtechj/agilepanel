@@ -243,6 +243,7 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	var orphanedVersions []string
 	needsOpcacheFix := false
 	needsPMFix := false
+	needsLockSync := false
 	var recommendedMemory = "256M"
 
 	ui.Banner("Site Doctor Diagnostic Report: " + strings.ToUpper(targetSite.Domain))
@@ -617,7 +618,16 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	// 8. Directory Security & Permissions
 	// -------------------------------------------------------------
 	ui.SectionHeader("8. DIRECTORY SECURITY & PERMISSIONS")
-	if targetSite.IsLocked {
+	fsLocked := server.IsDirectoryLocked(targetSite.PublicDir)
+	if targetSite.IsLocked != fsLocked {
+		ui.RowBadge("Lock State Alignment", "▲ Desynchronized", ui.BrightYellow)
+		ui.Row("State DB vs Filesystem", fmt.Sprintf("state.json records is_locked=%v, but filesystem has immutable=%v", targetSite.IsLocked, fsLocked))
+		recommendations = append(recommendations,
+			fmt.Sprintf("Lock State Desynchronized: '%s' is recorded as is_locked=%v in state.json but filesystem root has immutable=%v. Run 'ap site doctor %s --fix' to reconcile.",
+				targetSite.Domain, targetSite.IsLocked, fsLocked, targetSite.Domain))
+		fixableIssues = append(fixableIssues, fmt.Sprintf("Lock State Desynchronization (Database: %v vs Filesystem: %v)", targetSite.IsLocked, fsLocked))
+		needsLockSync = true
+	} else if targetSite.IsLocked {
 		ui.RowBadge("Security Lock", "● Locked (Read-Only / Protected)", ui.BrightGreen)
 	} else {
 		ui.RowBadge("Security Lock", "○ Unlocked (Standard Write Access)", ui.BrightYellow)
@@ -628,7 +638,7 @@ func DoctorWithFix(domain string, autoFix bool) error {
 	// -------------------------------------------------------------
 	// Auto-Remediation Execution (--fix flag)
 	// -------------------------------------------------------------
-	if autoFix && (needsCaddyWWWFix || needsMemoryScale || needsOrphanCleanup || needsOpcacheFix || needsPMFix || len(fixableIssues) > 0) {
+	if autoFix && (needsCaddyWWWFix || needsMemoryScale || needsOrphanCleanup || needsOpcacheFix || needsPMFix || needsLockSync || len(fixableIssues) > 0) {
 		ui.Divider()
 		ui.Banner("STARTING AUTOMATIC REMEDIATION & HEALING")
 		ui.PrintInfo(fmt.Sprintf("Found %d auto-healable issue(s). Applying safe, non-destructive remedies...", len(fixableIssues)))
@@ -715,8 +725,25 @@ func DoctorWithFix(domain string, autoFix bool) error {
 			}
 		}
 
-		// 4. Re-run verification check
-		ui.PrintStep(4, "Performing post-repair verification probe...")
+		// 4. Fix Lock State Desynchronization
+		if needsLockSync {
+			actualLocked := server.IsDirectoryLocked(targetSite.PublicDir)
+			ui.PrintStep(4, fmt.Sprintf("Reconciling lock state for %s in database...", targetSite.Domain))
+			targetSite.IsLocked = actualLocked
+			_ = config.WithLockedState(statePath, func(s *config.State) error {
+				for i, st := range s.Sites {
+					if strings.EqualFold(st.Domain, targetSite.Domain) {
+						s.Sites[i].IsLocked = actualLocked
+						break
+					}
+				}
+				return nil
+			})
+			ui.PrintSuccess(fmt.Sprintf("Lock state reconciled in database to is_locked=%v (synchronized with filesystem).", actualLocked))
+		}
+
+		// 5. Re-run verification check
+		ui.PrintStep(5, "Performing post-repair verification probe...")
 		postProbe := probeLocalHTTP(targetSite.Domain)
 		if postProbe.StatusCode == 200 || postProbe.StatusCode == 301 || postProbe.StatusCode == 302 {
 			ui.PrintSuccess(fmt.Sprintf("Post-repair verification passed! Site responded with HTTP %d.", postProbe.StatusCode))

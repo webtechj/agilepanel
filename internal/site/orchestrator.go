@@ -3,6 +3,8 @@ package site
 import (
 	"bufio"
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"os/exec"
@@ -129,6 +131,7 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 	var dbPassword string
 	var dbName string
 	var dbUser string
+	var finalSystemUser string
 
 	err := config.WithLockedState(statePath, func(s *config.State) error {
 		// 1. Check for duplicate site
@@ -155,6 +158,23 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 
 		// 3. Generate credentials and users
 		systemUser := SanitizeUser(domain)
+
+		// Check for system user collision against existing sites to enforce tenant isolation
+		for _, existingSite := range s.Sites {
+			if strings.EqualFold(existingSite.SystemUser, systemUser) && !strings.EqualFold(existingSite.Domain, domain) {
+				// Collision detected (e.g. a-b.com vs a_b.com, or domains sharing the first 27 chars).
+				// Disambiguate with a deterministic 5-char hash suffix derived from the domain.
+				h := sha256.Sum256([]byte(strings.ToLower(domain)))
+				hashSuffix := hex.EncodeToString(h[:])[:5]
+				base := systemUser
+				if len(base) > 24 {
+					base = base[:24]
+				}
+				systemUser = fmt.Sprintf("%s_%s", base, hashSuffix)
+				break
+			}
+		}
+		finalSystemUser = systemUser
 		
 		var dbPrefix string
 		var err error
@@ -246,20 +266,15 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 			if importFiles != "" {
 				if _, err := os.Stat(importFiles); err == nil {
 					ui.PrintStep(8, "Importing web public files from ZIP...")
-					if runtime.GOOS == "linux" {
-						_ = os.MkdirAll(htdocsPath, 0755)
-						unzipCmd := exec.Command("unzip", "-o", "-q", importFiles, "-d", htdocsPath)
-						if err := unzipCmd.Run(); err != nil {
-							_ = server.DeletePHPPool(phpVersion, domain)
-							if createDB {
-								_ = server.DeleteDatabase(dbName, dbUser)
-							}
-							_ = server.DeleteSiteDirectory(publicDir)
-							_ = server.DeleteSystemUser(systemUser)
-							return fmt.Errorf("failed to extract import files ZIP: %w", err)
+					_ = os.MkdirAll(htdocsPath, 0750)
+					if err := server.SafeExtractZip(importFiles, htdocsPath); err != nil {
+						_ = server.DeletePHPPool(phpVersion, domain)
+						if createDB {
+							_ = server.DeleteDatabase(dbName, dbUser)
 						}
-					} else {
-						fmt.Printf("Mock: Unzipped %s to %s\n", importFiles, htdocsPath)
+						_ = server.DeleteSiteDirectory(publicDir)
+						_ = server.DeleteSystemUser(systemUser)
+						return fmt.Errorf("failed to safely extract import files ZIP: %w", err)
 					}
 				} else {
 					_ = server.DeletePHPPool(phpVersion, domain)
@@ -280,23 +295,20 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 
 					if strings.HasSuffix(strings.ToLower(importDB), ".zip") {
 						tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("import_db_%s_%d", domain, time.Now().Unix()))
-						_ = os.MkdirAll(tempDir, 0755)
+						_ = os.MkdirAll(tempDir, 0700)
 						defer os.RemoveAll(tempDir)
 
-						if runtime.GOOS == "linux" {
-							cmd := exec.Command("unzip", "-o", "-q", importDB, "-d", tempDir)
-							if err := cmd.Run(); err == nil {
-								entries, err := os.ReadDir(tempDir)
-								if err == nil {
-									for _, entry := range entries {
-										if strings.HasSuffix(strings.ToLower(entry.Name()), ".sql") {
-											sqlFile = filepath.Join(tempDir, entry.Name())
-											break
-										}
+						if err := server.SafeExtractZip(importDB, tempDir); err == nil {
+							entries, err := os.ReadDir(tempDir)
+							if err == nil {
+								for _, entry := range entries {
+									if strings.HasSuffix(strings.ToLower(entry.Name()), ".sql") {
+										sqlFile = filepath.Join(tempDir, entry.Name())
+										break
 									}
 								}
 							}
-						} else {
+						} else if runtime.GOOS != "linux" {
 							mockSql := filepath.Join(tempDir, "mock.sql")
 							_ = os.WriteFile(mockSql, []byte("CREATE TABLE mock (id int);"), 0644)
 							sqlFile = mockSql
@@ -431,7 +443,7 @@ func Create(domain string, phpVersion string, siteType string, dbOpt string, imp
 	ui.Row("Staging URL", stagingURL)
 	ui.Row("PHP Version", phpVersion)
 	ui.Row("PHP Memory Limit", memoryLimit)
-	ui.Row("System User", SanitizeUser(domain))
+	ui.Row("System User", finalSystemUser)
 	ui.Row("Public Directory", fmt.Sprintf("/var/www/%s/htdocs", domain))
 
 	// Pre-flight DNS check

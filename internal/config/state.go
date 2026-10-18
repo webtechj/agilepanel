@@ -184,6 +184,10 @@ func readState(statePath string) (*State, error) {
 	}
 	defer file.Close()
 
+	// Enforce strict 0600 permissions on state file and 0700 on parent directory
+	_ = os.Chmod(statePath, 0600)
+	_ = os.Chmod(filepath.Dir(statePath), 0700)
+
 	// Get file size
 	info, err := file.Stat()
 	if err != nil {

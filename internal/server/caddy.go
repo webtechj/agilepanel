@@ -16,7 +16,10 @@ import (
 
 const caddyfileTemplateStr = `# Global Options Block
 {
-    {{if .Global.AdminEmail}}email {{.Global.AdminEmail}}{{end}}
+    admin unix//run/caddy/admin.sock {
+        permissions 0600
+    }
+    {{if and .Global.AdminEmail (ne .Global.AdminEmail "admin@localhost")}}email {{.Global.AdminEmail}}{{end}}
     servers {
         protocols h1 h2 h3
         timeouts {
@@ -304,8 +307,18 @@ func WriteCaddyfile(state *config.State) error {
 		return fmt.Errorf("failed to create Caddy config folder: %w", err)
 	}
 
-	if err := os.WriteFile(caddyfilePath, []byte(content), 0644); err != nil {
+	// Ensure /run/caddy runtime folder exists for the admin unix socket on Linux
+	if runtime.GOOS == "linux" {
+		_ = os.MkdirAll("/run/caddy", 0755)
+		_ = exec.Command("chown", "caddy:caddy", "/run/caddy").Run()
+	}
+
+	// Write Caddyfile with 0640 permissions (owner root, group caddy) to prevent unprivileged tenants from reading auth hashes
+	if err := os.WriteFile(caddyfilePath, []byte(content), 0640); err != nil {
 		return fmt.Errorf("failed to write Caddyfile to %s: %w", caddyfilePath, err)
+	}
+	if runtime.GOOS == "linux" {
+		_ = exec.Command("chown", "root:caddy", caddyfilePath).Run()
 	}
 
 	fmt.Printf("Caddy: Generated configuration written to %s successfully.\n", caddyfilePath)
@@ -330,12 +343,18 @@ func ReloadCaddy(state *config.State) error {
 	}
 
 	if isActive {
-		// Use caddy reload for zero-downtime config updates
-		cmd := exec.Command(caddyPath, "reload", "--config", caddyConfig)
+		// Use caddy reload with explicit unix socket address for zero-downtime config updates
+		cmd := exec.Command(caddyPath, "reload", "--config", caddyConfig, "--address", "unix//run/caddy/admin.sock")
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		if err := cmd.Run(); err != nil {
-			// If reload fails (e.g. admin port issues), fallback to systemctl restart
+			// Fallback: try standard caddy reload in case admin socket was not yet bound
+			fallbackCmd := exec.Command(caddyPath, "reload", "--config", caddyConfig)
+			if fallbackErr := fallbackCmd.Run(); fallbackErr == nil {
+				fmt.Println("Caddy: Reloaded configuration via fallback successfully.")
+				return nil
+			}
+			// If reload fails, fallback to systemctl restart
 			fmt.Printf("Caddy reload failed, falling back to restart: %v (stderr: %s)\n", err, stderr.String())
 			restartCmd := exec.Command("systemctl", "restart", "caddy")
 			if err := restartCmd.Run(); err != nil {
